@@ -6,10 +6,71 @@ self.addEventListener('install', event => event.waitUntil(onInstall(event)));
 self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
 
+self.addEventListener('push', function (e) {
+    var payload;
+
+    if (e.data) {
+        try {
+            payload = e.data.json();
+        } catch (error) {
+            console.error('Error parsing push notification data:', error);
+            payload = { message: 'Standard Message' };
+        }
+    } else {
+        payload = { message: 'Standard Message' };
+    }
+
+
+    var options = {
+        body: payload.message,
+        icon: 'icon-192.png',
+        vibrate: [100, 50, 100],
+        data: {
+            dateOfArrival: Date.now(),
+            url: payload.url
+        },
+        actions: [
+            {
+                action: 'explore', title: 'Go interact with this!',
+                icon: 'Media/PushNotification/tap.png'
+            },
+            {
+                action: 'close', title: 'Ignore',
+                icon: 'Media/PushNotification/cross.png'
+            },
+        ]
+    };
+
+    e.waitUntil(
+        self.registration.showNotification("New Notification!", options)
+            .catch(error => console.error('Error displaying notification:', error))
+    );
+    self.skipWaiting()
+});
+
+self.addEventListener('notificationclick', function (e) {
+    var notification = e.notification;
+    var action = e.action;
+
+    var promiseChain;
+
+    if (action === 'close') {
+        notification.close();
+        promiseChain = Promise.resolve();
+    } else {
+        promiseChain = clients.openWindow(notification.data.url);
+        notification.close();
+    }
+
+    e.waitUntil(promiseChain);
+
+});
+
+
 const cacheNamePrefix = 'offline-cache-';
 const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`;
-const offlineAssetsInclude = [ /\.dll$/, /\.pdb$/, /\.wasm/, /\.html/, /\.js$/, /\.json$/, /\.css$/, /\.woff$/, /\.png$/, /\.jpe?g$/, /\.gif$/, /\.ico$/, /\.blat$/, /\.dat$/ ];
-const offlineAssetsExclude = [ /^service-worker\.js$/ ];
+const offlineAssetsInclude = [/\.dll$/, /\.pdb$/, /\.wasm/, /\.html/, /\.js$/, /\.json$/, /\.css$/, /\.woff$/, /\.png$/, /\.jpe?g$/, /\.gif$/, /\.ico$/, /\.blat$/, /\.dat$/];
+const offlineAssetsExclude = [/^service-worker\.js$/];
 
 // Replace with your base path if you are hosting on a subfolder. Ensure there is a trailing '/'.
 const base = "/";
@@ -53,3 +114,7 @@ async function onFetch(event) {
 
     return cachedResponse || fetch(event.request);
 }
+
+self.addEventListener('message', event => {
+    if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
