@@ -1,0 +1,83 @@
+﻿@using FishPortMS.Pages.Account
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inject IClientAccountService ClientAccountService
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Error" Class="pl-5 pr-5 scroll-bar" Style="height: 100%;">
+
+    <div class="d-flex justify-content-center mt-8">
+        @if (!string.IsNullOrEmpty(Avatar))
+        {
+            <MudAvatar Style="width: 110px; height: 110px;">
+                <MudImage Src="@Avatar"></MudImage>
+            </MudAvatar>
+        }
+        else
+        {
+            <MudAvatar Style="width: 110px; height: 110px;">
+                <MudImage Src="images/nav_imgs/man.png"></MudImage>
+            </MudAvatar>
+        }
+    </div>
+
+    <div Class="mt-8 mb-5" style="border-bottom: 1px solid #8d9dad;" />
+
+    <MudNavGroup Icon="@Icons.Material.Outlined.Settings" Title="Settings">
+        <MudNavLink @onclick="EditProfile">Edit Profile</MudNavLink>
+        <MudNavLink @onclick="ChangePassword">Change Password</MudNavLink>
+        <MudNavLink @onclick="BeginLogOut">Logout</MudNavLink>
+    </MudNavGroup>
+
+</MudNavMenu>
+
+<MudDialog @bind-IsVisible="visibleChangePass" Class="no-dialog" Options="dialogOptionsChangePass">
+    <DialogContent>
+        <ChangePassword />
+    </DialogContent>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visibleEditProfile" Class="no-dialog" Options="dialogOptionsEditProfile">
+    <DialogContent>
+        <CEditProfile />
+    </DialogContent>
+</MudDialog>
+
+@code {
+
+    private string? UserRole { get; set; }
+    public string Avatar { get; set; }
+    private bool visibleChangePass;
+    private bool visibleEditProfile;
+    private void OpenDialogChangePass() => visibleChangePass = true;
+    private DialogOptions dialogOptionsChangePass = new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+
+    private void OpenDialogEditProfile() => visibleEditProfile = true;
+    private DialogOptions dialogOptionsEditProfile = new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Avatar = await ClientAccountService.GetSingleUserAvatar();
+    }
+
+    private async Task BeginLogOut()
+    {
+        string response = await ClientAccountService.Logout();
+        if (response == "success")
+        {
+            await AuthStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateToLogout("/login");
+        }
+    }
+
+    void ChangePassword()
+    {
+        visibleChangePass = !visibleChangePass;
+    }
+
+    void EditProfile()
+    {
+        visibleEditProfile = !visibleEditProfile;
+    }
+}

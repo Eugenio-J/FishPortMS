@@ -48,7 +48,7 @@ namespace FishPortMS.Server.Controllers
             return Ok(response.AccessToken);
         }
 
-        [HttpGet("get-single-user")]
+        [HttpGet("single-user-avatar")]
         public async Task<ActionResult<UpdateProfileDTO>> GetSingleUser() 
         {
             UpdateProfileDTO? response = await _accountService.GetSingleUser();

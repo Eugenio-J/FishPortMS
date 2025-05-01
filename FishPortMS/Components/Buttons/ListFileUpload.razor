@@ -1,0 +1,145 @@
+﻿@inject ISnackbar Snackbar
+
+<style>
+    .upload-btn{
+        font-family: 'Poppins' !important;
+        background: #f0f0f0 !important;
+        color: #757581 !important;
+        font-weight: 400 !important;
+        font-size: 12px !important;
+        border-radius: 7px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        transition: .3s ease;
+        margin-bottom: -10px;
+    }
+</style>
+
+@if (shouldUpdate || imgs.Any())
+{
+    <div class="mb-6 pa-4" style="border: 1px dashed #c4ccd5; border-radius: 8px;">
+        <MudCarousel 
+            Class="mud-width-full"
+            Style="height: 500px; border-radius: 8px!important;"
+            ShowArrows="true"
+            ShowBullets="true"
+            EnableSwipeGesture="true"
+            AutoCycle="false"
+            TData="string">
+            @foreach (var img in imgs)
+            {
+                <MudCarouselItem Color="@Color.Primary">
+                    <div class="d-flex justify-content-center" style="height:100%; background: #C6CAD4!important">
+                        <MudImage Src="@img" Fluid />
+                    </div>
+                </MudCarouselItem>
+            }
+        </MudCarousel>
+    </div>
+}
+
+@if (isActive)
+{
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnFileChanged" AppendMultipleFiles Hidden="false" Class="flex-1" InputClass="absolute mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
+        <ButtonTemplate Context="btnContext">
+            <MudButton 
+                Class="upload-btn"
+                ButtonType="ButtonType.Button"
+                Variant="Variant.Filled"
+                Size="Size.Large"
+                StartIcon="@Icons.Material.Filled.FileUpload"
+                IconSize="Size.Small"
+                DisableElevation>
+                @title
+            </MudButton>
+        </ButtonTemplate>
+    </MudFileUpload>
+}
+
+@code {
+    [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> OnFilesSelected { get; set; }
+    [Parameter] public string title { get; set; } = string.Empty;
+    [Parameter] public List<string> imgs { get; set; } = new List<string>();
+    [Parameter] public bool isActive { get; set; } = true;
+
+    private List<IBrowserFile> FileDatas = new List<IBrowserFile>();
+    private long maxFileSize = 1024 * 1024 * 5;
+    private List<string> displayFileNames = new List<string>();
+   
+    private bool shouldUpdate = false;
+
+    private async Task<string?> ConvertImgToString(IBrowserFile file)
+    {
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+        return Convert.ToBase64String(buffer);
+    }
+
+    private bool isImageValid(IBrowserFile file)
+    {
+        if (file.ContentType != "image/jpeg" && file.ContentType != "image/png" && file.ContentType != "image/jpg")
+        {
+            Snackbar.Add($"This file is {file.ContentType} ", Severity.Error, config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+            return false;
+        }
+
+        if (file.Size > maxFileSize)
+        {
+            Snackbar.Add($"Change this file {file.Name} with smaller Image Size", Severity.Error, config =>
+            {
+                config.ShowTransitionDuration = 200;
+                config.HideTransitionDuration = 400;
+                config.VisibleStateDuration = 2500;
+            });
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task OnFileChanged(InputFileChangeEventArgs e)
+    {
+        FileDatas.Clear();
+        imgs.Clear(); // Clear previous images
+        displayFileNames.Clear();
+
+        var files = e.GetMultipleFiles(); // Get the uploaded files
+
+        foreach (var file in files)
+        {
+            if (!isImageValid(file)) continue;
+
+            displayFileNames.Add(file.Name);
+            FileDatas.Add(file);
+
+            var base64Img = await ConvertImgToString(file);
+            if (!string.IsNullOrEmpty(base64Img))
+            {
+                imgs.Add($"data:{file.ContentType};base64,{base64Img}");
+            }
+        }
+
+        shouldUpdate = true;
+
+        // Trigger UI update
+        await InvokeAsync(StateHasChanged);
+
+        // Invoke callback for file selection
+        await OnFilesSelected.InvokeAsync(FileDatas);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (shouldUpdate)
+        {
+            shouldUpdate = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

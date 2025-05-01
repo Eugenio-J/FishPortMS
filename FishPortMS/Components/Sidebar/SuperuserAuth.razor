@@ -1,0 +1,127 @@
+﻿@inject IDialogService DialogService
+
+<AuthorizeView Roles="SUPERUSER">
+    <Authorized>
+        <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+        @* <MudNavLink Href="reports" Icon="@Icons.Material.Outlined.BarChart">Reports</MudNavLink> *@
+        <MudNavLink OnClick="() => ToggleAnnouncementDrawer.InvokeAsync()" Icon="@Icons.Material.Outlined.LocalLibrary">Bulletin Board</MudNavLink>
+
+        <SidebarLabel Title="SUPPLIES" />
+
+        <MudNavGroup Title="Products" Icon="@Icons.Material.Outlined.ShoppingCart">
+            <MudNavLink Href="/all-products">Manage</MudNavLink>
+            <MudNavGroup Title="Brand">
+                <MudNavLink Href="/all-brands">Manage</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Category">
+                <MudNavLink Href="/all-categories">Manage</MudNavLink>
+            </MudNavGroup>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Inventory" Icon="@Icons.Material.Outlined.Inventory">
+            <MudNavLink Href="/all-inventories">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Warehouse" Icon="@Icons.Material.Outlined.OtherHouses">
+            <MudNavLink Href="/all-warehouse-delivery">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Menu Items" Icon="@Icons.Material.Outlined.Fastfood">
+            <MudNavLink Href="/all-menu">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Menu Category" Icon="@Icons.Material.Outlined.Category">
+            <MudNavLink Href="/all-menu-category">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Petty Cash" Icon="@Icons.Material.Outlined.Wallet">
+            <MudNavLink Href="/all-petty-cash">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <SidebarLabel Title="BILLINGS" />
+
+        <MudNavGroup Title="Purchase Order" Icon="@Icons.Material.Outlined.ShoppingBag">
+            <MudNavLink Href="/all-po">Manage</MudNavLink>
+            <MudNavLink Href="/all-po-approval">For Approval</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Payments" Icon="@Icons.Material.Outlined.Payment">
+            <MudNavLink Href="/all-payment">Manage</MudNavLink>
+            <MudNavLink Href="/all-payment-approval">For Approval</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Delivery" Icon="@Icons.Material.Outlined.LocalShipping">
+            <MudNavLink Href="/all-delivery">Manage</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Expenses" Icon="@Icons.Material.Outlined.Receipt">
+            <MudNavLink Href="/all-expense">Manage</MudNavLink>
+            <MudNavLink Href="/all-expense-approval">For Approval</MudNavLink>
+        </MudNavGroup>
+
+        <SidebarLabel Title="OTHERS" />
+
+        <MudNavGroup Title="Xendit" Icon="@Icons.Material.Outlined.Payments">
+            <MudNavLink Href="/all-xendit-invoice">Manage</MudNavLink>
+            <MudNavLink OnClick="OpenXPricing">Pricing</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Announcement" Icon="@Icons.Material.Outlined.Announcement">
+            <MudNavLink Href="/all-announcement">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Discounts" Icon="@Icons.Material.Outlined.Discount">
+            <MudNavLink Href="/all-discounts">Manage</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Icon="@Icons.Material.Outlined.CalendarToday" Title="Attendance">
+            <MudNavGroup Title="Manage">
+                <MudNavLink Href="/all-attendance">All</MudNavLink>
+                <MudNavLink Href="/all-daily-attendance">Daily</MudNavLink>
+                <MudNavLink Href="/all-weekly-attendance">Weekly</MudNavLink>
+                <MudNavLink Href="/all-monthly-attendance">Monthly</MudNavLink>
+                <MudNavLink Href="/all-yearly-attendance">Yearly</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink OnClick="AddAttendance">Set Attendance</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Branches" Icon="@Icons.Material.Outlined.AccountTree">
+            <MudNavLink Href="/all-branches">Manage</MudNavLink>
+            <MudNavLink Href="/calendar">Renewal Calendar</MudNavLink>
+            <MudNavLink Href="/branch-map">Map</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Users" Icon="@Icons.Material.Outlined.Groups2">
+            <MudNavGroup Title="Manage">
+                <MudNavLink Href="/all-users">All</MudNavLink>
+                <MudNavLink Href="/all-franchisees">Franchisee</MudNavLink>
+                <MudNavLink Href="/all-warehouse">Warehouse</MudNavLink>
+            </MudNavGroup>
+        </MudNavGroup>
+    </Authorized>
+</AuthorizeView>
+
+@code{
+
+    [Parameter]
+    public EventCallback ToggleAnnouncementDrawer { get; set; }
+
+    private async Task AddAttendance()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+
+        //TODO: TODO
+
+        // await DialogService.Show<SetAttendance>("", parameters, options).Result;
+    }
+
+    private async Task OpenXPricing()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, CloseButton = true };
+
+        //TODO: TODO
+
+        // await DialogService.Show<XPricingDialog>("", parameters, options).Result;
+    }
+}

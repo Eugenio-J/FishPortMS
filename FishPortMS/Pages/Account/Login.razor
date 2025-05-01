@@ -1,0 +1,140 @@
+﻿@page "/login"
+@using System.Security.Claims;
+
+@inject IClientAccountService ClientAccountService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JavaScript
+@inject NavigationManager NavigationManager
+@inject ModifiedSnackBar ModifiedSnackBar
+@layout AuthMainLayout
+
+<style>
+    .mud-main-content {
+        height: 100vh !important;
+    }
+
+    .mud-container {
+        height: 100% !important;
+    }
+
+    .mud-input.mud-input-outlined.mud-input-adorned-end {
+        font-size: 13px !important;
+    }
+</style>
+@* <div class="auth-cont">
+    <div data-aos="fade-down">
+        <div class="d-flex justify-content-center mb-15 ">
+            <img src="/images/unicorp_imgs/logo-unip.png" width="400" class="unip-img mb-sm-14 mb-5" />
+        </div>
+
+        <div class="d-flex justify-content-center mt-sm-10 pb-10">
+            <div class="d-flex flex-column justify-content-center col-12 col-md-6">
+                <div class="d-flex px-5 px-sm-10 justify-content-start flex-column mb-7">
+                    <MudText Typo="Typo.h4" Class="fw-bold text-start" Style="letter-spacing: .5px; font-size: 25px!important; z-index: 5; color: white ; font-family: 'Poppins'; font-weight: 500!important; border-bottom: 1px solid #E4E6EC; padding-bottom: 18px;">LOGIN</MudText>
+                </div>
+                <CLogin />
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<div class="container">
+    <div class="right-panel position-relative">
+        <img src="images/sys_imgs/logo.png" class="logo" />
+        <div class="mb-11">
+            <h2>Sign In</h2>
+            <p>To continue to dashboard.</p>
+        </div>
+        <form @onsubmit="LoginAcc">
+            <label for="email" class="d-flex">Email <label class="ml-1" style="color: #FF4F53;">*</label></label>
+            <input type="email" id="email" name="email" placeholder="example@email.com" @bind-value="loginDTO.Email" required>
+
+            <label for="password" class="d-flex">Password <label class="ml-1" style="color: #FF4F53;">*</label></label>
+            <MudTextField 
+                @bind-Value="loginDTO.Password"
+                Placeholder="******"
+                Variant="Variant.Outlined"
+                InputType="@PasswordInput"
+                Margin="Margin.Dense"
+                Adornment="Adornment.End"
+                Class="w-100 mb-5"
+                Style="margin-top: -3px;"
+                AdornmentIcon="@PasswordInputIcon"
+                OnAdornmentClick="ShowPassword" />
+
+            <div class="options">
+                <div class="d-flex align-items-center">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember" class="ml-2" style="margin-bottom: 0px;">Remember me</label>
+                </div>
+                <a>Forgot password?</a>
+            </div>
+
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</div>
+
+<div class="background" />
+
+@code {
+
+    private LoginDTO loginDTO = new LoginDTO();
+
+    public bool Label_CheckBox2 { get; set; } = false;
+
+    private bool isLoading = false;
+
+    public string Password { get; set; } = string.Empty;
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private async void LoginAcc()
+    {
+        isLoading = true;
+
+        var response = await ClientAccountService.LoginAsync(loginDTO);
+
+        if (response == "success")
+        {
+            var auth_state = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = auth_state.User;
+            var roleClaim = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+            var role = roleClaim?.Value;
+
+            isLoading = false;
+
+            if (role == Roles.SUPERUSER.ToString())
+            {
+                isLoading = false;
+                StateHasChanged();
+                NavigationManager.NavigateTo("/dashboard");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            StateHasChanged();
+            ModifiedSnackBar.ShowMessage("Invalid Credentials.", Severity.Warning);
+            return;
+        }
+    }
+
+    void ShowPassword()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}
+

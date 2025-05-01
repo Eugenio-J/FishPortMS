@@ -1,39 +1,73 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FishPortMS</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿@using System.Security.Claims
+@using FishPortMS.Components.Sidebar
+@inject IDialogService DialogService
+@inject AuthenticationStateProvider AuthStateProvider
+@attribute [Authorize]
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+<div class="py-3 pb-10">
+    <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Error" Class="pl-5 pr-5 side-bar">
+
+        <div style="" class="pt-6 pb-5 px-3">
+
+            <div class="d-flex justify-content-center">
+                <div class="avatar-div">
+                    <MudImage Src="images/sys_imgs/logo.png" Width="110" Height="100" Style="filter: drop-shadow(0 0 0.04rem #fff);"></MudImage>
+                </div>
+            </div>
+
+            @* <div class="mt-7 mb-n1 text-center">
+              <span class="online-text">
+                    <i class="fa-regular fa-circle mr-1"></i>
+                    ONLINE
+              </span>
+            </div> *@
+
+            <div class="text-center d-flex flex-column">
+                <MudText Typo="Typo.button"
+                         Align="Align.Center"
+                         Color="Color.Dark"
+                         Class="text-break fw-bold mt-5"
+                         style="font-size: 11px!important; color: #fff!important; font-family: 'Poppins'!important; font-weight: 400!important;">
+                    @email
+                </MudText>
+
+                <MudText Typo="Typo.button" Align="Align.Center"
+                         Class="text-break"
+                         style="font-size: 11px!important;  color: #fff !important; font-family: 'Poppins'!important; font-weight: 200!important; letter-spacing: .6px;">
+                    @role
+                </MudText>
+            </div>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
+       
+        <div Class="mt-3 mb-5" style="border-bottom: 1px solid #6f7e8e;" />
+
+        <SuperuserAuth ToggleAnnouncementDrawer="ToggleAnnouncementDrawer" />
+
+    </MudNavMenu>
 </div>
 
 @code {
+
+    [Parameter]
+    public EventCallback ToggleAnnouncementDrawer { get; set; }
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    private string? email = string.Empty;
+    private string? role = string.Empty;
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState token_auth_state = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = token_auth_state.User;
+        email = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+        role = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role)?.Value;
     }
 }

@@ -1,0 +1,104 @@
+﻿@inject ModifiedSnackBar ModifiedSnackBar
+
+<MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" AppendMultipleFiles Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
+     <ButtonTemplate Context="btnContext">
+        <MudPaper Outlined="true" Class="pb-8 pt-5 relative rounded-lg border-2 border-dashed pa-4 mud-width-full mud-height-full z-10" Style=" text-align: center; background-color: #F6F7FF;">
+            <MudImage Src="images/form_imgs/image.png" Width="70" Class="mt-4 mb-2"></MudImage>
+            <MudText Typo="Typo.h6" Style="font-family: 'Poppins'; font-size: 16px;">Click to upload @Title<br>image here.</MudText>
+            @if (imgName != "")
+            {
+                <MudChip Color="Color.Dark" Class="mt-3 py-7">@imgName <br /> @imgSize mb</MudChip>
+            }
+        </MudPaper>
+    </ButtonTemplate>
+</MudFileUpload>
+@* 
+<div class="mt-6 text-end">
+    <MudButton 
+        OnClick="@Clear"
+        Color="Color.Error"
+        Variant="Variant.Filled"
+        DisableElevation
+        Class="clear-btn">
+         Clear
+     </MudButton>
+ </div> *@
+
+@code {
+
+    [Parameter] public int? Id { get; set; }
+    [Parameter] public string ObjectImg { get; set; } = string.Empty;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool isActive { get; set; } = true;
+    [Parameter] public Func<string, Task>? SetImageUrl { get; set; }
+    [Parameter] public IBrowserFile? FileData { get; set; } 
+    [Parameter] public EventCallback<IBrowserFile> OnFileDataChanged { get; set; }
+
+    public string ImageData = string.Empty;
+    public string? ImgString = null;
+    private long maxFileSize = 1024 * 1024 * 5;
+    private string imgName = "";
+    private double imgSize = 0;
+
+    private void Clear()
+    {
+        imgName = "";
+        imgSize = 0;
+        StateHasChanged();
+    }
+
+    private async Task<string?> ConvertImgToString(IBrowserFile file)
+    {
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+
+        return Convert.ToBase64String(buffer);
+    }
+
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        if (e != null && e.File != null)
+        {
+            var file = e.File;
+
+            FileData = e.File;
+
+            if (FileData != null)
+            {
+                await OnFileDataChanged.InvokeAsync(FileData);
+            }
+
+            if (file.Size > maxFileSize)
+            {
+                ModifiedSnackBar.ShowMessage("The uploaded image is too large.", Severity.Error);
+                return;
+            }
+
+            if (file.ContentType != "image/jpeg"
+                && file.ContentType != "image/png"
+                && file.ContentType != "image/jpg")
+                {
+                    ModifiedSnackBar.ShowMessage("Please upload a valid image.", Severity.Error);
+                    return;
+                }
+
+            ImgString = await ConvertImgToString(file);
+            if (!string.IsNullOrEmpty(ImgString))
+            {
+                ImageData = $"data:{file     .ContentType};base64,{ImgString}";
+                ObjectImg = ImageData;
+                imgName = FileData.Name;
+
+                var imgSizeInBytes = file.Size;
+                var imgSizeInMB = (double)imgSizeInBytes / 1048576;
+                var roundedSizeInMB = Math.Round(imgSizeInMB, 2);
+                imgSize = roundedSizeInMB;
+
+                if (SetImageUrl != null)
+                    await SetImageUrl(ImageData);
+                StateHasChanged();
+            }
+        }
+    }
+
+}

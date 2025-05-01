@@ -1,0 +1,37 @@
+﻿@using FishPortMS.Client.Response
+@using FishPortMS.Shared.DTOs.NotificationDTO
+
+<a href="/all-po-approval" class="pt-1">
+    <NotificationButton valueCallback="@ValueCallBackContainer.POValue" icon="@Icons.Material.Outlined.ShoppingBag" tooltip="Orders" className="nav-icon" />
+</a>
+
+<div class="mr-2"/>
+
+<a href="/all-payment-approval" class="pt-1">
+    <NotificationButton valueCallback="@ValueCallBackContainer.PaymentValue" icon="@Icons.Material.Outlined.Payment" tooltip="Payment" className="nav-icon" />
+</a>
+
+<div class="mr-2" />
+
+<a href="/all-delivery" class="pt-1">
+    <NotificationButton valueCallback="@ValueCallBackContainer.DeliveryValue" icon="@Icons.Material.TwoTone.LocalShipping" tooltip="Delivery" className="nav-icon" />
+</a>
+
+@code {
+
+    [CascadingParameter]
+    private ValueCallBackContainer<string> ValueCallBackContainer { get; set; } = new ValueCallBackContainer<string>();
+
+    private GetNotificationDTO notifications = new GetNotificationDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //TODO: TODO
+
+        // notifications = await ClientDashboardService.GetNotificationCount();
+        // ValueCallBackContainer.POCallBack?.Invoke(notifications.PONotif);
+        // ValueCallBackContainer.PaymentCallBack?.Invoke(notifications.PaymentNotif);
+        // ValueCallBackContainer.DeliveryCallBack?.Invoke(notifications.DeliveryNotif);
+    }
+}

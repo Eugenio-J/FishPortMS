@@ -1,0 +1,60 @@
+﻿@using FishPortMS.Shared.DTOs.AccountDTO
+<div class="mt-9">
+    <MudText Typo="Typo.h4" style="font-size: 13px !important; font-weight: 500!important; letter-spacing: .2px!important; color: #536B89 !important;">
+        USER DETAILS
+    </MudText>
+</div>
+
+<div class="d-sm-flex mt-5">
+    <div class="w-100">
+        <MudTextField @bind-Value="registerDTO.FirstName"
+                      For="@(() => registerDTO.FirstName)"
+                      Placeholder="Juan"
+                      Label="First Name"
+                      Clearable
+                      Margin="Margin.Dense"
+                      InputType="InputType.Text"
+                      Variant="Variant.Outlined" />
+    </div>
+    <div class="w-100 ml-0 ml-sm-2 mt-sm-0 mt-5">
+        <MudTextField @bind-Value="registerDTO.LastName"
+                      Placeholder="Dela Cruz"
+                       For="@(() => registerDTO.LastName)"
+                      Label="Last Name"
+                      Clearable
+                      Margin="Margin.Dense"
+                      InputType="InputType.Text"
+                      Variant="Variant.Outlined" />
+    </div>
+</div>
+
+<div class="d-sm-flex mt-5">
+    <div class="w-100">
+        <MudTextField @bind-Value="registerDTO.Address"
+                      Placeholder="N. Domingo Street‎"
+                       For="@(() => registerDTO.Address)"
+                      Label="Address"
+                      Clearable
+                      Margin="Margin.Dense"
+                      InputType="InputType.Text"
+                      Variant="Variant.Outlined" />
+    </div>
+    <div class="w-100 ml-0 ml-sm-2 mt-sm-0 mt-5">
+        <MudTextField @bind-Value="registerDTO.Phone"
+                      Placeholder="+63912345678"
+                       For="@(() => registerDTO.Phone)"
+                      Label="Phone No."
+                      Clearable
+                      Margin="Margin.Dense"
+                      InputType="InputType.Text"
+                      Variant="Variant.Outlined" />
+    </div>
+</div>
+
+
+
+@code {
+
+    [Parameter] public RegisterDTO registerDTO { get; set; } = new RegisterDTO();
+
+}

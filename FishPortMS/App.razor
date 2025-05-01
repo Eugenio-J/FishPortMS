@@ -1,12 +1,80 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@inject IClientAccountService ClientAuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@if (!isVisible)
+{
+    <CascadingAuthenticationState>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingAuthenticationState>
+}
+
+@code {
+
+    private bool isVisible = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(ClientAuthService.Token.value))
+        {
+            var response = await ClientAuthService.RefreshToken();
+
+            if (response == "success")
+            {
+                AuthenticationState token_auth_state = await AuthStateProvider.GetAuthenticationStateAsync();
+                var user = token_auth_state.User;
+                var roleClaim = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+                var role = roleClaim?.Value;
+
+                if (token_auth_state.User.Identity != null)
+                {
+                    // if (token_auth_state.User.Identity.IsAuthenticated)
+                    // {
+                    //     if (NavigationManager.Uri.EndsWith("/", StringComparison.OrdinalIgnoreCase))
+                    //     {
+                    //         NavigationManager.NavigateTo("/dashboard", forceLoad: true); // Redirect to another page for authenticated users
+                    //         return;
+                    //     }
+                    //     NavigationManager.NavigateTo("/dashboard");
+
+                    // }
+
+                    if (token_auth_state.User.Identity.IsAuthenticated != true)
+                    {
+                        string logout = await ClientAuthService.Logout();
+                        if (logout == "success")
+                        {
+                            await AuthStateProvider.GetAuthenticationStateAsync();
+                            NavigationManager.NavigateTo("/login");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                string logout = await ClientAuthService.Logout();
+                if (logout == "success")
+                {
+                    await AuthStateProvider.GetAuthenticationStateAsync();
+                    NavigationManager.NavigateTo("/login");
+                }
+            }
+        }
+        isVisible = false;
+    }
+}

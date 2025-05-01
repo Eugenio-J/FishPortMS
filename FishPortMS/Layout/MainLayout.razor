@@ -1,16 +1,212 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@attribute [Authorize]
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<style>
+    .app-bar {
+        background: #F5F5FB; /* fallback for old browsers */
+    }
+
+    .announcement-div .mud-drawer {
+        background: transparent !important;
+    }
+
+    .announcement-div .mud-drawer.mud-drawer-temporary.mud-drawer-pos-right.mud-drawer--open:not(.mud-drawer--initial) {
+        width: 450px !important;
+        border: 0px !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(3.9px);
+        -webkit-backdrop-filter: blur(3.9px);
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .pwa-updater[b-pwa-updater]{
+        padding: 23px;
+        z-index: 99999;
+        font-family: 'Poppins';
+    }
+
+    .pwa-updater-updatenow-button[b-pwa-updater]{
+        font-family: 'Poppins';
+    }
+
+    @@media only screen and (max-width: 600px) {
+        .announcement-div .mud-drawer.mud-drawer-temporary.mud-drawer-pos-right.mud-drawer--open:not(.mud-drawer--initial) {
+            width: 100% !important;
+        }
+    }
+
+    @@media only screen and (max-width: 355px) {
+        .announcement-div .mud-drawer.mud-drawer-temporary.mud-drawer-pos-right.mud-drawer--open:not(.mud-drawer--initial) {
+            width: 100% !important;
+        }
+    }
+
+    .scroll-bar {
+        scrollbar-width: thin !important;
+        scrollbar-color: transparent transparent !important;
+    }
+
+    .scroll-bar::-webkit-scrollbar {
+        background-color: transparent !important;
+    }
+
+    .scroll-bar {
+        scrollbar-width: thin !important;
+        scrollbar-color: transparent transparent !important;
+    }
+</style>    
+
+<CascadingValue 
+    Value="new ValueCallBackContainer<string>
+        {
+            POValue = notification.PONotif, POCallBack = ChangePOValue,
+            PaymentValue = notification.PaymentNotif, PaymentCallBack = ChangePaymentValue,
+            DeliveryValue = notification.DeliveryNotif, DeliveryCallBack = ChangeDeliveryValue
+        }
+    ">
+    <MudLayout>
+
+         <PWAUpdater 
+            Text="New version is available." 
+            EnvironmentsForWork="" 
+            ButtonCaption="Update now" 
+            Align="PWAUpdater.Aligns.Buttom" />
+
+        <MudAppBar Elevation="0" Class="app-bar pt-2">
+            <MudTooltip Text="Menu" Arrow="true">
+                <MudImage Style="height:29px; width:29px; cursor: pointer;" Src="images/nav_imgs/menu.png" @onclick="@((e) => ToggleDrawer())"></MudImage>
+            </MudTooltip>
+            <MudSpacer />
+
+            <NotificationList />
+
+            <MudTooltip Text="Settings" Arrow="true">
+                <MudFab StartIcon="@Icons.Material.Outlined.Settings"
+                        Class="nav-icon ml-2 mt-2"
+                        DisableElevation
+                        Size="Size.Small"
+                        OnClick="@((e) => ToggleEndDrawer())" />
+            </MudTooltip>
+        </MudAppBar>
+
+        <MudDrawer @bind-Open="@open" Class="scroll-bar">
+            <NavMenu ToggleAnnouncementDrawer="ToggleAnnouncementDrawer" />
+        </MudDrawer>
+
+        <div class="announcement-div">
+            <MudDrawer @bind-Open="@openAnnoucement" Anchor="Anchor.End" Variant="@DrawerVariant.Temporary">
+                <AnnouncementRightSidebar OnClose="ToggleAnnouncementDrawer" />
+            </MudDrawer>
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <MudDrawer @bind-Open="@openEnd" Anchor="Anchor.End" Variant="@DrawerVariant.Temporary">
+            <NavMenuRight />
+        </MudDrawer>
+    
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="h-100 pt-2 px-0 px-lg-8">
+                @Body
+                <div class="layout-cash" style="z-index: 100; position: fixed; bottom: 20px; right: 20px; padding: 8px; padding-left: 11px; padding-right: 11px; border-radius: 5px; font-size: 13px; font-family: 'Poppins'">
+                    PETTY CASH ( P @string.Format("{0:N2}", @pettyTotal) )
+                </div>
+            </MudContainer>
+        </MudMainContent>
+</MudLayout>
+</CascadingValue>
+
+<GlobalCSS />
+@code {
+
+    bool open = true;
+    bool openEnd = false; 
+    bool openAnnoucement = false;
+
+    private decimal pettyTotal = 0;
+
+    private bool isInitialized = false;
+
+    private GetNotificationDTO notification = new GetNotificationDTO();
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //TODO: TODO
+
+        // pettyTotal = await ClientPettyCashService.PettyCashTotal();
+
+        // if (!isInitialized)
+        // {
+        //     // Initialize the HubConnection if it's not already initialized
+        //     HubConnection = new HubConnectionBuilder()
+        //         .WithUrl(NavigationManager.ToAbsoluteUri("/serviceHub"))
+        //         .Build();
+
+        //     HubConnection.On("UpdatePettyCash", async () =>
+        //     {
+        //         pettyTotal = await ClientPettyCashService.PettyCashTotal();
+        //         StateHasChanged();
+        //     });
+
+        //     await HubConnection.StartAsync();
+        //     isInitialized = true;
+        // }
+    }
+
+    public void Dispose()
+    {
+        // if (HubConnection != null)
+        // {
+        //     _ = HubConnection.DisposeAsync();  // Ensure HubConnection is disposed
+        // }
+    }
+
+    void ToggleAnnouncementDrawer()
+    {
+        openAnnoucement = !openAnnoucement;
+    }
+
+    void ToggleEndDrawer()
+    {
+        openEnd = !openEnd;
+    }
+
+    private void ChangePOValue(string POValue)
+    {
+        if (!string.IsNullOrEmpty(POValue))
+        {
+            notification.PONotif = POValue;
+            StateHasChanged();
+        }
+    }
+
+    private void ChangePaymentValue(string paymentValue)
+    {
+        if (!string.IsNullOrEmpty(paymentValue))
+        {
+            notification.PaymentNotif = paymentValue;
+            StateHasChanged();
+        }
+    }
+
+    private void ChangeDeliveryValue(string deliveryValue)
+    {
+        if (!string.IsNullOrEmpty(deliveryValue))
+        {
+            notification.DeliveryNotif = deliveryValue;
+            StateHasChanged();
+        }
+    }
+}

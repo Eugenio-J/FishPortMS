@@ -1,0 +1,95 @@
+﻿@using FishPortMS.Shared.DTOs.AnnouncementDTO
+@using FishPortMS.Shared.Enums.Announcements
+@* @inject IClientAnnouncementService ClientAnnouncementService
+ *@
+
+<div class="py-7 px-7 position-relative ann-sidebar">
+
+    <div class="mb-8">
+        <span class="ann-title">What’s new announcement?</span>
+    </div>
+    <div class="close-icon" @onclick="() => OnClose.InvokeAsync()">
+        <MudIcon Icon="@Icons.Material.Filled.Close" />
+    </div>
+
+    @if (payload.Count > 0)
+    {
+        @foreach (var group in payload.OrderByDescending(g => g.Key))
+        {
+            <div class="mt-8">
+                <span class="ann-date">@FormatDate(group.Key)</span>
+                @foreach (var announcement in group.Value)
+                {
+                    <div class="ann-card mt-4">
+                        <div class="d-flex align-items-center">
+                            @if (@announcement.AnnouncementType == AnnouncementType.ANNOUNCEMENT)
+                            {
+                                <span class="ann-yellow-chip">@announcement.AnnouncementType</span>
+                            }
+                            else
+                            {
+                                <span class="ann-blue-chip">@announcement.AnnouncementType</span>
+                            }
+                            <span class="ann-card-date">@announcement.TimeElapsed</span>
+                            <span class="ml-1" style="color: #E58A00; font-size: 25px;">&#8226;</span>
+                        </div>
+                        <div class="mt-2 d-flex flex-column">
+                            @if (!string.IsNullOrEmpty(announcement.Branch))
+                            {
+                                <span class="ann-branch-name">TO : @announcement.Branch</span>
+                            }
+                            else
+                            {
+                                <span class="ann-branch-name">TO : All Branches</span>
+                            }
+
+                            <span class="ann-body-title">@announcement.AnnouncementTitle</span>
+                            <span class="ann-desc">@announcement.Description</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="mt-15 text-center">
+            <span class="ann-date">No recent announcement</span>
+        </div>
+    }
+
+</div>
+
+@code {
+
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private Dictionary<DateTime, List<GetRightSidebarAnnouncementDTO>>? payload = new Dictionary<DateTime, List<GetRightSidebarAnnouncementDTO>>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //TODO: TODO
+
+        // payload = await ClientAnnouncementService.GetAllAnnouncement();
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        DateTime currentPHTime = PHTime();
+        int daysAgo = (currentPHTime.Date - date).Days;
+
+        return daysAgo switch
+        {
+            0 => "Today",
+            1 => "Yesterday",
+            _ => "Others"
+        };
+    }
+
+    private DateTime PHTime()
+    {
+        TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
+        DateTime philippineTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+        return philippineTime;
+    }
+}

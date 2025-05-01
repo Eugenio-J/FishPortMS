@@ -1,0 +1,119 @@
+﻿@inject ISnackbar Snackbar
+
+@for (int i = 0; i < numberOfInputFiles; i++)
+{
+    <MudFileUpload @key="i" T="IReadOnlyList<IBrowserFile>" OnFilesChanged="@((files) => OnFileChanged(files, i))" Style="@GetInputFileStyle(i)" AppendMultipleFiles Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
+         <ButtonTemplate Context="btnContext">
+            <MudPaper Outlined="true" Class="pb-8 pt-5 relative rounded-lg border-2 border-dashed pa-4 mud-width-full mud-height-full z-10" Style=" text-align: center; background-color: #F6F7FF;">
+                <MudImage Src="images/form_imgs/image.png" Width="70" Class="mt-4 mb-2"></MudImage>
+                <MudText Typo="Typo.h6" Style="font-family: 'Poppins'; font-size: 16px;">Click to upload @title<br />images here.</MudText>
+                @foreach (var file in displayFileNames)
+                {
+                    <MudChip Color="Color.Dark" Text="@file" />
+                }
+            </MudPaper>
+        </ButtonTemplate>
+    </MudFileUpload>
+}
+
+@code {
+
+    [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> OnFilesSelected { get; set; }
+    [Parameter] public string title { get; set; } = string.Empty;
+
+    private List<IBrowserFile> FileDatas = new List<IBrowserFile>();
+    private long maxFileSize = 1024 * 1024 * 5;
+    private List<string> displayFileNames = new List<string>();
+
+    int numberOfInputFiles = 1;
+
+    string? status;
+
+    string GetInputFileStyle(int index)
+    {
+        return index == numberOfInputFiles - 1 ? "" : "display: none";
+    }
+
+    private async Task<string?> ConvertImgToString(IBrowserFile file)
+    {
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+
+        return Convert.ToBase64String(buffer);
+    }
+
+    private bool isImageValid(IBrowserFile file)
+    {
+        if (
+            file.ContentType != "image/jpeg"
+            && file.ContentType != "image/png"
+            && file.ContentType != "image/jpg"
+        )
+        {
+            Snackbar.Add(
+             $"This file is {file.ContentType} ",
+             Severity.Error,
+             config =>
+             {
+                 config.ShowTransitionDuration = 200;
+                 config.HideTransitionDuration = 400;
+                 config.VisibleStateDuration = 2500;
+             });
+
+            return false;
+        }
+
+        if (file.Size > maxFileSize)
+        {
+            Snackbar.Add(
+             $"Change this file {file.Name} with smaller Image Size",
+             Severity.Error,
+             config =>
+             {
+                 config.ShowTransitionDuration = 200;
+                 config.HideTransitionDuration = 400;
+                 config.VisibleStateDuration = 2500;
+             });
+
+            return false;
+        }
+
+        return true;
+    }
+
+    async Task OnFileChanged(InputFileChangeEventArgs e, int index)
+    {
+        numberOfInputFiles++;
+        status += "\nChanged";
+        try
+        {
+            var files = e.GetMultipleFiles(); // Extract the IBrowserFile instances from InputFileChangeEventArgs
+            var buffer = new byte[4096];
+
+            FileDatas.Clear();
+
+            foreach (var file in files)
+            {
+                status += "\nReading file: " + file.Name;
+                using var stream = file.OpenReadStream(maxAllowedSize: long.MaxValue);
+                while (true)
+                {
+                    var read = await stream.ReadAsync(buffer);
+                    if (read == 0)
+                        break;
+                }
+
+                status += "\nRead file: " + file.Name;
+                displayFileNames.Add(file.Name);
+                FileDatas.Add(file);
+                await InvokeAsync(StateHasChanged);
+            }
+            await OnFilesSelected.InvokeAsync(FileDatas);
+        }
+        catch (Exception ex)
+        {
+            status += "\nError: " + ex.Message;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

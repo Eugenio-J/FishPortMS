@@ -1,0 +1,61 @@
+﻿@* @inject IClientMasterProductService ClientMasterProductService
+ *@
+<div class="d-sm-flex align-content-center justify-content-between pb-4 mb-3">
+    <div class="d-block" style="margin-top: 33px!important;">
+        <MudText Typo="Typo.h4" Class="tbl-title" style="font-size: 13px !important; font-weight: 400!important; letter-spacing: .3px!important; color: #536B89!important;">
+            @title LOGS
+        </MudText>
+        <MudText Typo="Typo.h4" Class="mt-2" style="font-size: 13px !important; font-weight: 200!important; letter-spacing: .1px!important; color: #536B89 !important; text-transform: uppercase;">
+            This is your hub for @title.
+        </MudText>
+    </div>
+    <div class ="d-flex flex-sm-row flex-column gap-2">
+    @*     <ExportButton />
+        @if (IsImportActive)
+        {
+            <div>
+                <ImportButton OnClick="Import" FileSelected="selectedImportFile" />
+            </div>
+        } *@
+    </div>
+    
+</div>
+
+@code {
+
+    [Parameter] public string title { get; set; } = string.Empty;
+
+    private string dot = ".";
+
+    [Parameter] public EventCallback Import { get; set; }
+
+    [Parameter] public EventCallback<IBrowserFile> selectedImportFile { get; set; }
+
+    [Parameter] public bool IsImportActive { get; set; } = false;
+
+    //TODO: TODO
+    // private async Task UploadFile()
+    // {
+    //     if (selectedFile == null)
+    //     {
+    //         message = "No file selected.";
+    //         return;
+    //     }
+
+    //     isImporting = true;
+    //     try
+    //     {
+    //         using var stream = selectedFile.OpenReadStream();
+    //         var importedProducts = await ClientMasterProductService.ImportMasterProduct(stream, selectedFile.Name);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         message = $"Error: {ex.Message}";
+    //     }
+    //     finally
+    //     {
+    //         isImporting = false;
+    //     }
+    // }
+
+}

@@ -1,0 +1,45 @@
+﻿
+<style>
+    .icon-edit {
+        color: #FBFFFD !important;
+        background: #00A850 !important;
+        border-radius: 7px !important;
+    }
+
+    .icon-remove {
+        color: #FFF8F8 !important;
+        background: #FF6F6F !important;
+        border-radius: 7px !important;
+    }
+</style>
+
+<div class="d-flex justify-content-center mt-2">
+    <MudTooltip Text="Edit" Arrow="true">
+        <MudIconButton 
+            Icon="@Icons.Material.Filled.Edit"
+            Class="mr-2 icon-edit"
+            Variant="Variant.Filled"
+            Color="Color.Success"
+            Size="Size.Medium"
+            DisableElevation
+            OnClick="(() => Edit.InvokeAsync())" />
+     </MudTooltip>
+
+     <MudTooltip Text="Remove" Arrow="true">
+         <MudIconButton 
+            Icon="@Icons.Material.Filled.Remove"
+            Class="icon-remove"
+            Variant="Variant.Filled"
+            Color="Color.Error"
+            Size="Size.Medium"
+            DisableElevation
+            OnClick="(() => Remove.InvokeAsync())" />
+     </MudTooltip>
+ </div>
+
+
+
+ @code {
+    [Parameter] public EventCallback Edit { get; set; }
+    [Parameter] public EventCallback Remove { get; set; }
+}
