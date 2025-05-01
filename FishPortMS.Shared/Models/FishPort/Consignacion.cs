@@ -1,4 +1,8 @@
-﻿using System;
+﻿using FishPortMS.Shared.Models.Announcements;
+using FishPortMS.Shared.Models.ConPettyCash;
+using FishPortMS.Shared.Models.Expenses;
+using FishPortMS.Shared.Models.Products;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -29,16 +33,13 @@ namespace FishPortMS.Shared.Models.FishPort
         public List<ConsignacionEmployee>? ConsignacionEmployees { get; set; }
 
         [JsonIgnore]
-        public List<ClientExpense>? ClientExpenses { get; set; }
-
-        [JsonIgnore]
-        public List<MasterPO>? MasterPO { get; set; }
+        public List<Expense>? Expenses { get; set; }
 
         [JsonIgnore]
         public List<ClientProduct>? ClientProduct { get; set; }
 
         [JsonIgnore]
-        public List<ClientPettyCash>? ClientPettyCash { get; set; }
+        public List<PettyCash>? PettyCash { get; set; }
 
         [JsonIgnore]
         public List<Announcement>? Announcements { get; set; }
