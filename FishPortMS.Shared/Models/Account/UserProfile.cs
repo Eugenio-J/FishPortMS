@@ -1,7 +1,6 @@
 ﻿using FishPortMS.Shared.Models.Attendance;
 using FishPortMS.Shared.Models.ConPettyCash;
 using FishPortMS.Shared.Models.FishPort;
-using FishPortMS.Shared.Models.PettyCash;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
