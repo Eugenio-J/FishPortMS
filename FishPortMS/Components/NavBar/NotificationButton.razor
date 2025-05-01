@@ -1,0 +1,20 @@
+﻿<MudBadge Content="@valueCallback" Color="Color.Error" Overlap="true" Class="mr-2 my-4">
+    <MudTooltip Text="@tooltip" Arrow="true">
+        <MudFab Style="@css"
+                StartIcon="@icon"
+                Class="@className"
+                DisableElevation
+                Size="Size.Small"
+                OnClick="(() => OnClick.InvokeAsync())" />
+    </MudTooltip>
+</MudBadge>
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string button_name { get; set; } = string.Empty;
+    [Parameter] public string css { get; set; } = string.Empty;
+    [Parameter] public string className { get; set; } = string.Empty;
+    [Parameter] public string icon { get; set; } = string.Empty;
+    [Parameter] public string tooltip { get; set; } = string.Empty;
+    [Parameter] public string valueCallback { get; set; }
+}

@@ -1,0 +1,30 @@
+﻿
+<MudButton Class="@className"
+            ButtonType="ButtonType.Submit"
+            Variant="Variant.Filled"
+            Size="Size.Large"
+            StartIcon="@icon"
+            OnClick="@(() => OnClick.InvokeAsync())"
+            Style="@css"
+            Disabled="isLoading"
+            DisableElevation>
+        @if (isLoading == false)
+        {
+            <MudText style="font-size: 14px; letter-spacing: .5px;">@button_name</MudText>
+        }
+        else
+        {
+            <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" Class="mr-2"/>
+            <MudText style="font-size: 14px; letter-spacing: .5px;">PROCESSING</MudText>
+        }
+</MudButton>
+
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string button_name { get; set; } = string.Empty;
+    [Parameter] public string css { get; set; } = string.Empty;
+    [Parameter] public string className { get; set; } = string.Empty;
+    [Parameter] public string icon { get; set; } = string.Empty;
+    [Parameter] public bool isLoading { get; set; }
+}

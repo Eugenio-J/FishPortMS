@@ -1,0 +1,19 @@
+﻿<div class="d-flex justify-content-start justify-content-sm-end mt-2 mt-sm-n15 mb-n5 mb-sm-0">
+    <MudButton Class="@className"
+               ButtonType="ButtonType.Submit"
+               Variant="Variant.Filled"
+               Size="Size.Large"
+               StartIcon="@Icons.Material.Filled.Add"
+               OnClick="@(() => OnClick.InvokeAsync())"
+               Style="@css"
+               DisableElevation>
+               @button_name
+    </MudButton>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string button_name { get; set; } = string.Empty;
+    [Parameter] public string css { get; set; } = string.Empty;
+    [Parameter] public string className { get; set; } = string.Empty;
+}

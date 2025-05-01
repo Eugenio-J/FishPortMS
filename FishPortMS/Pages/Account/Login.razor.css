@@ -1,0 +1,142 @@
+﻿
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    background: linear-gradient(rgba(17, 24, 70, .7), rgba(17, 24, 70, 0.6)), /* Overlay color and opacity */
+    url('images/bg_imgs/pexels-burst-374023.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.right-panel {
+    width: 100%;
+    border-radius: 10px;
+    background: #fff;
+    padding: 29px 40px 35px 40px;
+    font-family: 'Poppins';
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.right-panel .logo {
+    width: 48px;
+    height: 43px;
+    position: absolute;
+    top: 18px;
+    right: 28px;
+}
+
+.right-panel h2 {
+    font-size: 19px;
+    margin-bottom: 2px;
+    margin-top: 7px;
+}
+
+.right-panel p {
+    font-size: 14px;
+    margin-bottom: 0px;
+    width: 100%;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    width: 100%;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 13px;
+    outline: none;
+}
+
+input[type="email"]:focus {
+    border: 1px solid #594ae2;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 35px;
+    margin-top: -5px;
+}
+
+.options a {
+    font-size: 12px;
+    color: #3b82f6;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .3s ease;
+}
+
+.options a:hover {
+    color: #2B6CD5;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    background-color: #000000;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    transition: .3s ease;
+    font-weight: 400;
+}
+
+button[type="submit"]:hover {
+    transform: scale(1.01);
+}
+
+.right-panel p {
+    font-size: 12px;
+}
+
+.right-panel p a {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+@media only screen and (max-width: 600px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .right-panel {
+        padding: 23px 30px 35px 30px;
+    }
+
+    .background {
+        background-position: right;
+    }
+}

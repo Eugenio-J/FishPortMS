@@ -1,0 +1,16 @@
+﻿
+<div class="d-flex align-content-center pb-7 mb-8 mt-4" style="border-bottom: 1px solid #E0EAF7">
+    <div class="mr-2" style="margin-top: 2px;">
+        <MudIcon Icon="@icon" Style="color: #536B89 !important;" />
+    </div>
+    <div class="d-flex flex-column" style="margin-top: 6px;">
+        <MudText Typo="Typo.h4" style="font-size: 13px !important; font-weight: 500!important; letter-spacing: .2px!important; color: #536B89 !important;">@title</MudText>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter] public string title { get; set; } = string.Empty;
+    [Parameter] public string icon { get; set; } = string.Empty;
+}

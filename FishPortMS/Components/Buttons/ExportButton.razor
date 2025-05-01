@@ -1,0 +1,41 @@
+﻿<style>
+    .export-btn {
+        font-family: 'Poppins' !important;
+        background: #E8FFEF !important;
+        color: #3FE56E !important;
+        font-weight: 300 !important;
+        font-size: 13px !important;
+        border-radius: 10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        transition: .3s ease;
+        letter-spacing: 1px!important;
+    }
+
+    .export-btn:hover {
+        background: #3FE56E !important;
+        color: #E8FFEF !important;
+    }
+
+
+    @@media only screen and (max-width: 600px)
+    {
+        .export-btn{
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="pt-2 mt-5 mb-0">
+    <MudButton 
+        id="export-excel"
+        Class="export-btn"
+        StartIcon="@Icons.Material.Filled.CloudUpload"
+        ButtonType="ButtonType.Button"
+        Variant="Variant.Filled"
+        Color="Color.Info"
+        Size="Size.Medium"
+        DisableElevation>
+        EXPORT
+    </MudButton>
+</div>

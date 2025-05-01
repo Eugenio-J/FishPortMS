@@ -1,0 +1,49 @@
+﻿@page "/register"
+@inject IJSRuntime JavaScript
+@layout AuthMainLayout
+
+<style>
+    .btn-submit:hover {
+        background-color: #060817 !important;
+    }
+    .mud-input.mud-input-outlined {
+        background: white !important;
+        border-radius: 5px !important;
+    }
+    .mud-input.mud-input-outlined.mud-input-adorned-end{
+        background: white !important;
+        border-radius: 5px !important;
+    }
+</style>
+
+<div data-aos="fade-down" class="mt-0 mt-sm-0">
+
+    <div class="d-flex justify-content-center mt-sm-10 pb-10">
+
+        <div class="d-flex flex-column justify-content-center col-12 col-md-6 pt-8 pb-8" style="background-color: white; border-radius: 15px;">
+
+            <div class="d-flex justify-content-center mt-5 mb-15 ">
+                <img src="/images/sys_imgs/logo.png" width="160" height="145" />
+            </div>
+
+            <div class="d-flex px-sm-10 px-5 justify-content-center flex-column mb-10 ">
+                <div style="border-bottom: 1px solid #E4E6EC;" class="pb-4">
+                    <MudText Typo="Typo.subtitle2" Style="color: #202969!important; font-size: 21px!important; font-weight: 500!important" Class="text-start">
+                       Register
+                    </MudText>
+                </div>
+            </div>
+            <CRegister />
+        </div>
+
+    </div>
+</div>  
+
+@code {
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await JavaScript.InvokeVoidAsync("initialize_anim_all");
+    // }
+
+}

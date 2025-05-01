@@ -1,0 +1,100 @@
+﻿body {
+}
+
+.ann-sidebar {
+}
+
+.close-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: #787E84;
+    cursor: pointer;
+}
+
+.ann-title {
+    color: #1D2630;
+    font-family: 'Poppins';
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: -.8px;
+}
+
+.ann-date {
+    color: #787E84;
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: -.3px;
+}
+/*CARD*/
+.ann-card {
+    border: 1px solid #C9C9C9;
+    padding: 15px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .3s ease;
+}
+
+.ann-card:hover {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.ann-yellow-chip {
+    background: #efc700;
+    color: #fff;
+    padding: 3px 8px 2px 8px;
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 11px;
+    border-radius: 12px;
+    margin-right: 7px;
+}
+
+.ann-blue-chip {
+    background: #003C61;
+    color: #fff;
+    padding: 3px 8px 2px 8px;
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 11px;
+    border-radius: 12px;
+    margin-right: 7px;
+}
+
+.ann-card-date {
+    color: #787E84;
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: -.3px;
+}
+
+.ann-body-title {
+    color: #787E84;
+    font-family: 'Poppins';
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .2px;
+    margin-bottom: 5px;
+}
+
+.ann-branch-name {
+    color: #1D2630;
+    font-family: 'Poppins';
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: .2px;
+    margin-bottom: 8px;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+.ann-desc {
+    color: #787E84;
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: -.3px;
+    white-space: pre-wrap;
+}

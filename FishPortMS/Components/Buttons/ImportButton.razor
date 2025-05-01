@@ -1,0 +1,63 @@
+﻿@inject IJSRuntime JSRuntime
+
+<style>
+    .import-btn {
+        font-family: 'Poppins' !important;
+        background: #f5f5f5 !important;
+        color: #22262a !important;
+        font-weight: 300 !important;
+        font-size: 13px !important;
+        border-radius: 10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        transition: .3s ease;
+        letter-spacing: 1px!important;
+    }
+
+    .import-btn:hover {
+            background: #efefef !important;
+    }
+
+    @@media only screen and (max-width: 600px)
+    {
+        .import-btn{
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="pt-2 mt-sm-5 mt-0 mb-0">
+    <!-- Hidden InputFile element -->
+    <InputFile @ref="fileInput" Style="display:none" OnChange="OnFileSelected" />
+
+    <!-- Button to trigger file upload -->
+    <MudButton Class="import-btn"
+               StartIcon="@Icons.Material.Filled.FileDownload"
+               ButtonType="ButtonType.Button"
+               Variant="Variant.Filled"
+               Color="Color.Info"
+               Size="Size.Medium"
+               OnClick="OpenFileUpload"
+               DisableElevation>
+        IMPORT
+    </MudButton>
+</div>
+
+@code {
+    private InputFile fileInput;
+
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public EventCallback<IBrowserFile> FileSelected { get; set; }
+
+    private async Task OpenFileUpload()
+    {
+        await JSRuntime.InvokeVoidAsync("triggerFileInputClick", fileInput.Element);
+    }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        await FileSelected.InvokeAsync(file); // Notify the parent of the selected file
+        await OnClick.InvokeAsync(); // Trigger the OnClick event after file upload
+    }
+}

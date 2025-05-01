@@ -1,0 +1,35 @@
+﻿<div class="pt-2 mt-n1">
+    <MudButton HtmlTag="label" Class="@classes"
+               Variant="Variant.Filled"
+               Disabled="isLoadingTimeInOut"
+               Color="Color.Info"
+               Size="Size.Medium"
+               DisableElevation
+               for="time_in_id">
+         @if (isLoadingTimeInOut == false)
+        {
+            <MudText style="font-size: 14px; letter-spacing: .5px;">@title</MudText>
+        }
+        else
+        {
+            <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            <MudText style="font-size: 14px; letter-spacing: .5px;">PROCESSING</MudText>
+        }
+    </MudButton>
+    <InputFile id="time_in_id" OnChange="HandleChange" accept="image/*" capture hidden></InputFile>
+</div>
+
+@code {
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
+    [Parameter] public bool isLoadingTimeInOut { get; set; }
+    [Parameter] public string title { get; set; } = string.Empty;
+    [Parameter] public string classes { get; set; } = string.Empty;
+
+    private async Task HandleChange(InputFileChangeEventArgs e)
+    {
+        if (OnChange.HasDelegate)
+        {
+            await OnChange.InvokeAsync(e);
+        }
+    }
+}

@@ -1,0 +1,162 @@
+﻿
+@inject IClientAccountService ClientAccountService
+@attribute [Authorize]
+
+<style>
+    .btn-submit:hover {
+        background-color: #060817 !important;
+    }
+</style>
+
+<div class="px-sm-3 mt-n4">
+    <HeaderInfos title=" EDIT PROFILE" icon="@Icons.Material.Filled.Edit" />
+</div>
+   
+<div class="px-sm-3">
+
+    <EditForm Model="editProfileDTO" OnValidSubmit="UpdateUser">
+        <div class="mb-8">
+         @*    <SingleUploadButton 
+                    ObjectImg="@editProfileDTO.Avatar"
+                    Title="avatar"
+                    OnFileDataChanged="HandleFileDataChanged"
+                    FileData="FileData"
+                    SetImageUrl="SetImageUrl" /> *@
+        </div>
+
+        <div class="d-sm-flex gap-3 mt-4">
+            <div class="py-4 mt-n5 w-100">
+                <MudTextField 
+                    @bind-Value="editProfileDTO.FirstName"
+                              For="@(() => editProfileDTO.FirstName)"
+                    Label="First Name"
+                    Clearable
+                    Margin="Margin.Dense"
+                    HelperText="Enter First Name"
+                    InputType="InputType.Text"
+                    Variant="Variant.Outlined"
+                    Adornment="Adornment.Start"
+                    AdornmentIcon="@Icons.Material.Outlined.Person"
+                    Required="true" />
+            </div>
+            <div class="py-4 mt-n5 w-100">
+                <MudTextField @bind-Value="editProfileDTO.LastName"
+                    For="@(() => editProfileDTO.LastName)"
+                    Label="Last Name"
+                    Clearable
+                    Margin="Margin.Dense"
+                    HelperText="Enter Last Name"
+                    InputType="InputType.Text"
+                    Variant="Variant.Outlined"
+                    Adornment="Adornment.Start"
+                    AdornmentIcon="@Icons.Material.Outlined.Person"
+                    Required="true" />
+            </div>
+        </div>
+
+        <div class="d-sm-flex gap-3">
+            <div class="py-4 mt-n5 w-100">
+                <MudTextField 
+                    @bind-Value="editProfileDTO.Address"
+                               For="@(() => editProfileDTO.Address)"
+                    Label="Address"
+                    Adornment="Adornment.Start"
+                    Clearable
+                    AdornmentIcon="@Icons.Material.Outlined.LocationCity"
+                    Margin="Margin.Dense" HelperText="Enter Address" InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+            </div>
+            <div class="py-4  mt-n5 w-100">
+                <MudTextField 
+                    @bind-Value="editProfileDTO.City"
+                               For="@(() => editProfileDTO.City)"
+                    Label="City"
+                    Adornment="Adornment.Start"
+                    Clearable
+                    AdornmentIcon="@Icons.Material.Outlined.LocationCity"
+                    Margin="Margin.Dense"
+                    HelperText="Enter City" InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+            </div>
+        </div>
+
+        <div class="d-sm-flex gap-3">
+            <div class="py-4  mt-n5 w-100">
+                <MudTextField 
+                    @bind-Value="editProfileDTO.Region"
+                               For="@(() => editProfileDTO.Region)"
+                    Label="Region"
+                    Adornment="Adornment.Start"
+                    Clearable
+                    AdornmentIcon="@Icons.Material.Outlined.LocationCity"
+                    Margin="Margin.Dense"
+                    HelperText="Enter Region" InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+            </div>
+            <div class="py-4  mt-n5 w-100">
+                <MudTextField
+                    @bind-Value="editProfileDTO.Phone"
+                               For="@(() => editProfileDTO.Phone)"
+                    Label="Phone No."
+                    Adornment="Adornment.Start"
+                    Clearable
+                    AdornmentIcon="@Icons.Material.Outlined.Phone"
+                    Margin="Margin.Dense"
+                    HelperText="Enter Phone No." InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+            </div>
+        </div>
+
+        <div class="py-3 mt-0 mb-4 text-end">
+            <AuthButton 
+                css="background-color: #101642; color: white!important; border-radius: 10px;"
+                className="btn-submit w-100"
+                button_name="UPDATE"
+                isLoading="isLoading" />
+        </div>
+    </EditForm>
+   
+</div>
+
+
+@code {
+    public IBrowserFile? FileData;
+    private bool isLoading = false;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+    void Cancel() => MudDialog.Cancel();
+
+    [Parameter] public UpdateProfileDTO editProfileDTO { get; set; } = new UpdateProfileDTO();
+   
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await ClientAccountService.GetSingleUser();
+        if (result != null)
+            editProfileDTO = result;
+    }
+
+    private async Task UpdateUser()
+    {
+        isLoading = true;
+
+        // TODO: TODO
+
+        // if (FileData != null)
+        // {
+        //     string imageURL = await ClientBlobStorageService.UploadAvatar(FileData);
+
+        //     if (!string.IsNullOrEmpty(imageURL))
+        //     {
+        //         editProfileDTO.Avatar = imageURL;
+        //     }
+        // }
+        await ClientAccountService.UpdateUser(editProfileDTO);
+        Cancel();
+        isLoading = false;
+    }
+
+    private async Task SetImageUrl(string imageUrl)
+    {
+        editProfileDTO.Avatar = imageUrl;
+    }
+
+    public async Task HandleFileDataChanged(IBrowserFile fileData)
+    {
+        FileData = fileData;
+    }
+}

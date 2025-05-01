@@ -1,0 +1,24 @@
+﻿<MudButton 
+    Class="@className"
+    ButtonType="ButtonType.Submit"
+    Disabled="isLoading"
+    Variant="Variant.Filled"
+    Size="Size.Large"
+    Style="@css"
+    DisableElevation>
+    @if (isLoading == false)
+    {
+        <MudText Style="letter-spacing: .5px; font-family: 'Poppins'; color: white!important;">@button_name</MudText>
+    }
+    else
+    {
+        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
+    }
+</MudButton>
+
+@code {
+    [Parameter] public string button_name { get; set; } = string.Empty;
+    [Parameter] public string css { get; set; } = string.Empty;
+    [Parameter] public string className { get; set; } = string.Empty;
+    [Parameter] public bool isLoading { get; set; }
+}
