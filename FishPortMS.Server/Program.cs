@@ -1,4 +1,5 @@
 using FishPortMS.Server.Data;
+using FishPortMS.Server.Services.AccountService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -33,6 +34,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateAudience = false
     };
 });
+
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 
 var app = builder.Build();
