@@ -1,0 +1,164 @@
+﻿@using FishPortMS.Pages.Account
+@inject IClientAccountService ClientAccountService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject ModifiedSnackBar ModifiedSnackBar
+@inject IJSRuntime JavaScript
+
+<style>
+    .btn-submit:hover {
+        background-color: #060817 !important;
+    }
+</style>
+
+<MudDialog>
+    <DialogContent>
+
+        <div class="px-sm-2 mt-n4 px-1 pb-4">
+            <HeaderInfos title="REGISTER" icon="@Icons.Material.Filled.Add" />
+            <EditForm Model="registerDTO" OnValidSubmit="HandleSubmit" id="formid">
+                <DataAnnotationsValidator />
+                <div class="mt-3">
+                    <MudSelect Margin="Margin.Dense" AnchorOrigin="Origin.BottomCenter" Label="Roles" Placeholder="-Select Roles-" Variant="Variant.Outlined" @bind-Value="registerDTO.Role">
+                        @foreach (Roles role in Enum.GetValues(typeof(Roles)).Cast<Roles>()
+                        .Where(role => role != Roles.CASHIER))
+                        {
+                            <MudSelectItem T="Roles" Value="role" />
+                        }
+                    </MudSelect>
+                </div>
+                <div class="mt-5">
+                    <MudTextField @bind-Value="registerDTO.Email"
+                                  Label="Email" Clearable AutoFocus
+                                  Placeholder="example@email.com"
+                                  Margin="Margin.Dense"
+                                  InputType="InputType.Email"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Outlined.Email" />
+                </div>
+                <div class="d-sm-flex mt-5">
+                    <div class="w-100">
+                        <MudTextField @bind-Value="registerDTO.Password"
+                                      For="@(() => registerDTO.Password)"
+                                      Placeholder="e.g., ********"
+                                      Label="Password"
+                                      Variant="Variant.Outlined"
+                                      InputType="@PasswordInput"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      OnAdornmentClick="ShowPassword" />
+                    </div>
+                    <div class="w-100 ml-0 ml-sm-2 mt-sm-0 mt-5">
+                        <MudTextField @bind-Value="registerDTO.ConfirmPass"
+                                      For="@(() => registerDTO.ConfirmPass)"
+                                      Placeholder="e.g., ********"
+                                      Label="Confirm Password"
+                                      Variant="Variant.Outlined"
+                                      InputType="@ConfirmPasswordInput"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@ConfirmPasswordInputIcon"
+                                      OnAdornmentClick="ShowConfirmPassword" />
+                    </div>
+                </div>
+
+                <CUserDetails registerDTO="registerDTO" />
+
+                @if (registerDTO.Role == Roles.CONSIGNACION_OWNER)
+                {
+                    <CConsignacionDetails registerDTO="registerDTO" />
+                }
+
+                <div class="mt-5">
+                    <AuthButton 
+                        css="background-color: #101642; color: white!important; border-radius: 10px;"
+                        className="btn-submit w-100"
+                        button_name="REGISTER"
+                        isLoading="isLoading" />
+                </div>
+            </EditForm>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+
+    [Parameter] public RegisterDTO registerDTO { get; set; } = new RegisterDTO();
+
+    [Parameter] public bool isLoading { get; set; } = false;
+
+    //PASS SHOW
+    bool isShow = false;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    //CONFIRM PASS SHOW
+    bool isConfirmShow = false;
+    InputType ConfirmPasswordInput = InputType.Password;
+    string ConfirmPasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    public bool Label_CheckBox2 { get; set; } = false;
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task HandleSubmit()
+    {
+        if (registerDTO.Role == Roles.NONE)
+        {
+            isLoading = false;
+            StateHasChanged();
+            ModifiedSnackBar.ShowMessage("Role is required.", Severity.Warning);
+            return;
+        }
+        else if (registerDTO.Role == Roles.CONSIGNACION_OWNER)
+        {
+            if (string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionName)
+                && string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionName)
+                && string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionLocation)
+                && string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionAddress))
+            {
+                isLoading = false;
+                StateHasChanged();
+                ModifiedSnackBar.ShowMessage("Please fill up all required fields.", Severity.Warning);
+                return;
+            }
+        }
+
+        MudDialog.Close(DialogResult.Ok(registerDTO));
+    }
+
+    void ShowPassword()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    void ShowConfirmPassword()
+    {
+        @if (isConfirmShow)
+        {
+            isConfirmShow = false;
+            ConfirmPasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            ConfirmPasswordInput = InputType.Password;
+        }
+        else
+        {
+            isConfirmShow = true;
+            ConfirmPasswordInputIcon = Icons.Material.Filled.Visibility;
+            ConfirmPasswordInput = InputType.Text;
+        }
+    }
+}

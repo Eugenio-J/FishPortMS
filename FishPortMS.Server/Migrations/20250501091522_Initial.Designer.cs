@@ -186,7 +186,7 @@ namespace FishPortMS.Server.Migrations
                     b.Property<int>("AttendanceState")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("BranchId")
+                    b.Property<Guid>("ConsignacionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")

@@ -34,13 +34,13 @@
                             <span class="ml-1" style="color: #E58A00; font-size: 25px;">&#8226;</span>
                         </div>
                         <div class="mt-2 d-flex flex-column">
-                            @if (!string.IsNullOrEmpty(announcement.Branch))
+                            @if (!string.IsNullOrEmpty(announcement.Consignacion))
                             {
-                                <span class="ann-branch-name">TO : @announcement.Branch</span>
+                                <span class="ann-branch-name">TO : @announcement.Consignacion</span>
                             }
                             else
                             {
-                                <span class="ann-branch-name">TO : All Branches</span>
+                                <span class="ann-branch-name">TO : All Consignaciones</span>
                             }
 
                             <span class="ann-body-title">@announcement.AnnouncementTitle</span>

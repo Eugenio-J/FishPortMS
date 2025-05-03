@@ -17,6 +17,6 @@ namespace FishPortMS.Shared.DTOs.AnnouncementDTO
         public bool IsActive { get; set; } = false;
         public AnnouncementRole AnnouncementRole { get; set; }
         public AnnouncementType AnnouncementType { get; set; }
-        public string? Branch { get; set; }
+        public string? Consignacion { get; set; }
     }
 }

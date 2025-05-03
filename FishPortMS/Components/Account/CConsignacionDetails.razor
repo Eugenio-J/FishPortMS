@@ -1,0 +1,51 @@
+﻿<div class="d-flex px-sm-10 px-5 justify-content-center flex-column mt-8 mb-3 ">
+    <div style="border-bottom: 1px solid #E4E6EC;" class="pb-4">
+        <MudText Typo="Typo.subtitle2" Style="color: #202969!important; font-size: 16px!important; font-weight: 500!important" Class="text-start">
+            Consignacion Details
+        </MudText>
+    </div>
+</div>
+
+@if(registerDTO.CreateConsignacionDTO != null)
+{
+    <div class="d-sm-flex gap-3">
+        <div class="pt-4 pl-sm-10 pr-sm-0 pr-5 pl-5 w-100">
+            <MudTextField @bind-Value="registerDTO.CreateConsignacionDTO.ConsignacionName"
+                          Label="Consignacion Name"
+                          Placeholder="SBC"
+                          Adornment="Adornment.Start"
+                          Clearable
+                          Margin="Margin.Dense"InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+         </div>
+        <div class="pt-4 pr-sm-10 pl-sm-0 pr-5 pl-5 w-100">
+             <MudTextField @bind-Value="registerDTO.CreateConsignacionDTO.ConsignacionAddress"
+                           Label="Consignacion Address"
+                          Placeholder="N. Domingo Street‎"
+                           Adornment="Adornment.Start"
+                           Clearable
+                           Margin="Margin.Dense" InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+         </div>
+     </div>
+
+    <div class="d-sm-flex gap-3">
+        <div class="pt-4 pl-sm-10 pr-sm-0 pr-5 pl-5 w-100">
+            <MudTextField @bind-Value="registerDTO.CreateConsignacionDTO.ConsignacionLocation"
+                          Label="Consignacion Location"
+                          Placeholder="Quezon City"
+                          Adornment="Adornment.Start"
+                          Clearable
+                          Margin="Margin.Dense" InputType="InputType.Text" Variant="Variant.Outlined" Required="true" />
+         </div>
+        <div class="pt-4 pr-sm-10 pl-sm-0 pr-5 pl-5 w-100">
+             <MudDatePicker @bind-Date="registerDTO.CreateConsignacionDTO.StartOfContract"
+                            Label="Start Of Contract"
+                            Margin="Margin.Dense" Variant="Variant.Outlined" Required="true" />
+         </div>
+     </div>
+}
+
+@code {
+
+    [Parameter] public RegisterDTO registerDTO { get; set; } = new RegisterDTO();
+}
+

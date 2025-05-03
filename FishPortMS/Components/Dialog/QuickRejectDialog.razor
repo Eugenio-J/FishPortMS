@@ -1,0 +1,24 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>Are you sure you want to reject this @title?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled"
+                Color="Color.Error"
+                   OnClick="() => Submit(true)"
+                Class="mb-1">
+            Yes
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string title { get; set; } = string.Empty;
+
+    void Submit(bool confirmed) => MudDialog.Close(DialogResult.Ok(confirmed));
+    void Cancel() => MudDialog.Cancel();
+}

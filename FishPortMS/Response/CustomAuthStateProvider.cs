@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using FishPortMS.Services.ClientAccountService;
 
-namespace SBCNestMain.Client.Response
+namespace FishPortMS.Client.Response
 {
     
     public class CustomAuthStateProvider : AuthenticationStateProvider

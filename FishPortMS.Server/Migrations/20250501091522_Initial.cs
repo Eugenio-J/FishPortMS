@@ -417,7 +417,7 @@ namespace FishPortMS.Server.Migrations
                     TimeOutImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserProfileId = table.Column<int>(type: "int", nullable: false),
                     UserDetailsId = table.Column<int>(type: "int", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ConsignacionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

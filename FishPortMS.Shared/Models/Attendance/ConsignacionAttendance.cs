@@ -24,6 +24,6 @@ namespace FishPortMS.Shared.Models.Attendance
         public string TimeOutImage { get; set; } = string.Empty;
         public UserProfile UserProfile { get; set; }
         public int UserDetailsId { get; set; }
-        public Guid BranchId { get; set; }
+        public Guid ConsignacionId { get; set; }
     }
 }

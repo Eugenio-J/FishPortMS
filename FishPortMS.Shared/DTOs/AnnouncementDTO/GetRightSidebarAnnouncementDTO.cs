@@ -17,6 +17,6 @@ namespace FishPortMS.Shared.DTOs.AnnouncementDTO
         public DateTime? DateCreated { get; set; }
         public DateTime ParentDate { get; set; } // Added parent date
         public string TimeElapsed { get; set; } // Added time elapsed
-        public string? Branch { get; set; } 
+        public string? Consignacion { get; set; } 
     }
 }

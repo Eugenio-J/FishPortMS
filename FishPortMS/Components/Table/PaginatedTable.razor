@@ -1,0 +1,323 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@inject IJSRuntime JavaScript
+@typeparam TItem
+
+<style>
+    #no-more-tables{
+        padding-bottom: 10px;
+    }
+    .search-input{
+        background-color: white;
+        border-radius: 10px;
+        margin-bottom: 13px!important;
+        border: 0px!important;
+    }
+
+    .total-items-text{
+        font-size: 13px !important;
+        letter-spacing: -.2px !important;
+        font-family: 'Poppins' !important;
+        color: #6F7E9F !important;
+    }
+
+    .mud-input.mud-input-outlined .mud-input-outlined-border {
+        border-color: #E1E5E9 !important;
+        border-radius: 10px !important;
+        font-size: 13px!important;
+    }
+
+    .mud-input-control > .mud-input-control-input-container > .mud-input-label-outlined.mud-input-label-inputcontrol {
+        font-size: 13px !important;
+        letter-spacing: .5px !important;
+        font-family: 'Poppins' !important;
+        background-color: white;
+        color: #7482A3 !important;
+    }
+
+    .mud-input > textarea.mud-input-root-outlined.mud-input-root-margin-dense, .mud-input > input.mud-input-root-outlined.mud-input-root-margin-dense, div.mud-input-slot.mud-input-root-outlined.mud-input-root-margin-dense{
+        font-size: 14px!important;
+        padding-top: 14px!important;
+        padding-bottom: 14px!important;
+    }
+
+    .mud-button-filled.mud-button-filled-warning{
+        box-shadow: none!important;
+        background-color: #FFE85A !important;
+    }
+
+    .table td {
+        white-space: nowrap !important;
+    }
+
+    tr td {
+        padding-left: 25px !important;
+        padding-right: 25px !important;
+    }
+
+    .dt-button{
+        font-family: 'Poppins' !important;
+        font-size: 13px !important;
+        letter-spacing: .5px !important;
+        font-weight: 400 !important;
+        border-radius: 7px !important;
+        text-transform: uppercase!important;
+        color: #fff!important;
+        border: 0px!important;
+        background: #FF5F5F !important; /* fallback for old browsers */
+        padding-top: 9px !important;
+        padding-bottom: 9px !important;
+    }
+
+    div.dt-buttons > .dt-button:first-child, div.dt-buttons > div.dt-button-split .dt-button:first-child{
+        margin-bottom: 23px;
+    }
+
+    div.dt-button-collection{
+        background: #FF5F5F !important; /* fallback for old browsers */
+    }
+
+    .sort-div, .search-div {
+        width: 280px;
+    }
+
+    @@media only screen and (max-width: 600px) {
+        table {
+            border: 0;
+        }
+
+        .table td {
+            white-space: normal !important;
+        }
+
+        tr td {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+
+        table thead {
+            border: none;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            width: 1px;
+        }
+
+        table tr {
+            border-bottom: 3px solid #ddd;
+            display: block;
+            margin-bottom: .625em;
+        }
+
+        table td {
+            border-bottom: 1px solid #ddd;
+            display: block;
+            color: #536B89 !important;
+            text-align: right;
+            font-size: 12px !important;
+            text-transform: uppercase;
+            letter-spacing: .1px !important;
+        }
+
+        table td::before {
+            content: attr(data-title);
+            float: left;
+            text-transform: uppercase;
+            padding-right: 15px;
+            font-weight: 500;
+            color: #536B89 !important;
+            letter-spacing: .3px !important;
+            font-size: 12px !important;
+        }
+
+        table td:last-child {
+            border-bottom: 0;
+        }
+
+        tr:last-child td:first-child{
+            border-bottom-left-radius: 0px!important;
+        }
+
+        .sort-div, .search-div {
+           width: 100%;
+        }
+    }
+</style>
+
+    <div class="mt-11 px-5 px-sm-11 pt-0 pt-sm-1 pb-5 mb-15" style="background: white; border-radius: 12px; ">
+
+    <TableHeader title="@Title" IsImportActive="IsImportActive" Import="Import" selectedImportFile="selectedImportFile" />
+        <div style="border-bottom: 1px dashed #DCE0E9" class="pb-1 mb-8" />
+
+        <div class="d-sm-flex d-block justify-content-sm-between mb-1">
+            <div class="search-div mb-3" style="width: 300px;">
+                <MudTextField T="string" Adornment="Adornment.End" Margin="Margin.Dense" AdornmentIcon="@Icons.Material.Filled.Search" Label="Search" Variant="Variant.Outlined" ValueChanged="HandleSearchTextValue" Class="search-input" />
+            </div>
+            <div class="d-flex">
+                <p class="total-items-text mt-4 ml-2 mr-2">
+                    Show
+                </p>
+                <MudSelect 
+                    T="int"
+                    Value="@PageSize"
+                    Variant="Variant.Outlined"
+                    AnchorOrigin="Origin.BottomCenter"
+                    Style="width:80px!important;"
+                    Margin="Margin.Dense"
+                    ValueChanged="HandleRowsPerPageChanged">
+
+                    <MudSelectItem T="int" Value="10" />
+                    <MudSelectItem T="int" Value="50" />
+                    <MudSelectItem T="int" Value="100" />
+                    <MudSelectItem T="int" Value="500" />
+                </MudSelect>
+                <p class="total-items-text mt-4 ml-2">
+                    Entries
+                </p>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;" id="no-more-tables" class="mt-4 mt-sm-0">
+            <table class="table tbl-parent w-100" id="@ID">
+                @if (tableLoading)
+                {
+                    <TableLoading />
+                }
+                else
+                {
+                    <thead>
+                        <tr>@TableHeader</tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Items.Any())
+                        {
+                            @foreach (var item in Items)
+                            {
+                                if (RowTemplate is not null)
+                                {
+                                    <tr>@RowTemplate((TItem)item)</tr>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="@THCount" class="py-sm-5 py-3" style="font-size: 15px; white-space: nowrap; text-align: center;">No results found</td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+            </table>
+        </div>
+
+        <div class="d-sm-flex d-block text-center text-sm-start justify-content-sm-between">
+            <div class="mt-7">
+                <p class="total-items-text">
+                    Showing 1 to @Items.Count() of @TotalItems entries
+                </p>
+            </div>
+            <div class="mt-2" style="text-align: end;">
+                <MudPagination 
+                    Rectangular
+                    ShowFirstButton="true"
+                    ShowLastButton="true"
+                    Color="Color.Warning"
+                    Class="mt-4"
+                    Count="@PaginationCount"
+                    SelectedChanged="HandlePaginatedBtn" />
+            </div>
+        </div>
+
+    </div>
+
+
+@code {
+
+    [Parameter] public string ID { get; set; }
+
+    [Parameter] public RenderFragment? TableHeader { get; set; }
+
+    [Parameter] public int THCount { get; set; }
+
+    [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    [Parameter, AllowNull]  public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter] public EventCallback<TableStates> RowsPerPageChanged { get; set; }
+
+    [Parameter] public EventCallback<string> SearchBar { get; set; }
+
+    [Parameter] public EventCallback<TableStates> Paginated { get; set; }
+
+    [Parameter] public int TotalItems { get; set; }
+
+    [Parameter] public bool tableLoading { get; set; }
+
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public bool IsImportActive { get; set; } = false;
+
+    [Parameter] public EventCallback Import { get; set; }
+
+    [Parameter] public EventCallback<IBrowserFile> selectedImportFile { get; set; }
+
+    public int PageSize { get; set; } = 10;
+
+    public string SearchString { get; set; } = string.Empty;
+
+    private int PaginationCount { get; set; } = 1;
+
+    private int CurrPage { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await JavaScript.InvokeVoidAsync("export_excel");
+    }
+    
+    protected override void OnParametersSet()
+    {
+        decimal dec_total_item = TotalItems;
+        decimal dec_row_perpage = PageSize;
+
+        PaginationCount = (int)Math.Ceiling(dec_total_item / dec_row_perpage);
+    }
+
+    private async Task HandleRowsPerPageChanged(int newValue)
+    {
+        decimal dec_total_item = TotalItems;
+        decimal dec_row_perpage = PageSize;
+
+        PageSize = newValue;
+
+        PaginationCount = (int)Math.Ceiling(dec_total_item / dec_row_perpage);
+
+        TableStates payload = new TableStates
+        {
+            Page = CurrPage,
+            PageSize = PageSize
+        };
+        await RowsPerPageChanged.InvokeAsync(payload);
+    }
+
+    private async Task HandleSearchTextValue(string textValue)
+    {
+        SearchString = textValue;
+        await SearchBar.InvokeAsync(textValue);
+    }
+
+    private async Task HandlePaginatedBtn(int pageValue)
+    {
+        CurrPage = pageValue - 1;
+        TableStates payload = new TableStates
+        {
+            Page = CurrPage,
+            PageSize = PageSize
+        };
+        await Paginated.InvokeAsync(payload);
+    }
+
+}
+

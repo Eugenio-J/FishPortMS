@@ -1,0 +1,61 @@
+﻿@inject NavigationManager NavigationManager
+@inject IClientConsignacionService ClientConsignacionService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+<MudDialog>
+    <DialogContent>
+        <MudPaper Class="px-sm-4 pt-2 px-1" Elevation="0">
+
+            <div class="text-start mb-n2 mt-n4">
+                <HeaderInfos title="ADD BRANCH" icon="@Icons.Material.Filled.Add" />
+            </div>
+
+            <div class="mt-7">
+                <MudTextField Class="mb-5" Label="Consignacion Name" @bind-Value="CreateConsignacionDTO.ConsignacionName" For="@(() => CreateConsignacionDTO.ConsignacionName)" InputType="InputType.Text" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                <MudTextField Class="mb-5" Label="Consignacion Address" @bind-Value="CreateConsignacionDTO.ConsignacionAddress" For="@(() => CreateConsignacionDTO.ConsignacionAddress)" InputType="InputType.Text" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                <MudTextField Class="mb-5" Label="Consignacion Location" @bind-Value="CreateConsignacionDTO.ConsignacionLocation" For="@(() => CreateConsignacionDTO.ConsignacionLocation)" InputType="InputType.Text" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                <MudDatePicker Class="mb-5" PickerVariant="PickerVariant.Dialog" Label="Start Of Contract" @bind-Date="CreateConsignacionDTO.StartOfContract" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+            </div>
+
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <div class="pb-4 pr-sm-8 pr-6 mt-n3">
+            <SubmitButton isLoading="isLoading" OnClick="HandleSubmit" button_name="SUBMIT" className="submit-btn" />
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+
+    [Parameter] public Guid userId { get; set; }
+
+    [Parameter] public CreateConsignacionDTO CreateConsignacionDTO { get; set; } = new CreateConsignacionDTO();
+
+    public bool isLoading = false;
+
+    public bool loadingProgress = false;
+
+    void Cancel() => MudDialog.Cancel();
+
+    async Task HandleSubmit()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want add this branch?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Confirmation", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            isLoading = true;
+            await ClientConsignacionService.AddMoreFranchiseConsignacion(userId, CreateConsignacionDTO);
+            CreateConsignacionDTO = new CreateConsignacionDTO();
+            isLoading = true;
+            Cancel();
+        };
+    }
+}

@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using SBCNestMain.Client.Response;
+using FishPortMS.Client.Response;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
+using FishPortMS.Services.ClientUserManagementService;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
+builder.RootComponents.Add<HeadOutlet>("head::after");  
 
 builder.Services.AddBlazoredLocalStorage();
 
@@ -27,6 +28,7 @@ builder.Services.AddMudServices();
 builder.Services.AddAuthorizationCore();
 
 builder.Services.AddScoped<IClientAccountService, ClientAccountService>();
+builder.Services.AddScoped<IClientUserManagementService, ClientUserManagementService>();
 
 
 await builder.Build().RunAsync();
