@@ -1,0 +1,232 @@
+﻿@page "/all-users"
+@using FishPortMS.Components.Account
+@using FishPortMS.Shared.DTOs.UserManagementDTO
+@inject NavigationManager NavigationManager
+@inject IClientUserManagementService ClientUserManagementService
+@inject IClientAccountService ClientAuthService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+@inject ModifiedSnackBar ModifiedSnackBar
+@attribute [Authorize]
+
+    @if (loadingProgress)
+    {
+        <TableSkeletonLoading />
+    }
+    else
+    {
+     <div Class="pt-8 px-5">
+
+        <MudText Typo="Typo.h4">USERS</MudText><MudBreadcrumbs Items="_items" Class="ml-n2"></MudBreadcrumbs>
+
+        <CreateButton OnClick="AddUser" className="create-btn" button_name="Add User" />
+
+        <PaginatedTable 
+            RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+            SearchBar="HandleSearchTextValue"
+            Paginated="HandlePaginatedBtn"
+            THCount="6"
+            TotalItems="@TotalItems"
+            tableLoading="tableLoading"
+            Title="USER"
+            Items="GetUsersDTO"
+            Context="users"
+            ID="table">
+
+            <TableHeader>
+                <th class="text-center">Name</th>
+                <th class="text-center">Address</th>
+                <th class="text-center">Contact</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Role</th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@users.FirstName @users.LastName</td>
+                <td data-title="Address" class="py-sm-5 py-3 text-end text-sm-center" style="white-space: normal !important; min-width: 250px !important">@users.Address</td>
+                <td data-title="Contact" class="py-sm-5 py-3 text-end text-sm-center">@users.Phone</td>
+                <td data-title="Email" class="py-sm-5 py-3 text-end text-sm-center">@users.Email</td>
+                <td data-title="Role" class="py-sm-5 py-3 text-end text-sm-center">@users.Roles</td>
+                <td class="text-end text-sm-start">
+                    @if (users.isActive == false)
+                    {
+                        <SubmitButton button_name="ENABLE" className="enable-btn" OnClick="(() => EnableUser(users.UserId))" />
+                    }
+                    else
+                    {
+                        <SubmitButton button_name="DISABLE" className="disable-btn" OnClick="() => DisableUser(users.UserId)" />
+                    }
+                </td>
+            </RowTemplate>
+
+        </PaginatedTable>
+
+    </div>
+
+}
+
+@code {
+
+    private int RowsPerPage { get; set; } = 5;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+
+    private List<GetUsersDTO> GetUsersDTO = new List<GetUsersDTO>();
+
+    private RegisterDTO registerDTO = new RegisterDTO();
+
+    private bool isLoading = false;
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+
+        PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+        TotalItems = response.Count;
+        GetUsersDTO = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Users", href: "#", disabled: true),
+        new BreadcrumbItem("All", href: "/all-users"),
+    };
+
+    private async Task AddUser()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("registerDTO", registerDTO);
+        parameters.Add("isLoading", isLoading);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<CRegister>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is RegisterDTO register)
+        {
+            int response = await ClientAuthService.Register(register);
+            if (response > 0)
+            {
+                isLoading = false;
+                StateHasChanged();
+                ModifiedSnackBar.ShowMessage("Registration Successful.", Severity.Success);
+                registerDTO = new RegisterDTO();
+            }
+            else
+            {
+                isLoading = false;
+                StateHasChanged();
+                ModifiedSnackBar.ShowMessage("Registration Failed.", Severity.Warning);
+                return;
+            }
+
+            registerDTO = new RegisterDTO();
+            PaginatedTableResponse<GetUsersDTO> page_response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+            TotalItems = page_response.Count;
+            GetUsersDTO = page_response.ResponseData;
+        };
+    }
+
+    private async Task EnableUser(Guid userId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want enable this user?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Enable User", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            int response = await ClientUserManagementService.EnableAccount(userId);
+
+            if (response > 0)
+            {
+                PaginatedTableResponse<GetUsersDTO> page_response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+                TotalItems = page_response.Count;
+                GetUsersDTO = page_response.ResponseData;
+            }
+        }
+    }
+
+    private async Task DisableUser(Guid userId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want disable this user?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Disable User", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            int response = await ClientUserManagementService.DisableAccount(userId);
+
+            if (response > 0)
+            {
+                PaginatedTableResponse<GetUsersDTO> page_response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+                TotalItems = page_response.Count;
+                GetUsersDTO = page_response.ResponseData;
+            }
+        }
+    }
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+        TotalItems = response.Count;
+        GetUsersDTO = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.SearchUser(Paginated);
+            TotalItems = response.Count;
+            GetUsersDTO = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+            TotalItems = response.Count;
+            GetUsersDTO = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+        TotalItems = response.Count;
+        GetUsersDTO = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+}

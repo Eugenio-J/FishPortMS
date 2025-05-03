@@ -116,8 +116,8 @@ namespace FishPortMS.Services.ClientAccountService
         {
             var result = await _http.PostAsync("api/account/logout", null);
 
-            await _localStorageService.RemoveItemAsync("SelectedBranch");
-            await _localStorageService.RemoveItemAsync("BranchId");
+            await _localStorageService.RemoveItemAsync("SelectedConsignacion");
+            await _localStorageService.RemoveItemAsync("ConsignacionId");
 
             string data = await SetToken(result);
             return data;

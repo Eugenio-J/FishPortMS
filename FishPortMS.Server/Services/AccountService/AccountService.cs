@@ -295,7 +295,7 @@ namespace FishPortMS.Server.Services.AccountService
                         Consignacion = new List<Consignacion>()
                     };
 
-                    var mBranch = new Consignacion
+                    var mConsignacion = new Consignacion
                     {
                         ConsignacionName = request.CreateConsignacionDTO!.ConsignacionName,
                         ConsignacionAddress = request.CreateConsignacionDTO.ConsignacionAddress,
@@ -307,7 +307,7 @@ namespace FishPortMS.Server.Services.AccountService
 
                     if (request.CreateConsignacionDTO.StartOfContract.HasValue)
                     {
-                        mBranch.EndOfContract = request.CreateConsignacionDTO.StartOfContract.Value.AddYears(1);
+                        mConsignacion.EndOfContract = request.CreateConsignacionDTO.StartOfContract.Value.AddYears(1);
                     }
 
                     var userDetails = new UserProfile
@@ -324,9 +324,9 @@ namespace FishPortMS.Server.Services.AccountService
                         ConsignacionOwnerId = consignacionOwner.Id
                     };
 
-                    consignacionOwner.Consignacion.Add(mBranch);
+                    consignacionOwner.Consignacion.Add(mConsignacion);
                     _context.ConsignacionOwners.Add(consignacionOwner);
-                    _context.Consignacions.Add(mBranch);
+                    _context.Consignacions.Add(mConsignacion);
                     _context.UserProfiles.Add(userDetails);
 
                     await _context.SaveChangesAsync();
@@ -349,7 +349,7 @@ namespace FishPortMS.Server.Services.AccountService
                 .Select(f => f.Id)
                 .FirstOrDefaultAsync();
 
-            var myBranch = await _context.Consignacions
+            var myConsignacion = await _context.Consignacions
                .Where(f => f.ConsignacionOwnerId == franchiseeId && f.Id.ToString() == request.consignasion)
                .Select(f => f.Id)
                .FirstOrDefaultAsync();
@@ -391,7 +391,7 @@ namespace FishPortMS.Server.Services.AccountService
                 var branchEmployee = new ConsignacionEmployee
                 {
                     IsActive = true,
-                    ConsignacionId = myBranch,
+                    ConsignacionId = myConsignacion,
                     UserProfile = userDetails
                 };
 

@@ -14,6 +14,6 @@ namespace FishPortMS.Shared.DTOs.AnnouncementDTO
         public string Description { get; set; } = string.Empty;
         public AnnouncementRole AnnouncementRole { get; set; }
         public AnnouncementType AnnouncementType { get; set; }
-        public Guid? BranchId { get; set; }
+        public Guid? ConsignacionId { get; set; }
     }
 }

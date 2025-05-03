@@ -1,0 +1,234 @@
+﻿@page "/all-Consignacions"
+@inject NavigationManager NavigationManager
+@inject IClientConsignacionService ClientConsignacionService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+@attribute [Authorize]
+
+    @if (loadingProgress)
+    {
+        <TableSkeletonLoading />
+    }
+    else
+    {
+     <div Class="pt-8 px-5">
+
+        <MudText Typo="Typo.h4">Consignacion</MudText><MudBreadcrumbs Items="_items" Class="ml-n2 mb-n5"></MudBreadcrumbs>
+
+        <PaginatedTable RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+            SearchBar="HandleSearchTextValue"    
+            Paginated="HandlePaginatedBtn"
+            THCount="8"
+            TotalItems="@TotalItems"
+            tableLoading="tableLoading"
+            Title="Consignacion"
+            Items="GetConsignacionDTO"
+            Context="Consignacion"
+            ID="table">
+
+            <TableHeader>
+                <th class="text-center">Consignacion Name</th>
+                <th class="text-center">Consignacion Owner</th>
+                <th class="text-center">Address</th>
+                <th class="text-center">Last Date Ordered</th>
+                <th class="text-center">SOC</th>
+                <th class="text-center">EOC</th>
+                <th></th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center" style="cursor: pointer;">@Consignacion.ConsignacionName</td>
+                <td data-title="Owner" class="py-sm-5 py-3 text-end text-sm-center">@Consignacion.ConsignacionOwner</td>
+                <td data-title="Address" class="py-sm-5 py-3 text-end text-sm-center" style="white-space: normal !important; min-width: 250px !important">@Consignacion.ConsignacionAddress</td>
+                <td data-title="LDO" class="py-sm-5 py-3 text-end text-sm-center">
+                    @if (Consignacion.LastOrder != null)
+                    {
+                        var lastOrderDate = Consignacion.LastOrder.Value;
+                        var today = DateTime.Now;
+
+                        if (lastOrderDate.Year == today.Year && lastOrderDate.Month == today.Month)
+                        {
+                            <span>@lastOrderDate.ToString("MM/dd/yyyy")</span>
+                        }
+                        else
+                        {
+                            <span style="color:#FF4F4F; font-weight: 500; letter-spacing: .2px">@lastOrderDate.ToString("MM/dd/yyyy")</span>
+                        }
+                    }
+                    else
+                    {
+                        <MudText>No Orders Yet</MudText>
+                    }
+                </td>
+                <td data-title="SOC" class="py-sm-5 py-3 text-end text-sm-center">@Consignacion.StartOfContract?.ToString("MM/dd/yyyy")</td>
+                <td data-title="EOC" class="py-sm-5 py-3 text-end text-sm-center">@Consignacion.EndOfContract?.ToString("MM/dd/yyyy")</td>
+                <td class="text-end text-sm-start">
+                    <IconButton OnClick="(() => EditGeoLoc(Consignacion))" icon="@Icons.Material.Filled.Edit" className="edit-icon" tooltip="Edit Location" />
+                </td>
+                <td class="text-end text-sm-start">
+                    @if (Consignacion.IsActive == false)
+                    {
+                        <SubmitButton button_name="ENABLE" className="enable-btn" OnClick="(() => EnableConsignacion(Consignacion.Id))" />
+                    }
+                    else
+                    {
+                        <SubmitButton button_name="DISABLE" className="disable-btn" OnClick="() => DisableConsignacion(Consignacion.Id)" />
+                    }
+                </td>
+             </RowTemplate>
+
+         </PaginatedTable>
+
+     </div>
+
+}
+
+@code {
+
+    private int RowsPerPage { get; set; } = 5;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+
+    private List<GetConsignacionDTO> GetConsignacionDTO = new List<GetConsignacionDTO>();
+
+    private UpdateConsignacionGeoDTO updateConsignacionGeo = new UpdateConsignacionGeoDTO();
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+
+        PaginatedTableResponse<GetConsignacionDTO> response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+        TotalItems = response.Count;
+        GetConsignacionDTO = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Consignaciones", href: "#", disabled: true),
+        new BreadcrumbItem("Manage", href: "/all-Consignaciones"),
+    };
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetConsignacionDTO> response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+        TotalItems = response.Count;
+        GetConsignacionDTO = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            PaginatedTableResponse<GetConsignacionDTO> response = await ClientConsignacionService.SearchConsignacion(Paginated);
+            TotalItems = response.Count;
+            GetConsignacionDTO = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            PaginatedTableResponse<GetConsignacionDTO> response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+            TotalItems = response.Count;
+            GetConsignacionDTO = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetConsignacionDTO> response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+        TotalItems = response.Count;
+        GetConsignacionDTO = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task EnableConsignacion(Guid id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want enable this Consignacion?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Enable Consignacion", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            int response = await ClientConsignacionService.EnableConsignacion(id);
+
+            if (response > 0)
+            {
+                PaginatedTableResponse<GetConsignacionDTO> page_response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+                TotalItems = page_response.Count;
+                GetConsignacionDTO = page_response.ResponseData;
+            }
+        }
+    }
+
+    private async Task DisableConsignacion(Guid id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want disable this Consignacion?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Disable Consignacion", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            int response = await ClientConsignacionService.DisableConsignacion(id);
+
+            if (response > 0)
+            {
+                PaginatedTableResponse<GetConsignacionDTO> page_response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+                TotalItems = page_response.Count;
+                GetConsignacionDTO = page_response.ResponseData;
+            }
+        }
+    }
+
+    private async Task EditGeoLoc(GetConsignacionDTO payload)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Id", payload.Id);
+        parameters.Add("updateConsignacionGeo", updateConsignacionGeo);
+        parameters.Add("getConsignacion", payload);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<EditConsignacionGeoDialog>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is UpdateConsignacionGeoDTO editGeo)
+        {
+            await ClientConsignacionService.EditConsignacionGeolocation(payload.Id, editGeo);
+            updateConsignacionGeo = new UpdateConsignacionGeoDTO();
+            PaginatedTableResponse<GetConsignacionDTO> page_response = await ClientConsignacionService.GetAllConsignacionesPaginated(Paginated);
+            TotalItems = page_response.Count;
+            GetConsignacionDTO = page_response.ResponseData;
+        };
+    }
+
+}

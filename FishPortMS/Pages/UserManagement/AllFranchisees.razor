@@ -1,0 +1,156 @@
+﻿@page "/all-franchisees"
+@using FishPortMS.Pages.Consignacion
+@using FishPortMS.Shared.DTOs.ConsignacionDTO
+@using FishPortMS.Shared.DTOs.UserManagementDTO
+@using FishPortMS.Shared.Response
+@inject NavigationManager NavigationManager
+@inject IClientUserManagementService ClientUserManagementService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+@attribute [Authorize]
+
+    @if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+     <div Class="pt-8 px-5">
+
+        <MudText Typo="Typo.h4">USERS</MudText><MudBreadcrumbs Items="_items" Class="ml-n2 mb-n5"></MudBreadcrumbs>
+
+        <PaginatedTable 
+            RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+            SearchBar="HandleSearchTextValue"
+            Paginated="HandlePaginatedBtn"
+            THCount="5"
+            TotalItems="@TotalItems"
+            tableLoading="tableLoading"
+            Title="USER"
+            Items="GetUsersDTO"
+            Context="users"
+            ID="table">
+
+            <TableHeader>
+                <th class="text-center">Name</th>
+                <th class="text-center">Address</th>
+                <th class="text-center">Contact</th>
+                <th class="text-center">Email</th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@users.FirstName @users.LastName</td>
+                <td data-title="Address" class="py-sm-5 py-3 text-end text-sm-center" style="white-space: normal !important; min-width: 250px !important">@users.Address</td>
+                <td data-title="Contact" class="py-sm-5 py-3 text-end text-sm-center">@users.Phone</td>
+                <td data-title="Email" class="py-sm-5 py-3 text-end text-sm-center">@users.Email</td>
+                <td class="text-end text-sm-start">
+                    <IconButton icon="@Icons.Material.Filled.Add" OnClick="() => AddConsignacion(users.UserId)" className="view-img-icon mr-2" tooltip="Add Consignacion" />
+                </td>
+            </RowTemplate>
+
+        </PaginatedTable>
+
+    </div>
+
+}
+
+@code {
+
+    private int RowsPerPage { get; set; } = 5;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+
+    private List<GetUsersDTO> GetUsersDTO = new List<GetUsersDTO>();
+
+    private CreateConsignacionDTO createConsignacion = new CreateConsignacionDTO();
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+
+        Paginated.Roles = Roles.CONSIGNACION_OWNER;
+        PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+        TotalItems = response.Count;
+        GetUsersDTO = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Users", href: "#", disabled: true),
+        new BreadcrumbItem("Franchisees", href: "/all-franchisees"),
+    };
+
+    private async Task AddConsignacion(Guid userId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("userId", userId);
+        parameters.Add("CreateConsignacionDTO", createConsignacion);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        await DialogService.Show<AddConsignacion>("", parameters, options).Result;
+    }
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        Paginated.Roles = Roles.CONSIGNACION_OWNER;
+        PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+        TotalItems = response.Count;
+        GetUsersDTO = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            Paginated.Roles = Roles.CONSIGNACION_OWNER;
+            PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.SearchUser(Paginated);
+            TotalItems = response.Count;
+            GetUsersDTO = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            Paginated.Roles = Roles.CONSIGNACION_OWNER;
+            PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+            TotalItems = response.Count;
+            GetUsersDTO = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        Paginated.Roles = Roles.CONSIGNACION_OWNER;
+        PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
+        TotalItems = response.Count;
+        GetUsersDTO = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+}

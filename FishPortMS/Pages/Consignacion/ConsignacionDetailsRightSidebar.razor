@@ -1,0 +1,18 @@
+﻿<div class="py-7 px-7 position-relative br-sidebar">
+
+    <div class="mb-8">
+        <span class="br-title">Consignacion Details</span>
+    </div>
+    <div class="close-icon" @onclick="() => OnClose.InvokeAsync()">
+        <MudIcon Icon="@Icons.Material.Filled.Close" />
+    </div>
+
+    @GetConsignacionDTO.ConsignacionName
+
+</div>
+
+@code {
+
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public GetConsignacionDTO? GetConsignacionDTO { get; set; } = new GetConsignacionDTO();
+}

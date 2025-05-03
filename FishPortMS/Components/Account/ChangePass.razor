@@ -1,0 +1,140 @@
+﻿@inject IClientAccountService ClientAccountService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ModifiedSnackBar ModifiedSnackBar
+@inject NavigationManager NavigationManager
+
+<style>
+    .btn-submit:hover {
+        background-color: #060817 !important;
+    }
+</style>
+
+<EditForm Model="Payload" style="z-index: 5" OnValidSubmit="SubmitForm">
+
+    <DataAnnotationsValidator />
+
+    <div class="py-3 px-sm-3 mt-n5">
+        <MudTextField @bind-Value="Payload.CurrPassword"
+                      For="@(() => Payload.CurrPassword)"
+                      Label="Current Password"
+                      Variant="Variant.Outlined"
+                      InputType="@PasswordInput"
+                      Margin="Margin.Dense"
+                      HelperText="Enter Current Password"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@PasswordInputIcon"
+                      OnAdornmentClick="() => showPass(1)" />
+    </div>
+    <div class="d-sm-flex gap-3">
+        <div class="py-3 pl-sm-3 mt-n3 w-100">
+            <MudTextField @bind-Value="Payload.NewPassword"
+                          For="@(() => Payload.NewPassword)"
+                          Label="New Password"
+                          Variant="Variant.Outlined"
+                          InputType="@PasswordInputConf"
+                          Margin="Margin.Dense"
+                          HelperText="Enter New Password"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@PasswordInputIconConf"
+                          OnAdornmentClick="() => showPass(2)" />
+        </div>
+        <div class="py-3 pr-sm-3 mt-n3 w-100">
+            <MudTextField @bind-Value="Payload.ConfirmPass"
+                          For="@(() => Payload.ConfirmPass)"
+                          Label="Confirm Password"
+                          Variant="Variant.Outlined"
+                          InputType="@PasswordInputConf2"
+                          Margin="Margin.Dense"
+                          HelperText="Enter Confirm Password"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@PasswordInputIconConf2"
+                          OnAdornmentClick="() => showPass(3)" />
+        </div>
+    </div>
+
+    <div class="py-3 px-sm-3 mt-0 mb-4 text-end">
+        <AuthButton css="background-color: #101642; color: white!important; border-radius: 10px;"
+                    className="btn-submit w-100"
+                    button_name="UPDATE"
+                    isLoading="isLoading" />
+    </div>
+
+</EditForm>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+
+    ChangePassDTO Payload = new ChangePassDTO();
+
+    private bool isLoading = false;
+
+    public bool isShow;
+    public InputType PasswordInput = InputType.Password;
+    public string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    public bool isConfirmShow;
+    public InputType PasswordInputConf = InputType.Password;
+    public string PasswordInputIconConf = Icons.Material.Filled.VisibilityOff;
+
+    public bool isConfirmShow2;
+    public InputType PasswordInputConf2 = InputType.Password;
+    public string PasswordInputIconConf2 = Icons.Material.Filled.VisibilityOff;
+
+    private async Task SubmitForm()
+    {
+        isLoading = true;
+        var response = await ClientAccountService.ChangePassword(Payload);
+        MudDialog.Cancel();
+        isLoading = false;
+    }
+
+    public void showPass(int num)
+    {
+        if (num == 1)
+        {
+            @if (isShow)
+            {
+                isShow = false;
+                PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+                PasswordInput = InputType.Password;
+            }
+            else
+            {
+                isShow = true;
+                PasswordInputIcon = Icons.Material.Filled.Visibility;
+                PasswordInput = InputType.Text;
+            }
+        }
+        else if (num == 2)
+        {
+            @if (isConfirmShow)
+            {
+                isConfirmShow = false;
+                PasswordInputIconConf = Icons.Material.Filled.VisibilityOff;
+                PasswordInputConf = InputType.Password;
+            }
+            else
+            {
+                isConfirmShow = true;
+                PasswordInputIconConf = Icons.Material.Filled.Visibility;
+                PasswordInputConf = InputType.Text;
+            }
+        }
+        else if (num == 3)
+        {
+            @if (isConfirmShow2)
+            {
+                isConfirmShow2 = false;
+                PasswordInputIconConf2 = Icons.Material.Filled.VisibilityOff;
+                PasswordInputConf2 = InputType.Password;
+            }
+            else
+            {
+                isConfirmShow2 = true;
+                PasswordInputIconConf2 = Icons.Material.Filled.Visibility;
+                PasswordInputConf2 = InputType.Text;
+            }
+        }
+    }
+}
