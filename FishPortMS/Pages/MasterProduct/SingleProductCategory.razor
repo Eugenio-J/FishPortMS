@@ -1,0 +1,96 @@
+﻿
+@inject IClientProductCategoryService ClientProductCategoryService
+
+@if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+
+            <MudPaper Class="px-sm-2 mt-n4 px-1 pb-4" Elevation="0">
+
+                @if(Id == null)
+                {
+                    <HeaderInfos title="ADD CATEGORY" icon="@Icons.Material.Filled.Add" />
+                }
+                else
+                {
+                    <HeaderInfos title="EDIT CATEGORY" icon="@Icons.Material.Filled.Edit" />
+                }
+
+                <div class="mt-3">
+                    <EditForm Model="singleCategory" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+
+                        <MudTextField 
+                            Class="mb-5"
+                            Label="Category Name" @bind-Value="createProductCategoryDTO.Title"
+                            For="@(() => createProductCategoryDTO.Title)"
+                            InputType="InputType.Text"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense"
+                            Required="true" />
+
+                     
+                        <div class="d-flex justify-content-end">
+                            @if (Id == null)
+                            {
+                                <SubmitButton isLoading="isLoading" button_name="SUBMIT" className="submit-btn" />
+                            }
+                            else
+                            {
+                                <SubmitButton isLoading="isLoading" button_name="EDIT" className="edit-btn" />
+                            }
+                        </div>
+                    </EditForm>
+                </div>
+            </MudPaper>
+        </DialogContent>
+    </MudDialog>
+}
+
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+
+    [Parameter] public int? Id { get; set; }
+
+    [Parameter] public ProductCategory? singleCategory { get; set; } = new ProductCategory();
+
+    [Parameter] public CreateProductCategoryDTO? createProductCategoryDTO { get; set; } = new CreateProductCategoryDTO();
+
+    private bool loadingProgress = true;
+
+    public bool isLoading = false;
+
+    void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loadingProgress = true;
+        if (Id == null)
+        {
+            singleCategory = new ProductCategory();
+        }
+        else
+        {
+            singleCategory = await ClientProductCategoryService.GetSingleProductCategory((int)Id);
+
+            createProductCategoryDTO = new CreateProductCategoryDTO
+            {
+                Title = singleCategory.Title
+            };
+        }
+        loadingProgress = false;
+    }
+
+    async Task HandleSubmit()
+    {
+        MudDialog.Close(DialogResult.Ok(createProductCategoryDTO));
+    }
+
+}

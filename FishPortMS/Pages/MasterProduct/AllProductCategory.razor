@@ -1,0 +1,172 @@
+﻿@page "/all-categories"
+@inject NavigationManager NavigationManager
+@inject IClientProductCategoryService ClientProductCategoryService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+
+
+    @if (loadingProgress)
+    {
+        <TableSkeletonLoading />
+    }
+    else
+    {
+     <div Class="pt-8 px-5">
+
+        <MudText Typo="Typo.h4">CATEGORY</MudText><MudBreadcrumbs Items="_items" Class="ml-n2"></MudBreadcrumbs>
+
+        <CreateButton OnClick="CreateCategory" className="create-btn" button_name="Add Category" />
+
+        <PaginatedTable 
+            RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+            SearchBar="HandleSearchTextValue"
+            Paginated="HandlePaginatedBtn"
+            TotalItems="@TotalItems"
+            tableLoading="tableLoading"
+            THCount="3"
+            Title="CATEGORY"
+            Items="ProductCategories"
+            Context="category"
+            ID="table">
+
+            <TableHeader>
+                <th class="text-center">Id</th>
+                <th class="text-center">Category Name</th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td data-title="Id" class="py-sm-5 py-3 text-end text-sm-center">@category.Id</td>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@category.Title</td>
+                <td class="text-end text-sm-start">
+                    <IconButton OnClick="(() => EditCategory(category))" icon="@Icons.Material.Filled.Edit" className="edit-icon" tooltip="Edit Category" />
+                </td>
+            </RowTemplate>
+
+        </PaginatedTable>
+
+    </div>
+}
+
+@code {
+
+    private int RowsPerPage { get; set; } = 10;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+    private List<ProductCategory> ProductCategories = new List<ProductCategory>();
+    private CreateProductCategoryDTO createProductCategoryDTO = new CreateProductCategoryDTO();
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+        PaginatedTableResponse<ProductCategory> response = await ClientProductCategoryService.GetAllProductCategoryPaginated(Paginated);
+        TotalItems = response.Count;
+        ProductCategories = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Product", href: "#", disabled: true),
+        new BreadcrumbItem("Category", href: "#", disabled: true),
+        new BreadcrumbItem("Manage", href: "/all-categories"),
+    };
+
+    void ShowProduct(int id)
+    {
+        NavigationManager.NavigateTo($"single-category/{id}");
+    }
+
+    private async Task CreateCategory()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("createProductCategoryDTO", createProductCategoryDTO);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<SingleProductCategory>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is CreateProductCategoryDTO editCategory)
+        {
+            await ClientProductCategoryService.CreateProductCategory(editCategory);
+            createProductCategoryDTO = new CreateProductCategoryDTO();
+            PaginatedTableResponse<ProductCategory> page_response = await ClientProductCategoryService.GetAllProductCategoryPaginated(Paginated);
+            TotalItems = page_response.Count;
+            ProductCategories = page_response.ResponseData;
+        };
+    }
+
+    private async Task EditCategory(ProductCategory payload)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Id", payload.Id);
+        parameters.Add("createProductCategoryDTO", createProductCategoryDTO);
+        parameters.Add("singleCategory", payload);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<SingleProductCategory>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is CreateProductCategoryDTO editCategory)
+        {
+            await ClientProductCategoryService.UpdateProductCategory(payload.Id, editCategory);
+            createProductCategoryDTO = new CreateProductCategoryDTO();
+            PaginatedTableResponse<ProductCategory> page_response = await ClientProductCategoryService.GetAllProductCategoryPaginated(Paginated);
+            TotalItems = page_response.Count;
+            ProductCategories = page_response.ResponseData;
+        };
+    }
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<ProductCategory> response = await ClientProductCategoryService.GetAllProductCategoryPaginated(Paginated);
+        TotalItems = response.Count;
+        ProductCategories = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            PaginatedTableResponse<ProductCategory> response = await ClientProductCategoryService.SearchProductCategory(Paginated);
+            TotalItems = response.Count;
+            ProductCategories = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            PaginatedTableResponse<ProductCategory> response = await ClientProductCategoryService.GetAllProductCategoryPaginated(Paginated);
+            TotalItems = response.Count;
+            ProductCategories = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<ProductCategory> response = await ClientProductCategoryService.GetAllProductCategoryPaginated(Paginated);
+        TotalItems = response.Count;
+        ProductCategories = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+}

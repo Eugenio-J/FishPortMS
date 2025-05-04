@@ -1,0 +1,238 @@
+﻿@page "/all-products"
+@inject NavigationManager NavigationManager
+@inject IClientMasterProductService ClientMasterProductService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+
+
+    @if (loadingProgress)
+    {
+        <TableSkeletonLoading/>
+    }
+    else
+    {
+      <div Class="pt-8 px-5">
+
+         <MudText Typo="Typo.h4">PRODUCTS</MudText><MudBreadcrumbs Items="_items" Class="ml-n2"></MudBreadcrumbs>
+
+         <CreateButton OnClick="CreateProduct" className="create-btn" button_name="Add Product" />
+
+         <PaginatedTable 
+             RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+             SearchBar="HandleSearchTextValue"
+             Paginated="HandlePaginatedBtn"
+             TotalItems="@TotalItems"
+             tableLoading="tableLoading"
+             THCount="10"
+             Title="PRODUCT"
+             Items="GetMasterProducts"
+             Context="product"
+             ID="table">
+
+             <TableHeader>
+                 <th class="text-center"></th>
+                 <th class="text-center">Product Name</th>
+                 <th class="text-center">SKU</th>
+                 <th class="text-center">UOM</th>
+                 <th class="text-center">Packaging Qty</th>
+                 <th class="text-center">Packaging Cost</th>
+                 <th></th>
+                 <th></th>
+             </TableHeader>
+             <RowTemplate>
+                <td class="text-end text-sm-center">
+                    <MudAvatar>
+                        @if (product.ProductImageURLs.Count > 0)
+                        {
+                            <MudImage Src="@product.ProductImageURLs.FirstOrDefault(prod => prod.MasterProductId == product.Id)!.ProductImageURL"></MudImage>
+                        }
+                        else
+                        {
+                            <MudImage Src="images/form_imgs/noimg.jpg"></MudImage>
+                        }
+                    </MudAvatar>
+                </td>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@product.Name</td>
+                <td data-title="SKU" class="py-sm-5 py-3 text-end text-sm-center">@product.SKU</td>
+                <td data-title="UOM" class="py-sm-5 py-3 text-end text-sm-center">@product.UOM</td>
+                <td data-title="PkgQty" class="py-sm-5 py-3 text-end text-sm-center">@product.PkgQnty</td>
+                <td data-title="PkgCost" class="py-sm-5 py-3 text-end text-sm-center">@product.PkgCost</td>
+                <td class="text-end text-sm-start">
+                    <IconButton OnClick="(() => EditProduct(product))" icon="@Icons.Material.Filled.Edit" className="edit-icon" tooltip="Edit Product" />
+                </td>
+                <td class="text-end text-sm-start">
+                    @if (product.IsActive == false)
+                    {
+                        <SubmitButton button_name="ENABLE" className="enable-btn" OnClick="(() => EnableProduct(product.Id))" />
+                    }
+                    else
+                    {
+                        <SubmitButton button_name="DISABLE" className="disable-btn" OnClick="() => DisableProduct(product.Id)" />
+                    }
+                </td>
+             </RowTemplate>
+
+         </PaginatedTable>
+
+    </div>
+    }
+
+@code {
+
+    private int RowsPerPage { get; set; } = 10;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+    private List<GetMasterProduct> GetMasterProducts = new List<GetMasterProduct>();
+    private CreateMasterProduct createMasterProduct = new CreateMasterProduct();
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+        PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+        TotalItems = response.Count;
+        GetMasterProducts = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Products", href: "#", disabled: true),
+        new BreadcrumbItem("Manage", href: "/all-products"),
+    };
+
+    private async Task CreateProduct()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("createMasterProduct", createMasterProduct);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<SingleMasterProduct>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is CreateMasterProduct createProd)
+        {
+            await ClientMasterProductService.CreateMasterProduct(createProd);
+            PaginatedTableResponse<GetMasterProduct> page_response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+            TotalItems = page_response.Count;
+            GetMasterProducts = page_response.ResponseData;
+        };
+    }
+
+    private async Task EditProduct(GetMasterProduct payload)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Id", payload.Id);
+        parameters.Add("singleProduct", payload);
+        parameters.Add("createMasterProduct", createMasterProduct);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<SingleMasterProduct>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is CreateMasterProduct createProd)
+        {
+            await ClientMasterProductService.UpdateMasterProduct(payload.Id, createProd);
+            PaginatedTableResponse<GetMasterProduct> page_response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+            TotalItems = page_response.Count;
+            GetMasterProducts = page_response.ResponseData;
+        };
+    }
+
+    private async Task EnableProduct(int id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want enable this product?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Enable Product", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            int response = await ClientMasterProductService.EnableProduct(id);
+
+            if (response > 0)
+            {
+                PaginatedTableResponse<GetMasterProduct> page_response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+                TotalItems = page_response.Count;
+                GetMasterProducts = page_response.ResponseData;
+            }
+        }
+    }
+
+    private async Task DisableProduct(int id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want disable this product?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var dialogResult = await DialogService.Show<ApprovalDialog>("Disable Product", parameters).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
+        {
+            int response = await ClientMasterProductService.DisableProduct(id);
+
+            if (response > 0)
+            {
+                PaginatedTableResponse<GetMasterProduct> page_response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+                TotalItems = page_response.Count;
+                GetMasterProducts = page_response.ResponseData;
+            }
+        }
+    }
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+        TotalItems = response.Count;
+        GetMasterProducts = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.SearchProduct(Paginated);
+            TotalItems = response.Count;
+            GetMasterProducts = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+            TotalItems = response.Count;
+            GetMasterProducts = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+        TotalItems = response.Count;
+        GetMasterProducts = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+}

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FishPortMS.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250503103723_Added Receipt Model")]
-    partial class AddedReceiptModel
+    [Migration("20250504095732_Modified_PettyCash_UserProfileId")]
+    partial class Modified_PettyCash_UserProfileId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -242,9 +242,6 @@ namespace FishPortMS.Server.Migrations
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("UserDetailsId")
-                        .HasColumnType("int");
 
                     b.Property<int>("UserProfileId")
                         .HasColumnType("int");
@@ -657,6 +654,84 @@ namespace FishPortMS.Server.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("BSId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BSName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CashierName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ConsignacionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DeductedPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GrossSales")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("NetSales")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConsignacionId");
+
+                    b.ToTable("Receipts");
+                });
+
+            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ReceiptItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClientProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CurrentPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsOut")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReceiptId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UOM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiptId");
+
+                    b.ToTable("ReceiptItems");
+                });
+
             modelBuilder.Entity("FishPortMS.Shared.Models.Sales.SalesOrder", b =>
                 {
                     b.Property<int>("Id")
@@ -889,6 +964,28 @@ namespace FishPortMS.Server.Migrations
                     b.Navigation("SalesOrder");
                 });
 
+            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
+                {
+                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
+                        .WithMany()
+                        .HasForeignKey("ConsignacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consignacion");
+                });
+
+            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ReceiptItem", b =>
+                {
+                    b.HasOne("FishPortMS.Shared.Models.Sales.Receipt", "Receipt")
+                        .WithMany("ReceiptItems")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receipt");
+                });
+
             modelBuilder.Entity("FishPortMS.Shared.Models.Sales.SalesOrder", b =>
                 {
                     b.HasOne("FishPortMS.Shared.Models.Sales.ConsignacionSession", "Session")
@@ -961,6 +1058,11 @@ namespace FishPortMS.Server.Migrations
             modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ConsignacionSession", b =>
                 {
                     b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
+                {
+                    b.Navigation("ReceiptItems");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Sales.SalesOrder", b =>

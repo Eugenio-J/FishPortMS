@@ -7,6 +7,7 @@ namespace FishPortMS.Server.Services.ConsignacionService
     {
         Task<PaginatedTableResponse<GetConsignacionDTO>?> GetAllConsignacionesPaginated(GetPaginatedDTO request);
         Task<PaginatedTableResponse<GetConsignacionDTO>?> SearchConsignacion(GetPaginatedDTO request);
+        Task<List<GetConsignacionDTO>?> GetAllConsignacion();
         Task<int> AddMoreFranchiseConsignacion(Guid userId, CreateConsignacionDTO request);
         Task<List<GetConsignacionPin>?> GetAllConsignacionPin();
         Task<int> EnableConsignacion(Guid id);

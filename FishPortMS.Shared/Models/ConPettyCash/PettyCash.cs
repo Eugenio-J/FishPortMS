@@ -21,7 +21,7 @@ namespace FishPortMS.Shared.Models.ConPettyCash
         public decimal Amount { get; set; } = 0;
 
         public UserProfile UserProfile { get; set; }
-        public int UserDetailsId { get; set; }
+        public int UserProfileId { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.Now;
 
         public Consignacion Consignacion { get; set; }

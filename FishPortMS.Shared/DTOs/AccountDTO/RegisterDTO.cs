@@ -37,8 +37,5 @@ namespace FishPortMS.Shared.DTOs.AccountDTO
         public string Phone { get; set; } = string.Empty;
 
         public CreateConsignacionDTO? CreateConsignacionDTO { get; set; } = new CreateConsignacionDTO();
-
-        public string? consignasion { get; set; }
-
     }
 }

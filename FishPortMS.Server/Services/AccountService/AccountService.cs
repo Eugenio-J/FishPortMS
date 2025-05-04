@@ -244,7 +244,7 @@ namespace FishPortMS.Server.Services.AccountService
             return DeleteRefreshToken();
         }
 
-        private async Task<int> RegisterAdmin(RegisterDTO request)
+        public async Task<int> Register(RegisterDTO request)
         {
             if (await _context.Users.AnyAsync(user => user.Email == request.Email)) return 0;
 
@@ -334,90 +334,6 @@ namespace FishPortMS.Server.Services.AccountService
             }
 
             return status;
-        }
-
-        private async Task<int> RegisterConsignacion(RegisterDTO request)
-        {
-            if (await _context.Users.AnyAsync(user => user.Email == request.Email)) return 0;
-
-            string userId = GetUserId() ?? string.Empty;
-
-
-            var franchiseeId = await _context.ConsignacionOwners
-                .Include(u => u.UserProfile)
-                .Where(f => f.UserProfile.UserId.ToString() == userId)
-                .Select(f => f.Id)
-                .FirstOrDefaultAsync();
-
-            var myConsignacion = await _context.Consignacions
-               .Where(f => f.ConsignacionOwnerId == franchiseeId && f.Id.ToString() == request.consignasion)
-               .Select(f => f.Id)
-               .FirstOrDefaultAsync();
-
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-            User new_user = new User
-            {
-                Email = request.Email,
-                Password = passwordHash,
-                PasswordSalt = passwordSalt,
-                VerificationToken = new Random().Next(100000, 1000000).ToString(),
-                Role = request.Role
-            };
-
-            _context.Users.Add(new_user);
-            int status = await _context.SaveChangesAsync();
-
-            if (status == 0)
-            {
-                return 0;
-            }
-            else
-            {
-
-                var userDetails = new UserProfile
-                {
-                    User = new_user,
-                    UserId = new_user.Id,
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    Address = request.Address,
-                    City = request.City,
-                    Region = request.Region,
-                    PhoneNumber = request.Phone,
-                    AttendancePin = Guid.NewGuid().ToString("N").Substring(0, 4),
-                };
-
-                var branchEmployee = new ConsignacionEmployee
-                {
-                    IsActive = true,
-                    ConsignacionId = myConsignacion,
-                    UserProfile = userDetails
-                };
-
-                userDetails.ConsignacionEmployeeId = branchEmployee.Id;
-
-
-                _context.ConsignacionEmployees.Add(branchEmployee);
-                _context.UserProfiles.Add(userDetails);
-                await _context.SaveChangesAsync();
-
-            }
-
-            return status;
-        }
-
-        public async Task<int> Register(RegisterDTO request)
-        {
-            if (string.IsNullOrEmpty(request.consignasion))
-            {
-                return await RegisterAdmin(request);
-            }
-
-            else 
-            {
-                return await RegisterConsignacion(request);
-            }
         }
 
         private ClaimsPrincipal? ValidateRefreshToken(string refreshToken)

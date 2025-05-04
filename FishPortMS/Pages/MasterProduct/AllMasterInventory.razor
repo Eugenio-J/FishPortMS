@@ -1,0 +1,164 @@
+﻿@page "/all-inventories"
+@inject NavigationManager NavigationManager
+@inject IClientMasterProductService ClientMasterProductService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+
+
+    @if (loadingProgress)
+    {
+        <TableSkeletonLoading/>
+    }
+    else
+    {
+      <div Class="pt-8 px-5">
+
+        <MudText Typo="Typo.h4">INVENTORY</MudText><MudBreadcrumbs Items="_items" Class="ml-n2 mb-n5"></MudBreadcrumbs>
+
+         <PaginatedTable 
+             RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+             SearchBar="HandleSearchTextValue"
+             Paginated="HandlePaginatedBtn"
+             TotalItems="@TotalItems"
+             tableLoading="tableLoading"
+             THCount="9"
+             Title="INVENTORY"
+             Items="GetMasterProducts"
+             Context="product"
+             ID="table">
+
+            <TableHeader>
+                <th class="text-center">Id</th>
+                <th class="text-center">Product Name</th>
+                <th class="text-center">QTY</th>
+                <th class="text-center">Current Price</th>
+                <th class="text-center">Previous Price</th>
+                <th class="text-center">AT COST</th>
+                <th class="text-center">FP</th>
+                <th class="text-center">WHP</th>
+                <th></th>
+            </TableHeader>
+             <RowTemplate>
+                <td data-title="ID" class="py-sm-5 py-3 text-end text-sm-center">@product.Id</td>
+            
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">
+                    @product.Name
+                </td>
+                    <td data-title="Qty" class="py-sm-5 py-3 text-end text-sm-center">
+                    @product.MasterInventory.Qty
+                </td>
+                
+                <td data-title="Curr Price" class="py-sm-5 py-3 text-end text-sm-center">P @string.Format("{0:N2}", @product.MasterInventory.CurrentPrice)</td>
+                <td data-title="Prev Price" class="py-sm-5 py-3 text-end text-sm-center">P @string.Format("{0:N2}", @product.MasterInventory.PreviousPrice)</td>
+                <td data-title="AT COST" class="py-sm-5 py-3 text-end text-sm-center">P @string.Format("{0:N2}", @product.MasterInventory.SRP)</td>
+                <td data-title="FP" class="py-sm-5 py-3 text-end text-sm-center">P @string.Format("{0:N2}", @product.MasterInventory.DCP)</td>
+                <td data-title="WHP" class="py-sm-5 py-3 text-end text-sm-center">P @string.Format("{0:N2}", @product.MasterInventory.WSP)</td>
+                <td class="text-end text-sm-start">
+                    <IconButton OnClick="(() => EditInventory(product))" icon="@Icons.Material.Filled.Edit" className="edit-icon" tooltip="Edit Inventory" />
+                </td>
+             </RowTemplate>
+
+         </PaginatedTable>
+
+    </div>
+    }
+
+@code {
+
+    private int RowsPerPage { get; set; } = 10;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+    private List<GetMasterProduct> GetMasterProducts = new List<GetMasterProduct>();
+    private UpdateMasterInventory updateMasterInventory = new UpdateMasterInventory();
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+        PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+        TotalItems = response.Count;
+        GetMasterProducts = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Inventory", href: "#", disabled: true),
+        new BreadcrumbItem("Manage", href: "/all-inventories"),
+    };
+
+    private async Task EditInventory(GetMasterProduct payload)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Id", payload.Id);
+        parameters.Add("singleProduct", payload);
+        parameters.Add("updateMasterInventory", updateMasterInventory);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<SingleMasterInventory>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is UpdateMasterInventory editInventory)
+        {
+            await ClientMasterProductService.UpdateMasterInventory(payload.Id, editInventory);
+            PaginatedTableResponse<GetMasterProduct> page_response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+            TotalItems = page_response.Count;
+            GetMasterProducts = page_response.ResponseData;
+        };
+    }
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+        TotalItems = response.Count;
+        GetMasterProducts = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.SearchProduct(Paginated);
+            TotalItems = response.Count;
+            GetMasterProducts = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+            TotalItems = response.Count;
+            GetMasterProducts = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetMasterProduct> response = await ClientMasterProductService.GetAllProductPaginated(Paginated);
+        TotalItems = response.Count;
+        GetMasterProducts = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+}

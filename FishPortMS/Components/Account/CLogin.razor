@@ -78,11 +78,7 @@
 
             if (role == Roles.SUPERUSER.ToString() 
                 || role == Roles.ADMIN.ToString()
-                || role == Roles.ADMIN_ASST.ToString()
-                || role == Roles.CASHIER.ToString()
-                || role == Roles.CONSIGNACION_OWNER.ToString()
-                || role == Roles.BUY_AND_SELL.ToString()
-            )
+                || role == Roles.ADMIN_ASST.ToString())
             {
                 isLoading = false;
                 StateHasChanged();
