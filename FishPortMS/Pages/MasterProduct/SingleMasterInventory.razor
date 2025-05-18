@@ -1,0 +1,88 @@
+﻿@using System.Net.Http.Headers
+@inject IClientMasterProductService ClientMasterProductService
+@inject ISnackbar Snackbar
+
+@if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+
+            <MudPaper Class="px-sm-2 mt-n4 px-1 pb-4" Elevation="0">
+
+                <HeaderInfos title="EDIT INVENTORY" icon="@Icons.Material.Filled.Edit" />
+
+                <div class="mt-3">
+                    <EditForm Model="updateMasterInventory" OnValidSubmit="HandleSubmit">
+                        <MudTextField Class="mb-5" Label="Quantity" @bind-Value="updateMasterInventory.Qty" InputType="InputType.Number" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        <MudTextField Class="mb-5" Label="Current Price" @bind-Value="updateMasterInventory.CurrentPrice" InputType="InputType.Number" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        <MudTextField Class="mb-5" Label="Previous Price" @bind-Value="updateMasterInventory.PreviousPrice" InputType="InputType.Number" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        <MudTextField Class="mb-5" Label="At Cost" @bind-Value="updateMasterInventory.SRP" InputType="InputType.Number" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        <MudTextField Class="mb-5" Label="FP" @bind-Value="updateMasterInventory.DCP" InputType="InputType.Number" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        <MudTextField Class="mb-5" Label="WHP" @bind-Value="updateMasterInventory.WSP" InputType="InputType.Number" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        <div class="d-flex justify-content-end">
+                            <SubmitButton isLoading="isLoading" button_name="EDIT" className="edit-btn" />
+                        </div>
+                    </EditForm>
+                </div>
+            </MudPaper>
+        </DialogContent>
+    </MudDialog>
+}
+
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+
+    [Parameter] public int? Id { get; set; }
+
+    [Parameter] public GetMasterProduct? singleProduct { get; set; } = new GetMasterProduct();
+
+    [Parameter] public UpdateMasterInventory? updateMasterInventory { get; set; } = new UpdateMasterInventory();
+
+    private bool loadingProgress = true;
+
+    public bool isLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loadingProgress = true;
+        if (Id == null)
+        {
+            singleProduct = new GetMasterProduct();
+        }
+        else
+        {
+            singleProduct = await ClientMasterProductService.GetSingleMasterProduct((int)Id);
+
+            if (singleProduct != null)
+            {
+                updateMasterInventory = new UpdateMasterInventory
+                {
+                    CurrentPrice = singleProduct.MasterInventory.CurrentPrice,
+                    PreviousPrice = singleProduct.MasterInventory.PreviousPrice,
+                    Qty = singleProduct.MasterInventory.Qty,
+                    SRP = singleProduct.MasterInventory.SRP,
+                    DCP = singleProduct.MasterInventory.DCP,
+                    WSP = singleProduct.MasterInventory.WSP,
+                };
+            }
+
+        }
+        loadingProgress = false;
+    }
+
+    async Task HandleSubmit()
+    {
+        loadingProgress = true;
+        isLoading = true;
+        MudDialog.Close(DialogResult.Ok(updateMasterInventory));
+        loadingProgress = false;
+        isLoading = false;
+    }
+
+}

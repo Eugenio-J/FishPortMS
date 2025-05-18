@@ -44,6 +44,8 @@ namespace FishPortMS.Server.Data
         public DbSet<ConsignacionSession> ConsignacionSessions => Set<ConsignacionSession>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
+        public DbSet<Receipt> Receipts => Set<Receipt>();
+        public DbSet<ReceiptItem> ReceiptItems => Set<ReceiptItem>();
 
     }
 

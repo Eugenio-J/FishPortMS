@@ -5,6 +5,7 @@ using FishPortMS.Shared.Response;
 using System.Security.Claims;
 using FishPortMS.Shared.DTOs.ConsignacionDTO;
 using FishPortMS.Shared.Models.FishPort;
+using Blazored.LocalStorage;
 
 namespace FishPortMS.Server.Services.ConsignacionService
 {
@@ -32,6 +33,32 @@ namespace FishPortMS.Server.Services.ConsignacionService
 
         private string? GetUserRole() => _httpContextAccessor.HttpContext?.User
             .FindFirstValue(ClaimTypes.Role);
+
+        public async Task<List<GetConsignacionDTO>?> GetAllConsignacion()
+        {
+            string userId = GetUserId() ?? string.Empty;
+
+            if (GetUserRole() != Roles.CONSIGNACION_OWNER.ToString()
+                && GetUserRole() != Roles.CONSIGNACION_OWNER.ToString()) return null;
+
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            int franchiseeId = await _context.ConsignacionOwners
+                .Where(franchisee => franchisee.UserProfile.UserId.ToString() == userId)
+                .Select(franchisee => franchisee.Id)
+                .FirstOrDefaultAsync();
+
+            List<GetConsignacionDTO>? branches = await _context.Consignacions
+                .Where(branch => branch.ConsignacionOwnerId == franchiseeId)
+                .Select(branch => new GetConsignacionDTO
+                {
+                    Id = branch.Id,
+                    ConsignacionName = branch.ConsignacionName
+                })
+                .ToListAsync();
+
+            return branches;
+        }
 
         public async Task<int> AddMoreFranchiseConsignacion(Guid userId, CreateConsignacionDTO request)
         {

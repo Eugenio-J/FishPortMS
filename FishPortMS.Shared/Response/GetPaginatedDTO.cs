@@ -10,7 +10,7 @@ namespace FishPortMS.Shared.Response
         public string? SearchValue { get; set; }
         public AttendanceState? AttendanceState { get; set; }
         public Roles? Roles { get; set; }
-
+        public string consignacion { get; set; } = string.Empty;
         public DateTime? AttendanceDateStart { get; set; }
         public DateTime? AttendanceDateEnd { get; set; }
         public string? EmployeeName { get; set; } = string.Empty;

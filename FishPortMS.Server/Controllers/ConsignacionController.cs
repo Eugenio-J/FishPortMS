@@ -18,6 +18,14 @@ namespace FishPortMS.Server.Controllers
             _consignacionService = ConsignacionService;
         }
 
+        [HttpGet("all-consignacions"), Authorize(Roles = "CONSIGNACION_OWNER, CASHIER")]
+        public async Task<ActionResult<List<GetConsignacionDTO>?>> GetAllConsignacion()
+        {
+            var status = await _consignacionService.GetAllConsignacion();
+            if (status == null) return Unauthorized();
+            return Ok(status);
+        }
+
         [HttpGet("all-consignacion-paginated")]
         public async Task<ActionResult<PaginatedTableResponse<GetConsignacionDTO>?>> GetAllConsignacionesPaginated([FromQuery] GetPaginatedDTO request)
         {

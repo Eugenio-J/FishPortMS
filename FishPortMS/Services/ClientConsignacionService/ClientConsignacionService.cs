@@ -3,6 +3,7 @@ using FishPortMS.Shared.Response;
 using System.Net.Http.Json;
 using FishPortMS.Utilities;
 using FishPortMS.Shared.DTOs.ConsignacionDTO;
+using Blazored.LocalStorage;
 
 namespace FishPortMS.Services.ClientConsignacionService
 {
@@ -10,11 +11,14 @@ namespace FishPortMS.Services.ClientConsignacionService
     {
         private readonly HttpClient _http;
         private readonly ModifiedSnackBar _modifiedSnackBar;
+        private readonly ILocalStorageService _localStorageService;
 
-        public ClientConsignacionService(HttpClient http, ModifiedSnackBar modifiedSnackBar)
+
+        public ClientConsignacionService(HttpClient http, ModifiedSnackBar modifiedSnackBar, ILocalStorageService localStorageService)
         {
             _http = http;
             _modifiedSnackBar = modifiedSnackBar;
+            _localStorageService = localStorageService;
         }
 
         public List<GetRenewalDetailsDTO> getRenewalDetails { get; set; } = new List<GetRenewalDetailsDTO>();
@@ -55,6 +59,15 @@ namespace FishPortMS.Services.ClientConsignacionService
             if (result != null) return result;
 
             return new PaginatedTableResponse<GetConsignacionDTO>();
+        }
+
+        public async Task<List<GetConsignacionDTO>> GetAllConsignacions()
+        {
+            var result = await _http.GetFromJsonAsync<List<GetConsignacionDTO>>("api/consignacion/all-consignacions");
+
+            if (result == null) return new List<GetConsignacionDTO>();
+
+            return result;
         }
 
         public async Task<int> EnableConsignacion(Guid id)

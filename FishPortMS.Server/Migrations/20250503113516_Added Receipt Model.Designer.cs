@@ -4,6 +4,7 @@ using FishPortMS.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FishPortMS.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250503113516_Added Receipt Model")]
+    partial class AddedReceiptModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,6 +242,9 @@ namespace FishPortMS.Server.Migrations
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("UserDetailsId")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserProfileId")
                         .HasColumnType("int");
@@ -670,9 +676,6 @@ namespace FishPortMS.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -688,13 +691,7 @@ namespace FishPortMS.Server.Migrations
                     b.Property<decimal>("NetSales")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsignacionId");
 
                     b.ToTable("Receipts");
                 });
@@ -963,17 +960,6 @@ namespace FishPortMS.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("SalesOrder");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany()
-                        .HasForeignKey("ConsignacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Consignacion");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ReceiptItem", b =>
