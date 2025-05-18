@@ -15,6 +15,7 @@ namespace FishPortMS.Shared.Models.Sales
         public int Id { get; set; }
         public string BSName { get; set; } = string.Empty;
         public string CashierName { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal GrossSales { get; set; }
