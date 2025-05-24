@@ -89,7 +89,7 @@ namespace FishPortMS.Server.Services.ReceiptService
 
                 ReceiptItem new_item = new ReceiptItem
                 {
-                    ClientProductId = item.ClientProductId,
+                    //ClientProductId = item.ClientProductId,
                     CurrentPrice = item.CurrentPrice,
                     IsOut = item.IsOut,
                     UOM = item.UOM,
