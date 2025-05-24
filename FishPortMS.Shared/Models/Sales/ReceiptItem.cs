@@ -16,8 +16,8 @@ namespace FishPortMS.Shared.Models.Sales
         public Receipt Receipt { get; set; }
         public int ReceiptId { get; set; }
         public bool IsOut { get; set; } = false;
-        ClientProduct ClientProduct { get; set; }
-        public int ClientProductId { get; set; }    
+        MasterProduct MasterProduct { get; set; }
+        public int MasterProductId { get; set; }
         public string UOM { get; set; } = "KG";
 
         [Column(TypeName = "decimal(18,2)")]
