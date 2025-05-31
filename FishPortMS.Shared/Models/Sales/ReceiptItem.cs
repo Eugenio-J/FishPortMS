@@ -24,6 +24,9 @@ namespace FishPortMS.Shared.Models.Sales
         public decimal Weight { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal CurrentPrice { get; set; }   
+        public decimal CurrentPrice { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Subtotal { get; set; }
     }
 }
