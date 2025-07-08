@@ -3,6 +3,7 @@
 @using FishPortMS.Shared.DTOs.UserManagementDTO
 @inject NavigationManager NavigationManager
 @inject IClientUserManagementService ClientUserManagementService
+@inject ILocalStorageService LocalStorageService
 @inject IClientAccountService ClientAuthService
 @inject IDialogService DialogService
 @inject IJSRuntime JavaScript
@@ -81,12 +82,13 @@
 
     private bool loadingProgress = true;
     private bool tableLoading = true;
+    public string? selectedbranch { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         loadingProgress = true;
         tableLoading = true;
-
+        selectedbranch = await LocalStorageService.GetItemAsync<string>("BranchId");
         PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
         TotalItems = response.Count;
         GetUsersDTO = response.ResponseData;

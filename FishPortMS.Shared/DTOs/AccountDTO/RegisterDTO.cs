@@ -36,6 +36,7 @@ namespace FishPortMS.Shared.DTOs.AccountDTO
         [RegularExpression("^(09|\\+639)\\d{9}$", ErrorMessage = "The number should start with +639 or 09 followed by 9 numbers.")]
         public string Phone { get; set; } = string.Empty;
 
+        public string? branch { get; set; }
         public CreateConsignacionDTO? CreateConsignacionDTO { get; set; } = new CreateConsignacionDTO();
     }
 }

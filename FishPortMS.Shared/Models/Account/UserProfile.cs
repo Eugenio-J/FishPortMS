@@ -1,6 +1,4 @@
-﻿using FishPortMS.Shared.Models.Attendance;
-using FishPortMS.Shared.Models.ConPettyCash;
-using FishPortMS.Shared.Models.FishPort;
+﻿using FishPortMS.Shared.Models.ConPettyCash;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -25,17 +23,6 @@ namespace FishPortMS.Shared.Models.Account
         public string? Avatar { get; set; }
         public User User { get; set; }
         public Guid UserId { get; set; }
-
-        [JsonIgnore]
-        public ConsignacionOwner? ConsignacionOwner { get; set; }
-        public int? ConsignacionOwnerId { get; set; }
-
-        [JsonIgnore]
-        public ConsignacionEmployee? ConsignacionEmployee { get; set; }
-        public int? ConsignacionEmployeeId { get; set; }
-
-        [JsonIgnore]
-        public List<ConsignacionAttendance>? ConsignacionAttendance { get; set; }
 
         [JsonIgnore]
         public List<PettyCash>? PettyCash { get; set; }

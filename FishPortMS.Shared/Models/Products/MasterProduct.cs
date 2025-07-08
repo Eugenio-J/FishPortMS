@@ -29,8 +29,5 @@ namespace FishPortMS.Shared.Models.Products
         public MasterInventory MasterInventory { get; set; }
 
         public List<ProductCarousel>? ProductCarousels { get; set; }
-
-        [JsonIgnore]
-        public List<ClientProduct>? ClientProducts { get; set; }
     }
 }

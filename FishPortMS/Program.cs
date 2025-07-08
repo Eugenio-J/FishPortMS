@@ -9,7 +9,6 @@ using MudBlazor.Services;
 using FishPortMS.Client.Response;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 using FishPortMS.Services.ClientUserManagementService;
-using FishPortMS.Services.ClientConsignacionService;
 using FishPortMS.Services.ClientMasterProductService;
 using FishPortMS.Services.ClientProductCategoryService;
 
@@ -32,7 +31,6 @@ builder.Services.AddAuthorizationCore();
 
 builder.Services.AddScoped<IClientAccountService, ClientAccountService>();
 builder.Services.AddScoped<IClientUserManagementService, ClientUserManagementService>();
-builder.Services.AddScoped<IClientConsignacionService, ClientConsignacionService>();
 builder.Services.AddScoped<IClientMasterProductService, ClientMasterProductService>();
 builder.Services.AddScoped<IClientProductCategoryService, ClientProductCategoryService>();
 

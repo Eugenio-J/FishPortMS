@@ -1,6 +1,5 @@
 using FishPortMS.Server.Data;
 using FishPortMS.Server.Services.AccountService;
-using FishPortMS.Server.Services.ConsignacionService;
 using FishPortMS.Server.Services.MasterProductService;
 using FishPortMS.Server.Services.ProductCategoryService;
 using FishPortMS.Server.Services.ReceiptService;
@@ -42,7 +41,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
-builder.Services.AddScoped<IConsignacionService, ConsignacionService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IMasterProductService, MasterProductService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();

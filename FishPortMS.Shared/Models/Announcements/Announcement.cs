@@ -1,5 +1,4 @@
 ﻿using FishPortMS.Shared.Enums.Announcements;
-using FishPortMS.Shared.Models.FishPort;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,5 @@ namespace FishPortMS.Shared.Models.Announcements
         public bool IsActive { get; set; } = false;
         public AnnouncementRole AnnouncementRole { get; set; }
         public AnnouncementType AnnouncementType { get; set; }
-        public Consignacion? Consignacion { get; set; }
-        public Guid? ConsignacionId { get; set; }
     }
 }

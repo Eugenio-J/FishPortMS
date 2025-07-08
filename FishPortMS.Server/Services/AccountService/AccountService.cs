@@ -3,7 +3,6 @@ using FishPortMS.Server.Response;
 using FishPortMS.Shared.DTOs.AccountDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Models.Account;
-using FishPortMS.Shared.Models.FishPort;
 using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -270,7 +269,11 @@ namespace FishPortMS.Server.Services.AccountService
             {
                 if (request.Role == Roles.SUPERUSER
                     || request.Role == Roles.ADMIN
-                    || request.Role == Roles.ADMIN_ASST)
+                    || request.Role == Roles.ADMIN_ASST
+                    || request.Role == Roles.CONSIGNACION_OWNER
+                    || request.Role == Roles.BATILYO
+                    || request.Role == Roles.CASHIER
+                    || request.Role == Roles.BUY_AND_SELL)
                 {
                     var userDetails = new UserProfile
                     {
@@ -285,50 +288,6 @@ namespace FishPortMS.Server.Services.AccountService
                         AttendancePin = Guid.NewGuid().ToString("N").Substring(0, 4),
                     };
                     _context.UserProfiles.Add(userDetails);
-                    await _context.SaveChangesAsync();
-                }
-                else if (request.Role == Roles.CONSIGNACION_OWNER)
-                {
-                    var consignacionOwner = new ConsignacionOwner
-                    {
-                        IsActive = true,
-                        Consignacion = new List<Consignacion>()
-                    };
-
-                    var mConsignacion = new Consignacion
-                    {
-                        ConsignacionName = request.CreateConsignacionDTO!.ConsignacionName,
-                        ConsignacionAddress = request.CreateConsignacionDTO.ConsignacionAddress,
-                        ConsignacionLocation = request.CreateConsignacionDTO.ConsignacionLocation,
-                        StartOfContract = request.CreateConsignacionDTO.StartOfContract,
-                        DateCreated = DateTime.Now,
-                        ConsignacionEmployees = new List<ConsignacionEmployee>()
-                    };
-
-                    if (request.CreateConsignacionDTO.StartOfContract.HasValue)
-                    {
-                        mConsignacion.EndOfContract = request.CreateConsignacionDTO.StartOfContract.Value.AddYears(1);
-                    }
-
-                    var userDetails = new UserProfile
-                    {
-                        UserId = new_user.Id,
-                        FirstName = request.FirstName,
-                        LastName = request.LastName,
-                        Address = request.Address,
-                        City = request.City,
-                        Region = request.Region,
-                        PhoneNumber = request.Phone,
-                        AttendancePin = Guid.NewGuid().ToString("N").Substring(0, 4),
-                        ConsignacionOwner = consignacionOwner,
-                        ConsignacionOwnerId = consignacionOwner.Id
-                    };
-
-                    consignacionOwner.Consignacion.Add(mConsignacion);
-                    _context.ConsignacionOwners.Add(consignacionOwner);
-                    _context.Consignacions.Add(mConsignacion);
-                    _context.UserProfiles.Add(userDetails);
-
                     await _context.SaveChangesAsync();
                 }
             }
