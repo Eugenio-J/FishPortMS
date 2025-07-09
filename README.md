@@ -8,4 +8,4 @@ The fish port is a fast-paced environment where everyone is in a rush. Transacti
 
 I want to build this system to help my family and others in the fish port automate their operations. By reducing manual input, we can minimize errors, improve accuracy, and streamline the sales process.
 
-Beyond error reduction, this system will also provide insightful analytics—allowing users to track and monitor sales by day, week, month, or even by the type of fish. This data can help them make better decisions, identify trends, and grow their business more effectively.
+Beyond error reduction, this system will also provide insightful analytics allowing users to track and monitor sales by day, week, month, or even by the type of fish. This data can help them make better decisions, identify trends, and grow their business more effectively.
