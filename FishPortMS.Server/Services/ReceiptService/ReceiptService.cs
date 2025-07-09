@@ -2,7 +2,7 @@
 using FishPortMS.Shared.DTOs.ReceiptDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Models.Products;
-using FishPortMS.Shared.Models.Sales;
+using FishPortMS.Shared.Models.Receipts;
 using FishPortMS.Shared.Response;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -67,7 +67,6 @@ namespace FishPortMS.Server.Services.ReceiptService
                 BSId = request.BSId,
                 CashierName = request.CashierName,
                 BSName = request.BSname,
-                ConsignacionId = consignacion,
                 DateCreated = PHTime(),
                 CreatedBy = UserId,
                 DeductedPercentage = request.DeductedPercentage,
@@ -78,9 +77,8 @@ namespace FishPortMS.Server.Services.ReceiptService
 
             foreach (GetReceiptItemDTO? item in request.GetReceiptItemDTO) 
             {
-                ClientProduct? clientProduct = await _context.ClientProducts
-                    .Include(x => x.MasterProduct)
-                    .Where(x => x.Id == item.ClientProductId && x.ConsignacionId == consignacion).FirstOrDefaultAsync();
+                MasterProduct? clientProduct = await _context.MasterProducts
+                    .Where(x => x.Id == item.ClientProductId).FirstOrDefaultAsync();
 
                 if (clientProduct == null) 
                 {

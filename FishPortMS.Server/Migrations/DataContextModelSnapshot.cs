@@ -88,12 +88,6 @@ namespace FishPortMS.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ConsignacionEmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ConsignacionOwnerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -115,14 +109,6 @@ namespace FishPortMS.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConsignacionEmployeeId")
-                        .IsUnique()
-                        .HasFilter("[ConsignacionEmployeeId] IS NOT NULL");
-
-                    b.HasIndex("ConsignacionOwnerId")
-                        .IsUnique()
-                        .HasFilter("[ConsignacionOwnerId] IS NOT NULL");
-
                     b.HasIndex("UserId")
                         .IsUnique();
 
@@ -143,9 +129,6 @@ namespace FishPortMS.Server.Migrations
                     b.Property<int>("AnnouncementType")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -164,63 +147,7 @@ namespace FishPortMS.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConsignacionId");
-
                     b.ToTable("Announcements");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Attendance.ConsignacionAttendance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AttendanceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("AttendanceState")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LunchIn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LunchOut")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TimeIn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TimeInImage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("TimeOut")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TimeOutImage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserDetailsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserProfileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserProfileId");
-
-                    b.ToTable("ConsignacionAttendances");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.ConPettyCash.PettyCash", b =>
@@ -234,9 +161,6 @@ namespace FishPortMS.Server.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -244,8 +168,6 @@ namespace FishPortMS.Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsignacionId");
 
                     b.HasIndex("UserProfileId");
 
@@ -268,9 +190,6 @@ namespace FishPortMS.Server.Migrations
 
                     b.Property<int>("ApprovalStatus")
                         .HasColumnType("int");
-
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -302,8 +221,6 @@ namespace FishPortMS.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConsignacionId");
-
                     b.HasIndex("ExpenseCategoryId");
 
                     b.ToTable("Expenses");
@@ -324,95 +241,6 @@ namespace FishPortMS.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExpenseCategories");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.Consignacion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ActiveSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConsignacionAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsignacionLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsignacionName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ConsignacionOwnerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EndOfContract")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Latitude")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Longitude")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("StartOfContract")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsignacionOwnerId");
-
-                    b.ToTable("Consignacions");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.ConsignacionEmployee", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CurrSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsignacionId");
-
-                    b.ToTable("ConsignacionEmployees");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.ConsignacionOwner", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ConsignacionOwners");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.NotifSubscription.NotifSubscription", b =>
@@ -438,54 +266,6 @@ namespace FishPortMS.Server.Migrations
                     b.HasKey("SubsriptionId");
 
                     b.ToTable("NotifSubscriptions");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Products.ClientInventory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClientProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaxQty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Qty")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientProductId")
-                        .IsUnique();
-
-                    b.ToTable("ClientInventories");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Products.ClientProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("MasterProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsignacionId");
-
-                    b.HasIndex("MasterProductId");
-
-                    b.ToTable("ClientProducts");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Products.MasterInventory", b =>
@@ -596,62 +376,7 @@ namespace FishPortMS.Server.Migrations
                     b.ToTable("ProductCategories");
                 });
 
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ConsignacionSession", b =>
-                {
-                    b.Property<Guid>("SessionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ConsignacionEmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("EndCash")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("EndSession")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartSession")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("StartingCash")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("SessionId");
-
-                    b.HasIndex("ConsignacionEmployeeId");
-
-                    b.ToTable("ConsignacionSessions");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("OrderQty")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("SalesOrderId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SalesOrderId");
-
-                    b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
+            modelBuilder.Entity("FishPortMS.Shared.Models.Receipts.Receipt", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -669,9 +394,6 @@ namespace FishPortMS.Server.Migrations
                     b.Property<string>("CashierName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ConsignacionId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -694,12 +416,10 @@ namespace FishPortMS.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConsignacionId");
-
                     b.ToTable("Receipts");
                 });
 
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ReceiptItem", b =>
+            modelBuilder.Entity("FishPortMS.Shared.Models.Receipts.ReceiptItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -736,183 +456,37 @@ namespace FishPortMS.Server.Migrations
                     b.ToTable("ReceiptItems");
                 });
 
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.SalesOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("PaymentType")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Ref_No")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("SalesOrders");
-                });
-
             modelBuilder.Entity("FishPortMS.Shared.Models.Account.UserProfile", b =>
                 {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.ConsignacionEmployee", "ConsignacionEmployee")
-                        .WithOne("UserProfile")
-                        .HasForeignKey("FishPortMS.Shared.Models.Account.UserProfile", "ConsignacionEmployeeId");
-
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.ConsignacionOwner", "ConsignacionOwner")
-                        .WithOne("UserProfile")
-                        .HasForeignKey("FishPortMS.Shared.Models.Account.UserProfile", "ConsignacionOwnerId");
-
                     b.HasOne("FishPortMS.Shared.Models.Account.User", "User")
                         .WithOne("UserProfile")
                         .HasForeignKey("FishPortMS.Shared.Models.Account.UserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ConsignacionEmployee");
-
-                    b.Navigation("ConsignacionOwner");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Announcements.Announcement", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany("Announcements")
-                        .HasForeignKey("ConsignacionId");
-
-                    b.Navigation("Consignacion");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Attendance.ConsignacionAttendance", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.Account.UserProfile", "UserProfile")
-                        .WithMany("ConsignacionAttendance")
-                        .HasForeignKey("UserProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserProfile");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.ConPettyCash.PettyCash", b =>
                 {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany("PettyCash")
-                        .HasForeignKey("ConsignacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("FishPortMS.Shared.Models.Account.UserProfile", "UserProfile")
                         .WithMany("PettyCash")
                         .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Consignacion");
 
                     b.Navigation("UserProfile");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Expenses.Expense", b =>
                 {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany("Expenses")
-                        .HasForeignKey("ConsignacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("FishPortMS.Shared.Models.Expenses.ExpenseCategory", "ExpenseCategory")
                         .WithMany()
                         .HasForeignKey("ExpenseCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Consignacion");
-
                     b.Navigation("ExpenseCategory");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.Consignacion", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.ConsignacionOwner", "ConsignacionOwner")
-                        .WithMany("Consignacion")
-                        .HasForeignKey("ConsignacionOwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ConsignacionOwner");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.ConsignacionEmployee", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany("ConsignacionEmployees")
-                        .HasForeignKey("ConsignacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Consignacion");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Products.ClientInventory", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.Products.ClientProduct", "ClientProduct")
-                        .WithOne("ClientInventory")
-                        .HasForeignKey("FishPortMS.Shared.Models.Products.ClientInventory", "ClientProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ClientProduct");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Products.ClientProduct", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany("ClientProduct")
-                        .HasForeignKey("ConsignacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FishPortMS.Shared.Models.Products.MasterProduct", "MasterProduct")
-                        .WithMany("ClientProducts")
-                        .HasForeignKey("MasterProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Consignacion");
-
-                    b.Navigation("MasterProduct");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Products.MasterInventory", b =>
@@ -946,59 +520,15 @@ namespace FishPortMS.Server.Migrations
                     b.Navigation("MasterProduct");
                 });
 
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ConsignacionSession", b =>
+            modelBuilder.Entity("FishPortMS.Shared.Models.Receipts.ReceiptItem", b =>
                 {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.ConsignacionEmployee", "ConsignacionEmployee")
-                        .WithMany("ConsignacionSessions")
-                        .HasForeignKey("ConsignacionEmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ConsignacionEmployee");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.OrderItem", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.Sales.SalesOrder", "SalesOrder")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("SalesOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("SalesOrder");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.FishPort.Consignacion", "Consignacion")
-                        .WithMany()
-                        .HasForeignKey("ConsignacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Consignacion");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ReceiptItem", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.Sales.Receipt", "Receipt")
+                    b.HasOne("FishPortMS.Shared.Models.Receipts.Receipt", "Receipt")
                         .WithMany("ReceiptItems")
                         .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Receipt");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.SalesOrder", b =>
-                {
-                    b.HasOne("FishPortMS.Shared.Models.Sales.ConsignacionSession", "Session")
-                        .WithMany("SalesOrder")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Account.User", b =>
@@ -1009,69 +539,20 @@ namespace FishPortMS.Server.Migrations
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Account.UserProfile", b =>
                 {
-                    b.Navigation("ConsignacionAttendance");
-
                     b.Navigation("PettyCash");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.Consignacion", b =>
-                {
-                    b.Navigation("Announcements");
-
-                    b.Navigation("ClientProduct");
-
-                    b.Navigation("ConsignacionEmployees");
-
-                    b.Navigation("Expenses");
-
-                    b.Navigation("PettyCash");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.ConsignacionEmployee", b =>
-                {
-                    b.Navigation("ConsignacionSessions");
-
-                    b.Navigation("UserProfile")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.FishPort.ConsignacionOwner", b =>
-                {
-                    b.Navigation("Consignacion");
-
-                    b.Navigation("UserProfile")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Products.ClientProduct", b =>
-                {
-                    b.Navigation("ClientInventory")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Products.MasterProduct", b =>
                 {
-                    b.Navigation("ClientProducts");
-
                     b.Navigation("MasterInventory")
                         .IsRequired();
 
                     b.Navigation("ProductCarousels");
                 });
 
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.ConsignacionSession", b =>
-                {
-                    b.Navigation("SalesOrder");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.Receipt", b =>
+            modelBuilder.Entity("FishPortMS.Shared.Models.Receipts.Receipt", b =>
                 {
                     b.Navigation("ReceiptItems");
-                });
-
-            modelBuilder.Entity("FishPortMS.Shared.Models.Sales.SalesOrder", b =>
-                {
-                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

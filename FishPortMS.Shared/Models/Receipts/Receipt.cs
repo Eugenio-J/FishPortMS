@@ -1,5 +1,4 @@
-﻿using FishPortMS.Shared.Models.FishPort;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FishPortMS.Shared.Models.Sales
+namespace FishPortMS.Shared.Models.Receipts
 {
     public class Receipt
     {
@@ -28,9 +27,6 @@ namespace FishPortMS.Shared.Models.Sales
         public Guid CreatedBy { get; set; } 
         public Guid? BSId { get; set; } 
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-
-        public Consignacion Consignacion { get; set; }
-        public Guid ConsignacionId { get; set; }
 
         public List<ReceiptItem> ReceiptItems { get; set; } = new List<ReceiptItem>(); 
     }

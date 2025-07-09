@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FishPortMS.Shared.Models.Sales
+namespace FishPortMS.Shared.Models.Receipts
 {
     public class ReceiptItem
     {

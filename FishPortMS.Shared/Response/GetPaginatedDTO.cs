@@ -8,7 +8,6 @@ namespace FishPortMS.Shared.Response
         public int Skip { get; set; } = 0;
         public string? Status { get; set; }
         public string? SearchValue { get; set; }
-        public AttendanceState? AttendanceState { get; set; }
         public Roles? Roles { get; set; }
         public string consignacion { get; set; } = string.Empty;
         public DateTime? AttendanceDateStart { get; set; }

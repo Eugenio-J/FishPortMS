@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FishPortMS.Shared.Models.FishPort;
 using FishPortMS.Shared.Enums.Status;
 
 namespace FishPortMS.Shared.Models.Expenses
@@ -35,9 +34,6 @@ namespace FishPortMS.Shared.Models.Expenses
 
         public ApprovalStatus ApprovalStatus { get; set; }
         public DateTime ApprovalDate { get; set; }
-
-        public Consignacion Consignacion { get; set; }
-        public Guid ConsignacionId { get; set; }
     }
 }
  
