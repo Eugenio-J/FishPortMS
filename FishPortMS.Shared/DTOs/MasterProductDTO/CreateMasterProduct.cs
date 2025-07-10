@@ -12,8 +12,6 @@ namespace FishPortMS.Shared.DTOs.MasterProductDTO
 
         public string Description { get; set; } = string.Empty;
 
-
-        [Required(ErrorMessage = "UOM field is required.")]
         public string UOM { get; set; } = string.Empty;
 
         public bool IsActive { get; set; }

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FishPortMS.Server", "FishPortMS.Server\FishPortMS.Server.csproj", "{46C98650-157C-473D-915A-20CDFE326DE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FishPortMS.Server", "FishPortMS.Server\FishPortMS.Server.csproj", "{46C98650-157C-473D-915A-20CDFE326DE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FishPortMS.Shared", "FishPortMS.Shared\FishPortMS.Shared.csproj", "{67823AC7-89EA-4465-B5CF-044A94702691}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FishPortMS.Shared", "FishPortMS.Shared\FishPortMS.Shared.csproj", "{67823AC7-89EA-4465-B5CF-044A94702691}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FishPortMS", "FishPortMS\FishPortMS.csproj", "{736D201C-A4B7-49C1-8581-C17327647410}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FishPortMS", "FishPortMS\FishPortMS.csproj", "{736D201C-A4B7-49C1-8581-C17327647410}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

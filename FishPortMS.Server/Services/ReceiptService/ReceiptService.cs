@@ -43,88 +43,191 @@ namespace FishPortMS.Server.Services.ReceiptService
             };
         }
 
-        public async Task<CheckReceiptDTO> CreateReceipt(CreateReceiptDTO request, string consignacionId)
+        public async Task<int> CreateReceipt(CreateReceiptDTO request)
         {
-            CheckReceiptDTO result = new CheckReceiptDTO(); 
-
             string userId = GetUserId() ?? string.Empty;
-
-            string userRole = GetUserRole() ?? string.Empty;
-
-            Guid.TryParse(consignacionId, out Guid consignacion);
 
             Guid.TryParse(userId, out Guid UserId);
 
-
-            var cashierName = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId.ToString() == userId);
-
-            if (!Enum.TryParse(GetUserRole(), out Roles acc_role)) return ReturnError();
-
-            if (string.IsNullOrEmpty(userId)) return ReturnError();
-
-            Receipt? newReceipt = new Receipt 
+            Receipt? newReceipt = new Receipt
             {
-                BSId = request.BSId,
                 CashierName = request.CashierName,
                 BSName = request.BSname,
+                BSId = request.BsId,
+                Notes = request.Notes,
                 DateCreated = PHTime(),
                 CreatedBy = UserId,
                 DeductedPercentage = request.DeductedPercentage,
                 ReceiptItems = new List<ReceiptItem>()
             };
 
-            _context.Receipts.Add(newReceipt);  
+            _context.Receipts.Add(newReceipt);
 
-            foreach (GetReceiptItemDTO? item in request.GetReceiptItemDTO) 
+            foreach (GetReceiptItemDTO? item in request.GetReceiptItemDTO)
             {
-                MasterProduct? clientProduct = await _context.MasterProducts
-                    .Where(x => x.Id == item.ClientProductId).FirstOrDefaultAsync();
+                MasterProduct? masterProduct = await _context.MasterProducts
+                    .Where(x => x.Id == item.MasterProductId).FirstOrDefaultAsync();
 
-                if (clientProduct == null) 
+                if (masterProduct == null)
                 {
-                    return ReturnError();
+                    return 0;
                 }
 
                 ReceiptItem new_item = new ReceiptItem
                 {
-                    //ClientProductId = item.ClientProductId,
+                    MasterProductId = item.MasterProductId,
                     CurrentPrice = item.CurrentPrice,
                     IsOut = item.IsOut,
-                    UOM = item.UOM,
                     Weight = item.Weight,
+                    Subtotal = item.Weight * item.CurrentPrice
                 };
 
-                newReceipt.ReceiptItems.Add(new_item);  
+                newReceipt.ReceiptItems.Add(new_item);
                 _context.ReceiptItems.Add(new_item);
             }
 
-            newReceipt.GrossSales = newReceipt.ReceiptItems.Sum(x => x.CurrentPrice);
+            newReceipt.GrossSales = newReceipt.ReceiptItems.Sum(x => x.Subtotal);
 
-            decimal amountDeducted = newReceipt.GrossSales-(newReceipt.GrossSales * (request.DeductedPercentage/100));
+            decimal amountDeducted = (newReceipt.GrossSales * (request.DeductedPercentage / 100));
 
-            newReceipt.NetSales = newReceipt.ReceiptItems.Sum(x => x.CurrentPrice) - amountDeducted;
+            newReceipt.NetSales = newReceipt.GrossSales - amountDeducted;
+
+            int count = await _context.SaveChangesAsync();
+
+            return newReceipt.Id;
+        }
+
+        public async Task<PaginatedTableResponse<GetReceiptDTO>> GetReceiptPaginated(GetPaginatedDTO request)
+        {
+            PaginatedTableResponse<GetReceiptDTO> response = new PaginatedTableResponse<GetReceiptDTO>();
+
+            List<Receipt> receipt = new List<Receipt>();
+
+            IQueryable<Receipt>? query = _context.Receipts;
+
+            receipt = await _context.Receipts
+                    .Include(consignacion => consignacion.ReceiptItems)
+                    .ThenInclude(consignacion => consignacion.MasterProduct)
+                    .OrderByDescending(p => p.Id)
+                    .Skip(request.Skip)
+                    .Take(request.Take)
+                    .ToListAsync();
+
+            response.ResponseData = receipt.Select(ConvertReceipt).ToList();
+            response.Count = await query.CountAsync();
+
+            return response;
+        }
+
+        public async Task<GetReceiptDTO?> GetSingleReceipt(int receiptId)
+        {
+            var singleReceipt = await _context.Receipts
+                .Include(x => x.ReceiptItems)
+                .ThenInclude(x => x.MasterProduct)
+                .SingleOrDefaultAsync(x => x.Id == receiptId);
+
+            if (singleReceipt == null) return null;
+
+            return ConvertReceipt(singleReceipt);
+        }
+
+        public async Task<PaginatedTableResponse<GetReceiptDTO>> SearchReceipt(GetPaginatedDTO request)
+        {
+            PaginatedTableResponse<GetReceiptDTO> response = new PaginatedTableResponse<GetReceiptDTO>();
+
+            List<Receipt> receipt = new List<Receipt>();
+
+            IQueryable<Receipt>? query = _context.Receipts.Where(b => b.BSName.Contains(request.SearchValue)
+                || (b.CashierName.Contains(request.SearchValue)));
+
+
+            receipt = await _context.Receipts
+                    .OrderByDescending(p => p.Id)
+                    .Skip(request.Skip)
+                    .Take(request.Take)
+                    .ToListAsync();
+
+            response.ResponseData = receipt.Select(ConvertReceipt).ToList();
+            response.Count = await query.CountAsync();
+
+            return response;
+        }
+
+        private GetReceiptDTO ConvertReceipt(Receipt receipt)
+        {
+            List<GetReceiptItemDTO> receiptItem = receipt.ReceiptItems.Select(x => new GetReceiptItemDTO
+            {
+                Id = x.Id,
+                MasterProductId = x.MasterProductId,
+                CurrentPrice = x.CurrentPrice,
+                IsOut = x.IsOut,
+                ProductName = x.MasterProduct.Name,
+                ReceiptId = x.ReceiptId,
+                Weight = x.Weight,
+                Subtotal = x.Subtotal,
+            }).ToList();
+
+            return new GetReceiptDTO
+            {
+                Id = receipt.Id,
+                BSName = receipt.BSName,
+                CashierName = receipt.CashierName,
+                Notes = receipt.Notes,
+                DateCreated = receipt.DateCreated,
+                DeductedPercentage = receipt.DeductedPercentage,
+                GrossSales = receipt.GrossSales,
+                NetSales = receipt.NetSales,
+                ReceiptItems = receiptItem,
+            };
+        }
+
+        public async Task<int> UpdateReceipt(int Id, CreateReceiptDTO request)
+        {
+            Receipt? receipt = await _context.Receipts
+                 .Include(x => x.ReceiptItems)
+                 .ThenInclude(x => x.MasterProduct)
+                 .Where(product => product.Id == Id)
+                 .FirstOrDefaultAsync();
+
+            if (receipt == null) return 0;
+
+            decimal grossSales = 0;
+            decimal netSales = 0;
+
+            receipt.Notes = request.Notes;
+            receipt.BSName = request.BSname;
+            receipt.BSId = request.BsId;
+            receipt.CashierName = request.CashierName;
+            receipt.DeductedPercentage = request.DeductedPercentage;
+
+            foreach (var item in request.GetReceiptItemDTO)
+            {
+                var receiptItem = await _context.ReceiptItems.FirstOrDefaultAsync(x => x.Id == item.Id);
+
+                if (receiptItem == null)
+                {
+                    return 0;
+                }
+
+                receiptItem.CurrentPrice = item.CurrentPrice;
+                receiptItem.Weight = item.Weight;
+                receiptItem.IsOut = item.IsOut;
+                receiptItem.Subtotal = item.Weight * item.CurrentPrice;
+
+
+                grossSales += item.CurrentPrice * item.Weight;
+
+            }
+
+            receipt.GrossSales = grossSales;
+
+            decimal amountDeducted = (grossSales * (request.DeductedPercentage / 100));
+
+            receipt.NetSales = grossSales - amountDeducted;
 
             await _context.SaveChangesAsync();
 
-            result.ReceiptItemId = newReceipt.Id;
-            result.IsSuccess = true;
-
-            return result;
-        }
-
-        public Task<PaginatedTableResponse<GetReceiptDTO>> GetReceiptPaginated(GetPaginatedDTO request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<GetReceiptDTO> GetSingleReceipt(int receiptId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<PaginatedTableResponse<GetReceiptDTO>> SearchReceipt(GetPaginatedDTO request)
-        {
-            throw new NotImplementedException();
+            return receipt.Id;
         }
     }
 }

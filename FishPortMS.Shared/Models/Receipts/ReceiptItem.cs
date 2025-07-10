@@ -16,7 +16,7 @@ namespace FishPortMS.Shared.Models.Receipts
         public Receipt Receipt { get; set; }
         public int ReceiptId { get; set; }
         public bool IsOut { get; set; } = false;
-        MasterProduct MasterProduct { get; set; }
+        public MasterProduct MasterProduct { get; set; }
         public int MasterProductId { get; set; }
         public string UOM { get; set; } = "KG";
 

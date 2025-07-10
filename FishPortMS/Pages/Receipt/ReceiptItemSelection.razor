@@ -1,0 +1,420 @@
+﻿@inject ModifiedSnackBar ModifiedSnackBar
+@inject IDialogService DialogService
+
+<style>
+    .mud-table-empty-row {
+        background: #fff !important;
+        border-radius: 12px !important;
+    }
+
+    .mud-table-small-cell {
+        padding: 5px !important;
+    }
+
+    .add-btn {
+        color: #FBFFFD !important;
+        background: #00A850 !important;
+        height: 40px;
+        border-radius: 9px;
+        font-weight: 400;
+    }
+
+        .add-btn:hover {
+            background: #049248 !important;
+        }
+
+    .update-btn {
+        color: #FBFFFD !important;
+        background: #27E485 !important;
+        height: 40px;
+        border-radius: 9px;
+        font-weight: 400;
+    }
+
+        .update-btn:hover {
+            background: #21B66B !important;
+        }
+
+    .order-list:first-child {
+        border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
+    }
+
+    .order-list:last-child {
+        border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .p-table-div {
+        /* background: #E2C6A4; */
+    }
+
+    .tbl-parent {
+        box-shadow: none;
+        background-color: white;
+        border-radius: 12px;
+    }
+
+        .tbl-parent th {
+            font-family: 'Poppins' !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+            padding-bottom: 18px !important;
+            padding-top: 21px !important;
+            letter-spacing: .3px !important;
+            text-transform: uppercase !important;
+            color: #43576F !important;
+            font-size: 10px !important;
+            border-bottom: 0px !important;
+            border-top: 0px !important;
+            background-color: #F6F7FB;
+            border-bottom: 1px solid #E4E7EF !important;
+        }
+
+        .tbl-parent td {
+            font-family: 'Poppins' !important;
+            font-weight: 400 !important;
+            letter-spacing: -.2px !important;
+            color: #43576F !important;
+            border-bottom: 1px solid #E4E7EF !important;
+        }
+
+    .mud-typography-subtitle1 {
+        font-family: 'Poppins' !important;
+        color: #43576F !important;
+        font-weight: 500 !important;
+        font-size: 13px !important;
+        margin-top: 2px !important;
+        text-transform: uppercase;
+    }
+
+    .table-footer {
+        height: 100px !important;
+    }
+
+}
+</style>
+
+
+    <div Class="mb-6">
+
+        <MudGrid Spacing="2">
+
+            <MudItem xs="12" sm="12">
+                @if (MasterProductList != null)
+                {
+                    if (productSelect)
+                    {
+                        <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
+                            Product Name <span style="color: red;">*</span>
+                        </MudText>
+
+                        <MudAutocomplete 
+                            @bind-Value="selectedProductName"
+                            MaxItems="100"
+                            SearchFunc="@SearchProduct"
+                            Margin="Margin.Dense"
+                            Strict="false"
+                            Class="mt-2"
+                            Variant="Variant.Outlined"
+                            OpenChanged="@GetProductId" />
+                    }
+                }
+            </MudItem>
+
+            <MudItem xs="6" sm="6">
+
+                <MudText Typo="Typo.subtitle2" Class="input-label">
+                    Kilograms <span style="color: red;">*</span>
+                </MudText>
+                <div class="d-flex align-items-center">
+                    <MudTextField 
+                        Class="w-100 mt-2"
+                        @ref="weightField"
+                        @bind-Value="POItems.Weight"
+                        For="@(() => POItems.Weight)"
+                        Adornment="Adornment.End"
+                        InputType="InputType.Number"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense"
+                        Required="true" />
+                 </div>
+             </MudItem>
+
+            <MudItem xs="6" sm="6">
+
+                <MudText Typo="Typo.subtitle2" Class="input-label">
+                    Price <span style="color: red;">*</span>
+                </MudText>
+                <div class="d-flex align-items-center">
+                    <MudTextField
+                        Class="w-100 mt-2"
+                        @bind-Value="POItems.CurrentPrice"
+                                  For="@(() => POItems.CurrentPrice)"
+                        Adornment="Adornment.End"
+                        InputType="InputType.Number"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense"
+                        Required="true" />
+
+                    <InvokeButton
+                        className="submit-btn mt-1 ml-2"
+                        css="font-size: 13px!important; white-space: nowrap;"
+                        button_name="Add"
+                        OnClick="AddProduct" />
+
+                </div>
+            </MudItem>
+         </MudGrid>
+
+    </div>
+
+    @if (_tabs.Any())
+    {
+        <MudPaper Class="pa-4">
+            <MudTabs @bind-ActivePanelIndex="_activeTabIndex">
+                @foreach (var tab in _tabs)
+                {
+                    decimal totalAmount = 0;
+
+                    foreach (var item in tab.POItemsList)
+                    {
+                        totalAmount += item.CurrentPrice * item.Weight;
+                    }
+
+                    <MudTabPanel Text="@tab.Title">
+
+                        <div class="mb-3" style="border: 1px solid #E0EAF7; border-radius: 8px; background: #FAFAFA;">
+                        <MudTable Items="@tab.POItemsList" Class="input-label" Hover="true" Breakpoint="Breakpoint.None" CellClass="mud-table-small-cell" LoadingProgressColor="Color.Info" Elevation="0" FooterClass="table-footer">
+                                <HeaderContent>
+                                    <MudTh Class="text-center">Kilo</MudTh>
+                                    <MudTh Class="text-center">Price/Kilo</MudTh>
+                                    <MudTh Class="text-center">Subtotal</MudTh>
+                                    <MudTh></MudTh>
+                                </HeaderContent>
+
+                                <RowTemplate Context="orders">
+                                    <MudTd DataLabel="Kilo" Class="text-center">@orders.Weight</MudTd>
+                                    <MudTd DataLabel="Price" Class="text-center">P @string.Format("{0:N0}", orders.CurrentPrice)</MudTd>
+                                    <MudTd DataLabel="Subtotal" Class="text-center">P @string.Format("{0:N0}", orders.CurrentPrice * @orders.Weight)</MudTd>
+                                    <MudTd Class="text-end text-sm-center">
+
+                                        <IconButton OnClick="() => UpdateProduct(orders)" icon="@Icons.Material.Filled.Edit" className="view-icon mr-2" tooltip="Update Qty" />
+
+                                        <IconButton OnClick="() => RemoveProduct(orders)" icon="@Icons.Material.Filled.Remove" className="reject-icon mr-2" tooltip="Remove Item" />
+
+                                    </MudTd>
+                                </RowTemplate>
+                                <PagerContent>
+                                    <MudTablePager Class="d-flex flex-column my-3" HorizontalAlignment="HorizontalAlignment.Center"/>
+                                </PagerContent>
+                            </MudTable>
+
+                            <div class="d-flex d-block justify-content-end mb-4 w-100 px-4 mt-15 mb-5">
+                                <MudText Class="input-label mr-4" Style="font-weight: 600!important;">TOTAL: P @string.Format("{0:N2}", @totalAmount)</MudText>
+                            </div>
+
+                        </div>
+
+                    </MudTabPanel>
+                }
+            </MudTabs>
+        </MudPaper>
+    }
+
+    else
+    {
+        <div class="text-center pt-3 pb-5 px-4 mb-3 order-list" style="border: 1px solid #E0EAF7; border-radius: 8px; background: #FAFAFA;">
+            <MudText Typo="Typo.h4" Class="mr-1 mt-2" Style="font-family: 'Poppins' !important; font-size: 14px!important; margin-top: 10px!important; text-transform: uppercase; font-weight: 400!important;">
+                NO ORDERS FOUND.
+            </MudText>
+        </div>
+    }
+
+
+
+@code {
+
+    [Parameter] public int? Id { get; set; }
+
+    [Parameter] public List<GetMasterProduct> MasterProductList { get; set; }
+
+    [Parameter] public CreateReceiptDTO CreateReceipt { get; set; } = new CreateReceiptDTO();
+
+    [Parameter] public List<GetReceiptItemDTO> POItemsList { get; set; } = new List<GetReceiptItemDTO>();
+
+    private MudTextField<decimal> weightField;
+
+    public GetReceiptItemDTO POItems { get; set; } = new GetReceiptItemDTO();
+
+    public GetMasterProduct MasterProduct { get; set; } = new GetMasterProduct();
+
+    private void OpenDialogEditProfile() => visibleEditProduct = true;
+
+    private DialogOptions dialogOptionsEditProduct = new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+
+    private bool visibleEditProduct;
+
+    private bool productSelect = true;
+
+    private bool buttonStatus = true;
+
+    private bool showDeliveryItems = false;
+
+    private string selectedProductName = "";
+
+    private int _tabCounter = 1;
+    private int _activeTabIndex = 0;
+
+    [Parameter] public List<Tabs> _tabs { get; set; } = new List<Tabs>();
+
+    private async Task<IEnumerable<string>> SearchProduct(string value, CancellationToken token)
+    {
+     
+        List<string> matchingNames = new List<string>();
+
+        foreach (var product in MasterProductList)
+        {
+            // Optional: you could also filter based on value
+            if (product.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
+            {
+                matchingNames.Add(product.Name);
+            }
+        }
+
+        return matchingNames;
+    }
+
+    private async Task FocusWeightField()
+    {
+        await weightField.FocusAsync();
+    }
+
+
+    private void GetProductId()
+    {
+        var selectedProduct = MasterProductList
+            .FirstOrDefault(product => product.Name == selectedProductName);
+
+        if (selectedProduct != null)
+        {
+            MasterProduct.Id = selectedProduct.Id;
+        }
+    }
+
+    private async Task AddProduct()
+    {
+
+        var selectedProduct = MasterProductList.FirstOrDefault(id => id.Id == MasterProduct.Id);
+
+        if (MasterProduct.Id == 0)
+        {
+            ModifiedSnackBar.ShowMessage("Please select a Product.", Severity.Warning);
+            return;
+        }
+
+        if (POItems.Weight <= 0)
+        {
+            ModifiedSnackBar.ShowMessage("Please enter a valid qty.", Severity.Warning);
+            return;
+        }
+
+        if (POItems.CurrentPrice <= 0)
+        {
+            ModifiedSnackBar.ShowMessage("Please enter a valid price.", Severity.Warning);
+            return;
+        }
+
+        GetReceiptItemDTO? newStockItem = new GetReceiptItemDTO();
+
+        // if (!POItemsList.Any(s => s.MasterProductId == MasterProduct.Id))
+        // {
+        newStockItem = new GetReceiptItemDTO
+                {
+                    MasterProductId = MasterProduct.Id,
+                    Weight = POItems.Weight,
+                    ProductName = selectedProduct.Name,
+                    UOM = selectedProduct.UOM,
+                    CurrentPrice = POItems.CurrentPrice
+                };
+
+        CreateReceipt.GetReceiptItemDTO.Add(newStockItem);
+
+        if (!_tabs.Any(x => x.Title == selectedProduct.Name))
+        {
+            var newTab = new Tabs
+                {
+                    Title = selectedProduct.Name,
+                    POItemsList = new List<GetReceiptItemDTO>()
+                };
+
+            newTab.POItemsList.Add(newStockItem);
+            _tabs.Add(newTab);
+        }
+
+        else
+        {
+            var selectedTab = _tabs.FirstOrDefault(x => x.Title == selectedProduct.Name);
+
+            selectedTab.POItemsList.Add(newStockItem);
+        }
+
+        POItems.Weight = 0;
+
+        await FocusWeightField();
+        // }
+        // else
+        // {
+        //     ModifiedSnackBar.ShowMessage("Product already exists on the list.", Severity.Warning);
+        // }
+
+        _activeTabIndex = _tabs.Count - 1;
+    }
+
+    private async Task UpdateProduct(GetReceiptItemDTO StockItem)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("StockItem", StockItem);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<EditQuantity>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is GetReceiptItemDTO stockItems)
+        {
+            productSelect = true;
+            POItems = stockItems;
+            buttonStatus = false;
+
+            var prodDelete = CreateReceipt.GetReceiptItemDTO.Find(c => c.MasterProductId == stockItems.MasterProductId);
+
+            var selectedProduct = MasterProductList.FirstOrDefault(mp => mp.Id == stockItems.MasterProductId)?.Name;
+
+            if (prodDelete != null)
+            {
+                productSelect = true;
+                POItems = prodDelete;
+                buttonStatus = false;
+                selectedProductName = selectedProduct;
+            }
+
+        }
+    }
+
+    private void RemoveProduct(GetReceiptItemDTO stock)
+    {
+        var prodDelete = CreateReceipt.GetReceiptItemDTO.Find(c => c.MasterProductId == stock.MasterProductId);
+
+        if (prodDelete != null)
+        {
+            var selectedProduct = MasterProductList.FirstOrDefault(mp => mp.Id == stock.MasterProductId)?.Name;
+
+            if (selectedProduct != null)
+            {
+                ModifiedSnackBar.ShowMessage($"{selectedProduct} has been removed.", Severity.Error);
+                CreateReceipt.GetReceiptItemDTO.Remove(prodDelete);
+                productSelect = true;
+                POItems = new GetReceiptItemDTO();
+            }
+        }
+    }
+
+}

@@ -52,5 +52,13 @@ namespace FishPortMS.Server.Controllers
             if (status == 0) return BadRequest();
             return Ok(status);
         }
+
+        [HttpGet("all-bs")]
+        public async Task<ActionResult<List<GetUsersDTO>?>> GetBSList()
+        {
+            var status = await _userManagementService.GetBSList();
+            if (status == null) return Unauthorized();
+            return Ok(status);
+        }
     }
 }

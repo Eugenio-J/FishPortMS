@@ -1,0 +1,44 @@
+﻿<style>
+    .export-btn{
+        color: #FBFFFD !important;
+        background: #FF5F5F !important;
+        font-weight: 400 !important;
+        font-size: 13px !important;
+        margin-bottom: 7px;
+        border-radius: 8px!important;
+    }
+
+    .export-btn:hover{
+        background: #BF3E3E !important;
+    }
+</style>
+
+<div class="mt-7 mb-0 d-flex justify-content-end">
+    <MudButton 
+        id="print_pdf"
+        Class="export-btn mr-2"
+        StartIcon="@Icons.Material.Filled.Print"
+        ButtonType="ButtonType.Button"
+        Variant="Variant.Filled"
+        Color="Color.Info"
+        Size="Size.Medium"
+        DisableElevation>
+        PRINT
+    </MudButton>
+
+    <MudButton 
+        Class="close-btn"
+        Style="border-radius: 8px!important;"
+        ButtonType="ButtonType.Button"
+        Variant="Variant.Filled"
+        Color="Color.Info"
+        Size="Size.Medium"
+        DisableElevation
+        OnClick="(() => OnClick.InvokeAsync())">
+        CLOSE
+    </MudButton>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; }
+}

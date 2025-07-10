@@ -11,5 +11,7 @@ namespace FishPortMS.Server.Services.UserManagementService
         Task<PaginatedTableResponse<GetUsersDTO>?> SearchUser(GetPaginatedDTO request);
         Task<int> EnableAccount(Guid userId);
         Task<int> DisableAccount(Guid userId);
+        Task<List<GetUsersDTO>> GetBSList();
+
     }
 }

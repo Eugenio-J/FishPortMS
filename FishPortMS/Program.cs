@@ -11,6 +11,8 @@ using Toolbelt.Blazor.Extensions.DependencyInjection;
 using FishPortMS.Services.ClientUserManagementService;
 using FishPortMS.Services.ClientMasterProductService;
 using FishPortMS.Services.ClientProductCategoryService;
+using FishPortMS.Services.ClientReceiptService;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -33,6 +35,7 @@ builder.Services.AddScoped<IClientAccountService, ClientAccountService>();
 builder.Services.AddScoped<IClientUserManagementService, ClientUserManagementService>();
 builder.Services.AddScoped<IClientMasterProductService, ClientMasterProductService>();
 builder.Services.AddScoped<IClientProductCategoryService, ClientProductCategoryService>();
+builder.Services.AddScoped<IClientReceiptService, ClientReceiptService>();
 
 
 await builder.Build().RunAsync();

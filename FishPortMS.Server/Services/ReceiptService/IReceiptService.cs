@@ -5,9 +5,10 @@ namespace FishPortMS.Server.Services.ReceiptService
 {
     public interface IReceiptService
     {
-        Task<CheckReceiptDTO> CreateReceipt(CreateReceiptDTO request, string consignacionId);
+        Task<int> CreateReceipt(CreateReceiptDTO request);
+        Task<int> UpdateReceipt(int Id, CreateReceiptDTO request);
         Task<PaginatedTableResponse<GetReceiptDTO>> GetReceiptPaginated(GetPaginatedDTO request);
         Task<PaginatedTableResponse<GetReceiptDTO>> SearchReceipt(GetPaginatedDTO request);
-        Task<GetReceiptDTO> GetSingleReceipt(int receiptId);
+        Task<GetReceiptDTO?> GetSingleReceipt(int receiptId);
     }
 }

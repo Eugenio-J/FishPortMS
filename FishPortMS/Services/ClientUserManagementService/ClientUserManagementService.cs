@@ -74,5 +74,13 @@ namespace FishPortMS.Services.ClientUserManagementService
             }
         }
 
+        public async Task<List<GetUsersDTO>> GetBSList()
+        {
+            List<GetUsersDTO>? result = await _http.GetFromJsonAsync<List<GetUsersDTO>>($"api/UserManagement/all-bs");
+
+            if (result != null) return result;
+
+            return new List<GetUsersDTO>();
+        }
     }
 }

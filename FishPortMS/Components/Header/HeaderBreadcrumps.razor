@@ -1,0 +1,151 @@
+﻿<style>
+    .mud-breadcrumb-item > a {
+        color: #536B89 !important;
+    }
+
+    .mud-breadcrumb-item > a:hover {
+            color: #df4140 !important;
+    }
+
+    .mud-breadcrumbs {
+        font-size: 12px !important;
+        font-weight: 300 !important;
+        font-family: 'Poppins' !important;
+        margin-top: -20px;
+        padding-left: 0px;
+        padding-right: 30px;
+        text-transform: uppercase;
+    }
+
+    .mud-breadcrumb-separator {
+        padding: 0px 7px !important;
+    }
+
+    .bread-date-filter {
+        background: #F3373F;
+        border-radius: 4px;
+        padding: 11px;
+        padding-left: 20px;
+        padding-right: 15px;
+        color: white;
+        font-family: 'Poppins' !important;
+        cursor: pointer;
+        transition: .3s ease;
+    }
+
+    .bread-date-filter:hover {
+        background: #BF2229;
+    }
+
+    .bread-add-btn {
+        border-radius: 4px;
+        background: #F3373F;
+        padding: 11px 15px;
+        color: white;
+        font-family: 'Poppins' !important;
+        cursor: pointer;
+        transition: .3s ease;
+        font-size: 12px;
+    }
+
+    .bread-add-btn:hover {
+        background: #BF2229;
+    }
+
+    @@media only screen and (max-width: 600px) {
+        .bread-date-filter {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .bread-add-btn {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+
+
+<div class="mt-1 mt-sm-4 d-sm-flex justify-content-between align-items-center">
+    <div class="d-flex flex-column">
+        <MudText Typo="Typo.h4" Class="bread-header-title mb-4">@header_title</MudText>
+        <MudBreadcrumbs Items="header_items" Separator=">" Class=""></MudBreadcrumbs>
+    </div>
+
+    @if (AddIsActive == 1)
+    {
+        <div class="bread-date-filter">
+            <span class="datetime-value" @onclick="() => OnOpenDatePicker.InvokeAsync()" style="font-size: 13px; font-weight: 300!important;">
+
+                @if (dateFilter != null)
+                {
+                    @if (dateFilter.Start.HasValue && dateFilter.End.HasValue)
+                    {
+                        @dateFilter.Start.Value.ToString("dd MMM yyyy") @(" - ")
+                        @dateFilter.End.Value.ToString("dd MMM yyyy")
+                    }
+
+                    else
+                    {
+                        @FromDate.ToString("dd MMM yyyy") @(" - ") @ToDate.ToString("dd MMM yyyy")
+                    }
+                }
+
+                else
+                {
+                    @FromDate.ToString("dd MMM yyyy") @(" - ") @ToDate.ToString("dd MMM yyyy")
+                }
+
+            </span>
+        </div>
+    }
+
+    @if (AddIsActive == 3)
+    {
+        <div class="bread-date-filter">
+            <span class="datetime-value" style="font-size: 13px; font-weight: 300!important;">
+                @FromDate.ToString("dd MMM yyyy") ~ @ToDate.ToString("dd MMM yyyy")
+            </span>
+        </div>
+    }
+
+    else if (AddIsActive == 2)
+    {
+        <AuthorizeView Roles="CASHIER, CONSIGNACION_OWNER, SUPERUSER">
+            <Authorized>
+                <div class="bread-add-btn" @onclick="() => OnClick.InvokeAsync()">
+                    <i class="fa-solid fa-plus mr-1" style="color: white!important; font-size: 13px;"></i>
+                    <span class="datetime-value" style="font-size: 14px; font-weight: 300!important;">
+                        @add_btn_title
+                    </span>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public List<BreadcrumbItem> header_items { get; set; }
+    [Parameter] public string header_title { get; set; } = string.Empty;
+    [Parameter] public string add_btn_title { get; set; } = string.Empty;
+    [Parameter] public int AddIsActive { get; set; } = 0;
+    [Parameter] public DateRange? dateFilter { get; set; }
+    [Parameter] public EventCallback OnOpenDatePicker { get; set; }
+    [Parameter] public EventCallback ClearDatePicker { get; set; }
+
+    public DateTime FromDate { get; set; } = DateTime.Today;
+    public DateTime ToDate { get; set; } = DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+    private async Task OnDivClick()
+    {
+        await OnOpenDatePicker.InvokeAsync();
+    }
+
+    private async Task ClearDate()
+    {
+        await ClearDatePicker.InvokeAsync();
+    }
+}
