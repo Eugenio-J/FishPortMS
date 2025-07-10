@@ -1,0 +1,130 @@
+﻿<style>
+    .icon-class {
+        background: #FFE85A!important;
+        color: #F7FFF1 !important;
+        padding: 13px !important;
+        font-size: 50px !important;
+        border-radius: 7px !important;
+    }
+
+    .inc-div{
+        color: #56E783 !important;
+        padding: 0px 10px !important;
+        padding-top: 4px !important;
+        padding-bottom: 6px !important;
+        border-radius: 8px !important;
+        font-size: 13px!important;
+        height: 35px !important;
+    }
+
+    .dec-div {
+        color: #FD8484 !important;
+        padding: 0px 10px !important;
+        padding-top: 4px!important;
+        padding-bottom: 6px !important;
+        border-radius: 8px !important;
+        font-size: 13px !important;
+        height: 33px !important;
+    }
+
+    .mud-typography-subtitle1 {
+        font-weight: 700 !important;
+        letter-spacing: .2px !important;
+        font-size: 16px !important;
+        color: #45576F !important;
+    }
+
+    .mud-typography-subtitle2 {
+        font-family: 'Poppins' !important;
+        font-weight: 400 !important;
+        letter-spacing: .6px !important;
+        font-size: 13px !important;
+        color: #A3B2C2 !important;
+        text-transform: uppercase !important;
+    }
+
+    .header-date {
+        font-family: 'Poppins' !important;
+        font-weight: 500 !important;
+        letter-spacing: .6px !important;
+        font-size: 13px !important;
+        color: #fff;
+        text-transform: uppercase !important;
+    }
+
+    .fa-chart-simple{
+        font-size: 30px;
+    }
+</style>
+
+<MudItem xs="12" sm="6" lg="3">
+
+    <div class="mud-width-full container-parent position-relative" style="height: 137px;">
+        <div class="d-block pt-5 px-6">
+
+            <div class="mt-0">
+
+                <div class="position-absolute" style="right: 25px; top: 20px;">
+
+                    @if (Value.Status == CardStatus.Equal)
+                    {
+                    <i class="fa-solid fa-chart-simple" style="color: #002760;"></i>
+                    }
+                    else if (Value.Status == CardStatus.Less)
+                    {
+                        <i class="fa-solid fa-chart-simple" style="color: #FD8484;"></i>
+                    }
+                    else if (Value.Status == CardStatus.Greater)
+                    {
+                        <i class="fa-solid fa-chart-simple" style="color: #56E783;"></i>
+                    }
+                </div>
+               
+                
+                <div class="d-flex justify-content-between">
+                    <div class="d-block">
+                        <MudText Typo="Typo.subtitle2" Style="@($"color:{Colors.BlueGray.Darken1}; font-size: 13px !important;")">@Date @Title</MudText>
+                        <MudText Typo="Typo.subtitle1" Style="font-size: 17px !important;" Class="mt-5">P @string.Format("{0:N2}", Value.Data)</MudText>
+                    </div>
+                </div>
+               
+                <div class="d-flex justify-content-between ml-n3">
+                    @if (Value.Status == CardStatus.Greater)
+                    {
+                        <div class="d-flex gap-1 inc-div">
+                            <i class="fa-solid fa-arrow-up" style="margin-top: 7px;" />
+                            <MudText Typo="Typo.body2" Class="mt-1" Style="font-size: 14px!important; font-weight: 400!important;">@Value.VaryTotal % increase</MudText>
+                        </div>
+                    }
+                    else if (Value.Status == CardStatus.Less)
+                    {
+                        <div class="d-flex gap-2 dec-div">
+                            <i class="fa-solid fa-arrow-down" style="margin-top: 7px;" />
+                            <MudText Typo="Typo.body2" Class="mt-1" Style="font-size: 14px!important; font-weight: 400!important;">@Value.VaryTotal % decrease</MudText>
+                        </div>
+                    }
+                    else if (Value.Status == CardStatus.Equal)
+                    {
+                        <div class="d-flex gap-2 ml-3 mt-1">
+                            <i class="fa-solid fa-equals" style="color: #A3B2C2; font-size: 15px; margin-top: 6px;"></i>
+                            <MudText Typo="Typo.body2" Class="mt-1" Style="color: #A3B2C2 !important; font-size: 13px!important; font-weight: 400!important; font-family: 'Poppins'">no changes</MudText>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</MudItem>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    [Parameter]
+    public string Date { get; set; } = string.Empty;
+    [Parameter]
+    public string Icon { get; set; } = string.Empty;
+    [Parameter]
+    public DashboardCardResponse Value { get; set; } = new DashboardCardResponse();
+}

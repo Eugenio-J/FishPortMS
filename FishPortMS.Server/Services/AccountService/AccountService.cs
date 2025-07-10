@@ -183,6 +183,8 @@ namespace FishPortMS.Server.Services.AccountService
             CookieOptions cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
                 Expires = DateTime.Now
             };
 
@@ -218,8 +220,10 @@ namespace FishPortMS.Server.Services.AccountService
 
                     CookieOptions cookieOptions = new CookieOptions
                     {
+                        Expires = refreshToken.ExpiresAt,
                         HttpOnly = true,
-                        Expires = refreshToken.ExpiresAt
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict
                     };
 
                     user.RefreshToken = refreshToken.Token;

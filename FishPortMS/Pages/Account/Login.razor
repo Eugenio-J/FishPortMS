@@ -107,7 +107,7 @@
                 StateHasChanged();
                 NavigationManager.NavigateTo("/branch-selection");
             }
-            else if (role == Roles.CASHIER.ToString())
+            else if (role == Roles.CASHIER.ToString() || role == Roles.BUY_AND_SELL.ToString())
             {
                 NavigationManager.NavigateTo("/employee-home");
             }

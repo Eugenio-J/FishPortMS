@@ -1,5 +1,6 @@
 using FishPortMS.Server.Data;
 using FishPortMS.Server.Services.AccountService;
+using FishPortMS.Server.Services.DashboardService;
 using FishPortMS.Server.Services.MasterProductService;
 using FishPortMS.Server.Services.ProductCategoryService;
 using FishPortMS.Server.Services.ReceiptService;
@@ -11,7 +12,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 
@@ -34,7 +35,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-            .GetBytes(builder.Configuration.GetValue<string>("AccessToken")!)),
+            .GetBytes(builder.Configuration.GetValue<string>("AccessToken")!)), 
         ValidateIssuer = false,
         ValidateAudience = false
     };
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IMasterProductService, MasterProductService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
 var app = builder.Build();

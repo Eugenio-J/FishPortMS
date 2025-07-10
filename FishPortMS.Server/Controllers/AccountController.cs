@@ -44,7 +44,7 @@ namespace FishPortMS.Server.Controllers
         public async Task<ActionResult<string>> Logout() 
         {
             LoginResponse response = _accountService.Logout();
-            Response.Cookies.Append("refreshToken", response.RefreshToken, response.CookieOptions);
+            Response.Cookies.Delete("refreshToken");
             return Ok(response.AccessToken);
         }
 

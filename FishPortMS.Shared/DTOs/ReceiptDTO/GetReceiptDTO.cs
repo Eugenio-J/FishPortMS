@@ -10,6 +10,7 @@ namespace FishPortMS.Shared.DTOs.ReceiptDTO
     public class GetReceiptDTO
     {
         public int Id { get; set; }
+        public Guid? BuyAndSellId { get; set; }
         public string BSName { get; set; } = string.Empty;
         public string CashierName { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;

@@ -1,4 +1,5 @@
 ﻿@page "/dashboard"
+@using FishPortMS.Components.Dashboard.Chart
 @inject IJSRuntime JavaScript
 
 <div class="pa-7 pb-10">
@@ -6,12 +7,7 @@
     <div class="pb-7 mb-8 mt-n2" style="border-bottom: 1px solid #DAE4F3" data-aos="fade-up">
         <MudText Typo="Typo.h4" Class="mt-3" data-aos="fade-up">DASHBOARD</MudText>
     </div>
-@* 
-    <SalesContainer />
-    <div class="mt-4 mb-8" style="border-bottom: 1px solid #DAE4F3" />
-    <PettyCashContainer />
-    <div class="mt-4 mb-8" style="border-bottom: 1px solid #DAE4F3" />
-    <ExpenseContainer /> *@
 
+    <SalesChart />
 
 </div>

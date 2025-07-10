@@ -103,12 +103,19 @@ namespace FishPortMS.Server.Services.ReceiptService
 
             List<Receipt> receipt = new List<Receipt>();
 
-            IQueryable<Receipt>? query = _context.Receipts;
+            string userId = GetUserId() ?? string.Empty;
+            string userRole = GetUserRole() ?? string.Empty;
 
-            receipt = await _context.Receipts
+            IQueryable<Receipt>? query = _context.Receipts
                     .Include(consignacion => consignacion.ReceiptItems)
-                    .ThenInclude(consignacion => consignacion.MasterProduct)
-                    .OrderByDescending(p => p.Id)
+                    .ThenInclude(consignacion => consignacion.MasterProduct);
+
+            if (userRole == Roles.BUY_AND_SELL.ToString()) 
+            {
+                query = query.Where(x => x.BSId.ToString() == userId && x.BSId != null); 
+            }
+
+            receipt = await query.OrderByDescending(p => p.Id)
                     .Skip(request.Skip)
                     .Take(request.Take)
                     .ToListAsync();
@@ -171,6 +178,7 @@ namespace FishPortMS.Server.Services.ReceiptService
             {
                 Id = receipt.Id,
                 BSName = receipt.BSName,
+                BuyAndSellId = receipt.BSId,
                 CashierName = receipt.CashierName,
                 Notes = receipt.Notes,
                 DateCreated = receipt.DateCreated,
