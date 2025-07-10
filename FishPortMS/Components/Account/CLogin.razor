@@ -34,7 +34,7 @@
             OnAdornmentClick="ShowPassword"/>
     </div>
     <div class="py-3 px-sm-10 px-5 ml-n3 mt-n5">
-        <MudCheckBox @bind-Checked="@Label_CheckBox2" Color="Color.Primary" Size="Size.Small" Class="rem-pass-text">Remember password?</MudCheckBox>
+        <MudCheckBox T="bool" @bind-Checked="@Label_CheckBox2" Color="Color.Primary" Size="Size.Small" Class="rem-pass-text">Remember password?</MudCheckBox>
     </div>
     <div class="pt-3 pb-0 px-sm-10 px-5 mt-0">
         <AuthButton 
@@ -48,7 +48,7 @@
     </div>
 </EditForm>
 
-@code{
+ @code{
 
     private LoginDTO loginDTO = new LoginDTO();
 
@@ -76,13 +76,22 @@
 
             isLoading = false;
 
-            if (role == Roles.SUPERUSER.ToString() 
+            if (role == Roles.SUPERUSER.ToString()
                 || role == Roles.ADMIN.ToString()
+                || role == Roles.CONSIGNACION_OWNER.ToString()
                 || role == Roles.ADMIN_ASST.ToString())
             {
                 isLoading = false;
                 StateHasChanged();
                 NavigationManager.NavigateTo("/dashboard");
+            }
+
+            else if(role == Roles.CASHIER.ToString()
+                || role == Roles.BUY_AND_SELL.ToString())
+            {
+                isLoading = false;
+                StateHasChanged();
+                NavigationManager.NavigateTo("/employee-home");
             }
         }
         else

@@ -1,0 +1,249 @@
+﻿@page "/view-receipt"
+@page "/view-receipt/{Id:int}"
+@inject IClientReceiptService ClientReceiptService
+@inject ILocalStorageService LocalStorageService
+@inject IClientMasterProductService ClientProductService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JavaScript
+
+<style>
+
+    .order-add-btn {
+        font-family: 'Poppins' !important;
+        background: #ff9419 !important;
+        color: white !important;
+        font-weight: 500 !important;
+        font-size: 12px !important;
+        border-radius: 10px;
+        transition: .3s ease;
+    }
+
+        .order-add-btn:hover {
+            background: #EA8817 !important;
+            color: white !important;
+        }
+</style>
+
+@if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+    <div class="px-7">
+        <HeaderBreadcrumps header_items="_items" header_title="View Receipt" />
+    </div>
+
+    <PrintButton />
+
+    <div class="position-relative mx-2 mx-sm-7 my-2 my-sm-10" style="border: solid 1px #df4140 ">
+
+        <div class="d-flex align-items-center justify-content-start" style="width: 100% !important; background: #df4140; height: 40px; ">
+            <MudText Style="font-size: 20px !important; color: white !important; letter-spacing: 1px;">
+                <MudImage Class="ml-1" Src="images/sys_imgs/more.png" Width="17" ObjectFit="ObjectFit.Fill" /> Receipt
+            </MudText>
+        </div>
+
+        <div class="mx-2 mx-sm-0 px-2 px-sm-4 pb-4">
+
+                <div class="d-flex flex-column mx-1 mx-sm-2">
+
+                    <MudText Typo="Typo.h4" Class="form-header-title mt-10 mb-2">Basic Information</MudText>
+
+                    <div class="mb-5" style="background-color: #DADADA; height: 1px; width: 100%;"></div>
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Date: @CreateReceipt.DateCreated?.ToString("MMMM d, yyyy")</MudText>
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Notes</MudText>
+                    <MudTextField 
+                        Class="mb-5"
+                        Lines="5"
+                        HelperText="Utang, Kulang, Hulog..."
+                        @bind-Value="CreateReceipt.Notes"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" 
+                        ReadOnly />
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Buy and Sell Name</MudText>
+                    <MudTextField
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.BSname"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense"
+                        ReadOnly />
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Cashier</MudText>
+
+                    <MudTextField 
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.CashierName"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" 
+                        ReadOnly />
+
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Percentage</MudText>
+
+                    <MudTextField 
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.DeductedPercentage"
+                        InputType="InputType.Number"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" 
+                        ReadOnly />
+
+                </div>
+
+
+             @if (_tabs.Any())
+            {
+                <MudPaper Class="pa-2">
+                    <MudTabs @bind-ActivePanelIndex="_activeTabIndex">
+                        @foreach (var tab in _tabs)
+                        {
+                            decimal totalAmount = 0;
+
+                            foreach (var item in tab.POItemsList)
+                            {
+                                totalAmount += item.CurrentPrice * item.Weight;
+                            }
+
+                            <MudTabPanel Text="@tab.Title">
+                                <MudTable Items="@tab.POItemsList" Dense="true" Hover="true" Breakpoint="Breakpoint.None" Style="padding-bottom: 0px;" CellClass="text-center" LoadingProgressColor="Color.Info">
+                                    <HeaderContent>
+                                        <MudTh Class="text-center">Kilo</MudTh>
+                                        <MudTh Class="text-center">Price/Kilo</MudTh>
+                                        <MudTh Class="text-center">Subtotal</MudTh>
+                                    </HeaderContent>
+
+                                    <RowTemplate Context="orders">
+                                        <MudTd DataLabel="Kilo" Class="text-center">@orders.Weight</MudTd>
+                                        <MudTd DataLabel="Price" Class="text-center">P @string.Format("{0:N0}", orders.CurrentPrice)</MudTd>
+                                        <MudTd DataLabel="Subtotal" Class="text-center">P @string.Format("{0:N0}", orders.CurrentPrice * @orders.Weight)</MudTd>
+                                    </RowTemplate>
+                                    <FooterContent>
+                                        <MudTFootRow Class="bold-text text-end">
+                                            <MudTd>Total Kilo: @string.Format("{0:N2}", tab.POItemsList.Sum(x => x.Weight))</MudTd>
+                                            <MudTd>Total Benta: @string.Format("{0:N2}", tab.POItemsList.Sum(x => x.Subtotal))</MudTd>
+                                        </MudTFootRow>
+                                    </FooterContent>
+                                    <PagerContent>
+                                        <MudTablePager
+                                            HorizontalAlignment="HorizontalAlignment.Center"
+                                            HideRowsPerPage="true"/>
+                                    </PagerContent>
+                                </MudTable>
+                            </MudTabPanel>
+                        }
+                    </MudTabs>
+                </MudPaper>
+            }
+
+            else
+            {
+                <div class="text-center pt-3 pb-5 px-4 mb-3 order-list" style="border: 1px solid #E0EAF7; border-radius: 8px; background: #FAFAFA;">
+                    <MudText Typo="Typo.h4" Class="mr-1 mt-2" Style="font-family: 'Poppins' !important; font-size: 14px!important; margin-top: 10px!important; text-transform: uppercase; font-weight: 400!important;">
+                        NO ORDERS FOUND.
+                    </MudText>
+                </div>
+            }
+
+            
+        </div>
+    </div>
+        
+    <PrintableReceipt ReceiptSummaryDTO="@ReceiptSummaryDTO" Receipt="@CreateReceipt" />
+ 
+}
+
+@code {
+
+    [Parameter] public int? Id { get; set; }
+    public bool isLoading { get; set; } = false;
+    private string selectedBranch = string.Empty;
+    public CreateReceiptDTO CreateReceipt { get; set; }
+    public GetReceiptDTO? GetReceipt { get; set; }
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>();
+    private bool loadingProgress = true;
+    private int _tabCounter = 1;
+    private int _activeTabIndex = 0;
+    public ReceiptSummaryDTO ReceiptSummaryDTO { get; set; } = new ReceiptSummaryDTO();
+    protected decimal DeductedPercentage = 0;
+    protected decimal DeductedAmount = 0;
+    protected decimal GrossSales = 0;
+    protected decimal NetSales = 0;
+
+    private List<Tabs> _tabs = new List<Tabs>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await JavaScript.InvokeVoidAsync("print_pdf");
+
+        _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("RECEIPT", href: "/all-receipt"),
+            new BreadcrumbItem("View Receipt", href: "#", disabled: true),
+        };
+
+        loadingProgress = true;
+
+        if (Id == null)
+        {
+            CreateReceipt = new CreateReceiptDTO();
+        }
+
+        else
+        {
+            GetReceipt = await ClientReceiptService.GetSingleReceipt((int)Id);
+
+            if (GetReceipt != null)
+            {
+                CreateReceipt = new CreateReceiptDTO
+                {
+                    BSname = GetReceipt.BSName,
+                    CashierName = GetReceipt.CashierName,
+                    DeductedPercentage = GetReceipt.DeductedPercentage,
+                    Notes = GetReceipt.Notes,
+                    GetReceiptItemDTO = GetReceipt.ReceiptItems
+                };
+            }
+
+            foreach (var item in CreateReceipt.GetReceiptItemDTO)
+            {
+                if (!_tabs.Any(x => x.Title == item.ProductName)) 
+                {
+                    var newTab = new Tabs
+                        {
+                            Title = item.ProductName,
+                            POItemsList = new List<GetReceiptItemDTO>()
+                        };
+
+                    newTab.POItemsList.Add(item);
+                    _tabs.Add(newTab);
+                }
+
+                else
+                {
+                    var selectedTab = _tabs.FirstOrDefault(x => x.Title == item.ProductName);
+
+                    selectedTab.POItemsList.Add(item);
+                }
+            }
+
+            ReceiptSummaryDTO = new ReceiptSummaryDTO
+            {
+                GrossSales = GetReceipt.GrossSales,
+                NetSales = GetReceipt.NetSales,
+                DeductedPercentage = GetReceipt.DeductedPercentage,
+                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales
+            };
+        }
+
+        loadingProgress = false;
+
+    }
+
+}

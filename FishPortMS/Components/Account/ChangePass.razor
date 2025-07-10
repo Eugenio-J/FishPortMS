@@ -63,7 +63,7 @@
 
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     ChangePassDTO Payload = new ChangePassDTO();
 

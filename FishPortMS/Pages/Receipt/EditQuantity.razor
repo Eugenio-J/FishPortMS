@@ -1,0 +1,73 @@
+﻿@inject ModifiedSnackBar ModifiedSnackBar
+@attribute [Authorize]
+
+<MudDialog>
+    <DialogContent>
+
+        <MudPaper Class="px-sm-2 mt-n4 px-1 pb-4" Elevation="0">
+
+            <HeaderInfos title="EDIT QUANTITY" icon="@Icons.Material.Filled.Edit" />
+
+            <div class="mt-3">
+
+                <MudText Class="mb-5 text-uppercase align-items-center"
+                         Style="font-size: 13px!important; font-family: 'Poppins'!important;">
+                    @StockItem.ProductName
+                </MudText>
+
+                <MudTextField Class="mb-5"
+                                Label="Kilo"
+                                @bind-Value="StockItem.Weight"
+                                For="@(() => StockItem.Weight)"
+                                InputType="InputType.Number"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense"
+                                Required="true" />
+
+                <MudTextField Class="mb-5"
+                              Label="Price"
+                              @bind-Value="StockItem.CurrentPrice"
+                              For="@(() => StockItem.CurrentPrice)"
+                              InputType="InputType.Number"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Required="true" />
+
+                <div class="d-flex justify-content-end">
+                    <InvokeButton isLoading="isLoading" OnClick="UpdateProduct" button_name="EDIT" className="submit-btn" />
+                </div>
+            </div>
+        </MudPaper>
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+    private bool isLoading = false;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
+   
+    void Cancel() => MudDialog.Cancel();
+
+    [Parameter] public GetReceiptItemDTO StockItem { get; set; } = new GetReceiptItemDTO();
+
+    private void UpdateProduct()
+    {
+
+        if (StockItem.Weight <= 0)
+        {
+            ModifiedSnackBar.ShowMessage("Please enter a valid kilo.", Severity.Warning);
+            return;
+        }
+
+        if (StockItem.CurrentPrice <= 0)
+        {
+            ModifiedSnackBar.ShowMessage("Please enter a valid price.", Severity.Warning);
+            return;
+        }
+        StockItem = new GetReceiptItemDTO();
+
+        isLoading = true;
+        MudDialog.Close(DialogResult.Ok(StockItem));
+        isLoading = false;
+    }
+}

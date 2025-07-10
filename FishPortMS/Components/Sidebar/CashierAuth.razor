@@ -1,0 +1,20 @@
+﻿@inject IDialogService DialogService
+
+<AuthorizeView Roles="CASHIER">
+    <Authorized>
+        <MudDivider Class="mt-5 mb-5" Style="border-color: #92A9CB" />
+
+        <MudNavLink Href="/employee-home" Icon="@Icons.Material.Outlined.Home">Home</MudNavLink>
+
+        <SidebarLabel Title="RECEIPT" />
+
+        <MudNavGroup Title="Receipts" Icon="@Icons.Material.Outlined.Receipt">
+            <MudNavLink Href="/all-receipt">Receipts</MudNavLink>
+            <MudNavLink Href="/single-receipt">Add Receipts</MudNavLink>
+        </MudNavGroup>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+}

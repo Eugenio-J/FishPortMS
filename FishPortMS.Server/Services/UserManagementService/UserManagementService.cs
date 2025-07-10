@@ -156,5 +156,18 @@ namespace FishPortMS.Server.Services.UserManagementService
             return await _context.SaveChangesAsync() == 0 ? 0 : 1;
         }
 
+        public async Task<List<GetUsersDTO>> GetBSList()
+        {
+            List<GetUsersDTO> users = new List<GetUsersDTO>();
+
+            var bsUserList = await _context.UserProfiles
+                .Include(x => x.User)
+                .Where(x => x.User.Role == Roles.BUY_AND_SELL)
+                .ToListAsync();
+
+            users = bsUserList.Select(ConvertDTO).ToList();
+
+            return users;
+        }
     }
 }

@@ -1,0 +1,292 @@
+﻿@page "/single-receipt"
+@page "/single-receipt/{Id:int}"
+
+@inject IClientReceiptService ClientReceiptService
+@inject ILocalStorageService LocalStorageService
+@inject IClientMasterProductService ClientProductService
+@inject IClientUserManagementService ClientUserManagementService
+@inject NavigationManager NavigationManager
+@inject ModifiedSnackBar ModifiedSnackBar
+@attribute [Authorize(Roles = "ADMIN, SUPERUSER, CONSIGNACION_OWNER, CASHIER")]
+
+
+  
+<style>
+
+    .order-add-btn {
+        font-family: 'Poppins' !important;
+        background: #ff9419 !important;
+        color: white !important;
+        font-weight: 500 !important;
+        font-size: 12px !important;
+        border-radius: 10px;
+        transition: .3s ease;
+    }
+
+        .order-add-btn:hover {
+            background: #EA8817 !important;
+            color: white !important;
+        }
+</style>
+
+@if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+    <div class="px-7">
+        <HeaderBreadcrumps header_items="_items" header_title="New Receipt" />
+    </div>
+
+    <div class="position-relative mx-2 mx-sm-7 my-2 my-sm-10" style="border: solid 1px #df4140 ">
+
+        <div class="d-flex align-items-center justify-content-start" style="width: 100% !important; background: #df4140; height: 40px; ">
+            <MudText Style="font-size: 20px !important; color: white !important; letter-spacing: 1px;">
+                <MudImage Class="ml-1" Src="images/sys_imgs/more.png" Width="17" ObjectFit="ObjectFit.Fill" /> Receipt
+            </MudText>
+        </div>
+            
+        <div class="mx-2 mx-sm-0 px-2 px-sm-4 pb-4">
+
+            <EditForm Model="CreateReceipt" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="d-flex flex-column mx-1 mx-sm-2">
+
+                    <MudText Typo="Typo.h4" Class="form-header-title mt-10 mb-2">Basic Information</MudText>
+
+                    <div class="mb-5" style="background-color: #DADADA; height: 1px; width: 100%;"></div>
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
+                        Notes 
+                    </MudText>
+                    <MudTextField Class="mb-5"
+                                  Lines="5"
+                                  HelperText="Utang, Kulang, Hulog..."
+                                  HelperTextOnFocus="true"
+                                  @bind-Value="CreateReceipt.Notes"
+                                  For="@(() => CreateReceipt.Notes)"
+                                  InputType="InputType.Text"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
+                        Buy and Sell Name
+                    </MudText>
+
+                    <MudSelect Class="mb-5" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="CreateReceipt.BsId">
+                        @foreach (var bs in BuyAndSellList) 
+                        {
+                            <MudSelectItem Value="bs.UserId">@bs.FirstName @bs.LastName</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
+                        Cashier
+                    </MudText>
+                    <MudTextField Class="mb-5"
+                                  @bind-Value="CreateReceipt.CashierName"
+                                  For="@(() => CreateReceipt.CashierName)"
+                                  InputType="InputType.Text"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+
+
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
+                        Percentage
+                    </MudText>
+                    <MudTextField Class="mb-5"
+                                  @bind-Value="CreateReceipt.DeductedPercentage"
+                                  For="@(() => CreateReceipt.DeductedPercentage)"
+                                  InputType="InputType.Number"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+
+                </div>
+
+                <div class="d-flex flex-column mx-1 mx-sm-2">
+
+                    <MudText Typo="Typo.subtitle1" Class="input-label mb-2">
+                        Item Selection
+                    </MudText>
+
+                    <div class="mb-5" style="background-color: #DADADA; height: 1px; width: 100%;"></div>
+
+                    <ReceiptItemSelection
+                        Id="@Id"
+                        _tabs="@_tabs"
+                        MasterProductList="@MasterProductList" 
+                        CreateReceipt="@CreateReceipt"
+                        POItemsList="@ReceiptItems"/>
+
+                </div>
+
+                @if (Id == null)
+                {
+                    <div class="d-flex justify-content-end mt-8">
+
+                        <SubmitButton 
+                            button_name="SUBMIT"
+                            isLoading="isLoading"
+                            className="submit-btn mr-2"
+                            icon="@Icons.Material.Filled.Check"
+                            OnClick="HandleSubmit" />
+
+                        <SubmitButton 
+                            button_name="Cancel"
+                            className="cancel-btn"
+                            OnClick="Cancel" />
+
+                    </div>
+                }
+
+                else
+                {
+                    <div class="d-flex justify-content-end mt-8">
+
+                        <SubmitButton button_name="Update"
+                                      isLoading="isLoading"
+                                      className="submit-btn mr-2"
+                                      icon="@Icons.Material.Filled.Check"
+                                      OnClick="() => UpdateReceipt((int)Id)" />
+
+                        <SubmitButton button_name="Cancel"
+                                      className="cancel-btn"
+                                      OnClick="Cancel" />
+
+                    </div>
+                }
+       
+            </EditForm>
+
+        </div>
+    </div>
+
+}
+
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    public string selectedBranch = string.Empty;
+    public bool isLoading { get; set; } = false;
+    public CreateReceiptDTO CreateReceipt { get; set; }
+    public GetReceiptDTO? GetReceipt { get; set; }
+    public GetReceiptItemDTO ReceiptItem { get; set; } 
+    public List<GetReceiptItemDTO> ReceiptItems { get; set; } = new List<GetReceiptItemDTO>();
+    private List<GetMasterProduct> MasterProductList = new List<GetMasterProduct>();
+    private List<GetUsersDTO> BuyAndSellList = new List<GetUsersDTO>();
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>();
+    private bool loadingProgress = true;
+
+    public List<Tabs> _tabs { get; set; } = new List<Tabs>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        await ClientProductService.GetAllMasterProducts();
+        MasterProductList = ClientProductService.getMasterProducts;
+        selectedBranch = await LocalStorageService.GetItemAsync<string>("BranchId");
+        BuyAndSellList = await ClientUserManagementService.GetBSList();
+        _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("RECEIPT", href: "/all-receipt"),
+            new BreadcrumbItem("Add Receipt", href: "/add-receipt"),
+        };
+
+        loadingProgress = false;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+            CreateReceipt = new CreateReceiptDTO();
+        }
+
+        else
+        {
+            GetReceipt = await ClientReceiptService.GetSingleReceipt((int)Id);
+
+            if (GetReceipt != null)
+            {
+                CreateReceipt = new CreateReceiptDTO
+                {
+                    BSname = GetReceipt.BSName,
+                    CashierName = GetReceipt.CashierName,
+                    DateCreated = GetReceipt.DateCreated,
+                    DeductedPercentage = GetReceipt.DeductedPercentage,
+                    Notes = GetReceipt.Notes,
+                    GetReceiptItemDTO = GetReceipt.ReceiptItems
+
+                };
+            }
+
+            foreach (var item in CreateReceipt.GetReceiptItemDTO)
+            {
+                if (!_tabs.Any(x => x.Title == item.ProductName))
+                {
+                    var newTab = new Tabs
+                        {
+                            Title = item.ProductName,
+                            POItemsList = new List<GetReceiptItemDTO>()
+                        };
+
+                    newTab.POItemsList.Add(item);
+                    _tabs.Add(newTab);
+                }
+
+                else
+                {
+                    var selectedTab = _tabs.FirstOrDefault(x => x.Title == item.ProductName);
+
+                    selectedTab.POItemsList.Add(item);
+                }
+            }
+        }
+    }
+
+    private void OnSelect(string name)
+    {
+        CreateReceipt.BSname = name;
+    }
+
+    async Task HandleSubmit()
+    {
+
+        if (CreateReceipt.BsId == Guid.Empty)
+        {
+            ModifiedSnackBar.ShowMessage("Please select buy and sell name", Severity.Warning);
+            return;
+        }
+
+        if (!CreateReceipt.GetReceiptItemDTO.Any())
+        {
+            ModifiedSnackBar.ShowMessage("Please select add an item", Severity.Warning);
+            return;
+        }
+
+        isLoading = true;
+        // CreateReceipt.GetReceiptItemDTO = ReceiptItems;
+        var buyAndSell = BuyAndSellList.FirstOrDefault(x => x.UserId == CreateReceipt.BsId);
+        CreateReceipt.BSname = buyAndSell.FirstName + " " + buyAndSell.LastName;
+        await ClientReceiptService.CreateReceipt(CreateReceipt);
+        CreateReceipt = new CreateReceiptDTO();
+        isLoading = false;
+        NavigationManager.NavigateTo("/all-receipt");
+
+    }
+
+    async Task UpdateReceipt(int Id)
+    {
+        isLoading = true; 
+        await ClientReceiptService.UpdateReceipt(Id, CreateReceipt);
+        CreateReceipt = new CreateReceiptDTO();
+        isLoading = false;
+        NavigationManager.NavigateTo("/all-receipt");
+
+    }
+
+    void Cancel() => NavigationManager.NavigateTo("/all-receipt");
+}

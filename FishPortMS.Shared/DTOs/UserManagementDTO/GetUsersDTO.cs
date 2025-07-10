@@ -4,7 +4,7 @@ namespace FishPortMS.Shared.DTOs.UserManagementDTO
 {
     public class GetUsersDTO
     {
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public string AttendancePin { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;

@@ -1,0 +1,59 @@
+﻿<style>
+    .mud-button-icon-size-large > *:first-child {
+        font-size: 16px;
+    }
+
+    .save-btn {
+        background: #4d90fe;
+        color: white !important;
+    }
+
+        .save-btn:hover {
+            background: #0060FF;
+        }
+
+    .cancel-btn {
+        background: #e5e5e5;
+        color: #333333;
+        width: 90px;
+    }
+
+        .cancel-btn:hover {
+            background: #D3D3D3;
+        }
+
+    .btn-text {
+        font-family: 'Poppins' !important;
+        font-weight: 600 !important;
+        letter-spacing: .5px;
+    }
+</style>
+
+<MudButton Class="@className"
+           Variant="Variant.Filled"
+           Size="Size.Large"
+           StartIcon="@icon"
+           OnClick="@(() => OnClick.InvokeAsync())"
+           Style="@css"
+           Disabled="isLoading"
+           DisableElevation>
+    @if (isLoading == false)
+    {
+        <MudText style="font-size: 13px; letter-spacing: .5px;" Class="btn-text">@button_name</MudText>
+    }
+    else
+    {
+        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" Class="mr-2" />
+        <MudText style="font-size: 13px!important; letter-spacing: .5px;" Class="btn-text">PROCESSING</MudText>
+    }
+</MudButton>
+
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string button_name { get; set; } = string.Empty;
+    [Parameter] public string css { get; set; } = string.Empty;
+    [Parameter] public string className { get; set; } = string.Empty;
+    [Parameter] public string icon { get; set; } = string.Empty;
+    [Parameter] public bool isLoading { get; set; }
+}

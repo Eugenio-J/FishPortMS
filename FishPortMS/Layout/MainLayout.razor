@@ -7,6 +7,8 @@
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<MudPopoverProvider />
+
 
 <style>
     .app-bar {
@@ -114,9 +116,9 @@
         <MudMainContent>
             <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="h-100 pt-2 px-0 px-lg-8">
                 @Body
-                <div class="layout-cash" style="z-index: 100; position: fixed; bottom: 20px; right: 20px; padding: 8px; padding-left: 11px; padding-right: 11px; border-radius: 5px; font-size: 13px; font-family: 'Poppins'">
+                @* <div class="layout-cash" style="z-index: 100; position: fixed; bottom: 20px; right: 20px; padding: 8px; padding-left: 11px; padding-right: 11px; border-radius: 5px; font-size: 13px; font-family: 'Poppins'">
                     PETTY CASH ( P @string.Format("{0:N2}", @pettyTotal) )
-                </div>
+                </div> *@
             </MudContainer>
         </MudMainContent>
 </MudLayout>

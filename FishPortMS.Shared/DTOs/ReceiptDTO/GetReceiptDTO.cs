@@ -12,6 +12,7 @@ namespace FishPortMS.Shared.DTOs.ReceiptDTO
         public int Id { get; set; }
         public string BSName { get; set; } = string.Empty;
         public string CashierName { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal GrossSales { get; set; }
@@ -22,7 +23,6 @@ namespace FishPortMS.Shared.DTOs.ReceiptDTO
         [Column(TypeName = "decimal(18,2)")]
         public decimal DeductedPercentage { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-        public string ConsignacionName { get; set; }
         public List<GetReceiptItemDTO> ReceiptItems { get; set; } = new List<GetReceiptItemDTO>();
     }
 }

@@ -9,16 +9,19 @@ namespace FishPortMS.Shared.DTOs.ReceiptDTO
 {
     public class GetReceiptItemDTO
     {
+        public int Id { get; set; }
         public int ReceiptId { get; set; }
-        public int ClientProductId { get; set; }
+        public int MasterProductId { get; set; }
         public bool IsOut { get; set; } = false;
         public string ProductName { get; set; }
-        public string UOM { get; set; }
+        public string? UOM { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Weight { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal CurrentPrice { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Subtotal { get; set; }
     }
 }

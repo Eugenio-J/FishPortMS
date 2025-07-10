@@ -9,7 +9,7 @@
                 <MudText Typo="Typo.h6" Style="font-family: 'Poppins'; font-size: 16px;">Click to upload @title<br />images here.</MudText>
                 @foreach (var file in displayFileNames)
                 {
-                    <MudChip Color="Color.Dark" Text="@file" />
+                    <MudChip T="string" Color="Color.Dark" Text="@file" />
                 }
             </MudPaper>
         </ButtonTemplate>

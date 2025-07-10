@@ -15,6 +15,6 @@ namespace FishPortMS.Shared.Enums
         CASHIER,
         CONSIGNACION_OWNER,
         BUY_AND_SELL,
-        BATILYO,
+        BATILYO
     }
 }

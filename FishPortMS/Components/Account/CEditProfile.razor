@@ -118,7 +118,7 @@
 @code {
     public IBrowserFile? FileData;
     private bool isLoading = false;
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
     void Cancel() => MudDialog.Cancel();
 
     [Parameter] public UpdateProfileDTO editProfileDTO { get; set; } = new UpdateProfileDTO();

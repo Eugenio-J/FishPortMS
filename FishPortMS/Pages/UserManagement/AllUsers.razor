@@ -82,13 +82,11 @@
 
     private bool loadingProgress = true;
     private bool tableLoading = true;
-    public string? selectedbranch { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         loadingProgress = true;
         tableLoading = true;
-        selectedbranch = await LocalStorageService.GetItemAsync<string>("BranchId");
         PaginatedTableResponse<GetUsersDTO> response = await ClientUserManagementService.GetAllUsersPaginated(Paginated);
         TotalItems = response.Count;
         GetUsersDTO = response.ResponseData;
@@ -137,7 +135,7 @@
         };
     }
 
-    private async Task EnableUser(Guid userId)
+    private async Task EnableUser(Guid? userId)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", "Are you sure you want enable this user?");
@@ -148,7 +146,7 @@
 
         if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
         {
-            int response = await ClientUserManagementService.EnableAccount(userId);
+            int response = await ClientUserManagementService.EnableAccount((Guid)userId);
 
             if (response > 0)
             {
@@ -159,7 +157,7 @@
         }
     }
 
-    private async Task DisableUser(Guid userId)
+    private async Task DisableUser(Guid? userId)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", "Are you sure you want disable this user?");
@@ -170,7 +168,7 @@
 
         if (dialogResult.Data != null && dialogResult.Data is bool confirmed && confirmed)
         {
-            int response = await ClientUserManagementService.DisableAccount(userId);
+            int response = await ClientUserManagementService.DisableAccount((Guid)userId);
 
             if (response > 0)
             {

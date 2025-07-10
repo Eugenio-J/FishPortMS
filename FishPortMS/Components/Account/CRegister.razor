@@ -20,8 +20,7 @@
                 <DataAnnotationsValidator />
                 <div class="mt-3">
                     <MudSelect Margin="Margin.Dense" AnchorOrigin="Origin.BottomCenter" Label="Roles" Placeholder="-Select Roles-" Variant="Variant.Outlined" @bind-Value="registerDTO.Role">
-                        @foreach (Roles role in Enum.GetValues(typeof(Roles)).Cast<Roles>()
-                        .Where(role => role != Roles.CASHIER))
+                        @foreach (Roles role in Enum.GetValues(typeof(Roles)).Cast<Roles>())
                         {
                             <MudSelectItem T="Roles" Value="role" />
                         }
@@ -85,7 +84,7 @@
 
 @code {
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     [Parameter] public RegisterDTO registerDTO { get; set; } = new RegisterDTO();
 
@@ -113,20 +112,7 @@
             ModifiedSnackBar.ShowMessage("Role is required.", Severity.Warning);
             return;
         }
-        else if (registerDTO.Role == Roles.CONSIGNACION_OWNER)
-        {
-            if (string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionName)
-                && string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionName)
-                && string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionLocation)
-                && string.IsNullOrEmpty(registerDTO.CreateConsignacionDTO!.ConsignacionAddress))
-            {
-                isLoading = false;
-                StateHasChanged();
-                ModifiedSnackBar.ShowMessage("Please fill up all required fields.", Severity.Warning);
-                return;
-            }
-        }
-
+       
         MudDialog.Close(DialogResult.Ok(registerDTO));
     }
 
