@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FishPortMS.Shared.DTOs.VendorExpDTO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -25,5 +26,6 @@ namespace FishPortMS.Shared.DTOs.ReceiptDTO
         public decimal DeductedPercentage { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public List<GetReceiptItemDTO> ReceiptItems { get; set; } = new List<GetReceiptItemDTO>();
+        public List<GetVendorExp>? VendorExpenses { get; set; } 
     }
 }

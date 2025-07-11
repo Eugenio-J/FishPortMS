@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FishPortMS.Shared.Models.Expenses;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,5 +30,6 @@ namespace FishPortMS.Shared.Models.Receipts
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         public List<ReceiptItem> ReceiptItems { get; set; } = new List<ReceiptItem>(); 
+        public List<VendorExpense>? VendorExpenses { get; set; } = new List<VendorExpense>(); 
     }
 }

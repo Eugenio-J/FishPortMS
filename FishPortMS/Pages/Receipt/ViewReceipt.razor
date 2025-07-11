@@ -126,8 +126,9 @@ else
                                     </RowTemplate>
                                     <FooterContent>
                                         <MudTFootRow Class="bold-text text-end">
-                                            <MudTd>Total Kilo: @string.Format("{0:N2}", tab.POItemsList.Sum(x => x.Weight))</MudTd>
-                                            <MudTd>Total Benta: @string.Format("{0:N2}", tab.POItemsList.Sum(x => x.Subtotal))</MudTd>
+                                            <MudTd>Total Kilo: P @string.Format("{0:N2}", tab.POItemsList.Sum(x => x.Weight))</MudTd>
+                                            <MudTd>Total Benta: P @string.Format("{0:N2}", tab.POItemsList.Sum(x => x.Subtotal))</MudTd>
+                                            <MudTd>Total %: P @string.Format("{0:N2}", (tab.POItemsList.Sum(x => x.Subtotal) * (@CreateReceipt.DeductedPercentage / 100)))</MudTd>
                                         </MudTFootRow>
                                     </FooterContent>
                                     <PagerContent>
@@ -151,7 +152,8 @@ else
                 </div>
             }
 
-            
+            <SalesBreakdown Summary="ReceiptSummaryDTO" />
+
         </div>
     </div>
         
@@ -175,8 +177,10 @@ else
     protected decimal DeductedAmount = 0;
     protected decimal GrossSales = 0;
     protected decimal NetSales = 0;
-
+    private bool isAddExpense = false;
     private List<Tabs> _tabs = new List<Tabs>();
+
+    public AddVendorExp AddVendorExp { get; set; } = new AddVendorExp();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -238,12 +242,17 @@ else
                 GrossSales = GetReceipt.GrossSales,
                 NetSales = GetReceipt.NetSales,
                 DeductedPercentage = GetReceipt.DeductedPercentage,
-                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales
+                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales,
+                ExpenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount)
             };
         }
 
         loadingProgress = false;
-
     }
 
+    private async Task AddExpense(int? Id)
+    {
+        
+    
+    }
 }

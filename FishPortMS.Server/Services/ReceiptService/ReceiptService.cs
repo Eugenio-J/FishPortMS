@@ -1,5 +1,6 @@
 ﻿using FishPortMS.Server.Data;
 using FishPortMS.Shared.DTOs.ReceiptDTO;
+using FishPortMS.Shared.DTOs.VendorExpDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Models.Products;
 using FishPortMS.Shared.Models.Receipts;
@@ -130,7 +131,8 @@ namespace FishPortMS.Server.Services.ReceiptService
         {
             var singleReceipt = await _context.Receipts
                 .Include(x => x.ReceiptItems)
-                .ThenInclude(x => x.MasterProduct)
+                  .ThenInclude(x => x.MasterProduct)
+                .Include(x => x.VendorExpenses)
                 .SingleOrDefaultAsync(x => x.Id == receiptId);
 
             if (singleReceipt == null) return null;
@@ -174,6 +176,15 @@ namespace FishPortMS.Server.Services.ReceiptService
                 Subtotal = x.Subtotal,
             }).ToList();
 
+            List<GetVendorExp>? vendorExpenses = receipt.VendorExpenses?.Select(x => new GetVendorExp
+            {
+                Id = x.Id,
+                Amount = x.Amount,
+                ExpenseCategoryId = x.ExpenseCategoryId,
+                ReceiptId = x.ReceiptId 
+            }).ToList();
+
+
             return new GetReceiptDTO
             {
                 Id = receipt.Id,
@@ -186,6 +197,7 @@ namespace FishPortMS.Server.Services.ReceiptService
                 GrossSales = receipt.GrossSales,
                 NetSales = receipt.NetSales,
                 ReceiptItems = receiptItem,
+                VendorExpenses = vendorExpenses
             };
         }
 

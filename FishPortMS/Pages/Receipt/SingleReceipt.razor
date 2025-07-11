@@ -160,6 +160,8 @@ else
        
             </EditForm>
 
+            <SalesBreakdown Summary="ReceiptSummaryDTO" />
+
         </div>
     </div>
 
@@ -171,6 +173,7 @@ else
     public string selectedBranch = string.Empty;
     public bool isLoading { get; set; } = false;
     public CreateReceiptDTO CreateReceipt { get; set; }
+    public ReceiptSummaryDTO ReceiptSummaryDTO { get; set; }
     public GetReceiptDTO? GetReceipt { get; set; }
     public GetReceiptItemDTO ReceiptItem { get; set; } 
     public List<GetReceiptItemDTO> ReceiptItems { get; set; } = new List<GetReceiptItemDTO>();
@@ -245,6 +248,15 @@ else
                     selectedTab.POItemsList.Add(item);
                 }
             }
+
+            ReceiptSummaryDTO = new ReceiptSummaryDTO
+            {
+                GrossSales = GetReceipt.GrossSales,
+                NetSales = GetReceipt.NetSales,
+                DeductedPercentage = GetReceipt.DeductedPercentage,
+                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales,
+                ExpenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount)
+            };
         }
     }
 

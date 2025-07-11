@@ -5,6 +5,7 @@ using FishPortMS.Server.Services.MasterProductService;
 using FishPortMS.Server.Services.ProductCategoryService;
 using FishPortMS.Server.Services.ReceiptService;
 using FishPortMS.Server.Services.UserManagementService;
+using FishPortMS.Server.Services.VendorExpenseService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IMasterProductService, MasterProductService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IVendorExpenseService, VendorExpenseService>();
 
 
 var app = builder.Build();

@@ -18,7 +18,7 @@ namespace FishPortMS.Server.Services.UserManagementService
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
-        }
+        }   
 
         private string? GetUserId() => _httpContextAccessor.HttpContext?.User
            .FindFirstValue(ClaimTypes.NameIdentifier);

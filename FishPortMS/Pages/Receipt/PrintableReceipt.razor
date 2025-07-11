@@ -118,13 +118,7 @@
             }
         }
 
-        <div class="d-flex flex-column align-items-end mx-1"> 
-            <span>Gross Sales: @ReceiptSummaryDTO.GrossSales</span> 
-            <span>Porsyento (%): @ReceiptSummaryDTO.DeductedPercentage</span>
-            <span>Porsyente: @ReceiptSummaryDTO.DeductedAmount</span>
-            <span>Net Sales: @ReceiptSummaryDTO.NetSales</span>
-        </div>
-
+        <SalesBreakdown Summary="ReceiptSummaryDTO" />
 
         </div>
     </div>

@@ -26,6 +26,8 @@ namespace FishPortMS.Server.Data
         public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
         public DbSet<Receipt> Receipts => Set<Receipt>();
         public DbSet<ReceiptItem> ReceiptItems => Set<ReceiptItem>();
+        public DbSet<VendorExpense> VendorExpenses => Set<VendorExpense>();
+        public DbSet<VendorExpenseCategory> VendorExpenseCategories => Set<VendorExpenseCategory>();
 
     }
 
