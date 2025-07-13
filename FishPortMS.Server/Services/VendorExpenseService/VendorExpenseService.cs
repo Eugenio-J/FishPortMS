@@ -87,10 +87,6 @@ namespace FishPortMS.Server.Services.VendorExpenseService
 				exp.Amount = expense.Amount;
 			}
 
-            receipt.GrossSales = receipt.ReceiptItems.Sum(x => x.Subtotal);
-            decimal amountDeducted = (receipt.GrossSales * (receipt.DeductedPercentage / 100));
-            receipt.NetSales = receipt.GrossSales - amountDeducted;
-            receipt.NetSales -= request.VendorExpenses.Sum(x => x.Amount);
             return await _dbContext.SaveChangesAsync() == 0 ? 0 : 1;
 		}
 
