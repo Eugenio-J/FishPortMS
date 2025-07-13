@@ -98,7 +98,7 @@ namespace FishPortMS.Server.Services.ReceiptService
             return newReceipt.Id;
         }
 
-        public async Task<PaginatedTableResponse<GetReceiptDTO>> GetReceiptPaginated(GetPaginatedDTO request)
+        public async Task<PaginatedTableResponse<GetReceiptDTO>> GetAllReceiptPaginated(GetPaginatedDTO request)
         {
             PaginatedTableResponse<GetReceiptDTO> response = new PaginatedTableResponse<GetReceiptDTO>();
 

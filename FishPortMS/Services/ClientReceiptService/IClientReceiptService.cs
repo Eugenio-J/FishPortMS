@@ -7,7 +7,7 @@ namespace FishPortMS.Services.ClientReceiptService
     {
         Task<int> CreateReceipt(CreateReceiptDTO payload);
         Task<int> UpdateReceipt(int Id, CreateReceiptDTO payload);
-        Task<PaginatedTableResponse<GetReceiptDTO>> GetReceiptPaginated(GetPaginatedDTO payload);
+        Task<PaginatedTableResponse<GetReceiptDTO>> GetAllReceiptPaginated(GetPaginatedDTO payload);
         Task<PaginatedTableResponse<GetReceiptDTO>> SearchReceipt(GetPaginatedDTO payload);
         Task<GetReceiptDTO> GetSingleReceipt(int receiptId);
     }

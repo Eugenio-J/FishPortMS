@@ -82,7 +82,7 @@ else
     {
         loadingProgress = true;
         tableLoading = true;
-        PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetReceiptPaginated(Paginated);
+        PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetAllReceiptPaginated(Paginated);
         TotalItems = response.Count;
         GetMasterProducts = response.ResponseData;
         await JavaScript.InvokeVoidAsync("TablePaginate");
@@ -117,7 +117,7 @@ else
         RowsPerPage = state.PageSize;
         Paginated.Skip = state.Page * state.PageSize;
         Paginated.Take = state.PageSize;
-        PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetReceiptPaginated(Paginated);
+        PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetAllReceiptPaginated(Paginated);
         TotalItems = response.Count;
         GetMasterProducts = response.ResponseData;
         tableLoading = false;
@@ -141,7 +141,7 @@ else
             tableLoading = true;
             Paginated.Skip = 0;
             Paginated.Take = RowsPerPage;
-            PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetReceiptPaginated(Paginated);
+            PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetAllReceiptPaginated(Paginated);
             TotalItems = response.Count;
             GetMasterProducts = response.ResponseData;
             tableLoading = false;
@@ -154,7 +154,7 @@ else
         tableLoading = true;
         Paginated.Skip = state.Page * state.PageSize;
         Paginated.Take = state.PageSize;
-        PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetReceiptPaginated(Paginated);
+        PaginatedTableResponse<GetReceiptDTO> response = await ClientReceiptService.GetAllReceiptPaginated(Paginated);
         TotalItems = response.Count;
         GetMasterProducts = response.ResponseData;
         tableLoading = false;
