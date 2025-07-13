@@ -1,10 +1,17 @@
-﻿using FishPortMS.Shared.DTOs.VendorExpDTO;
+﻿using FishPortMS.Shared.DTOs.ExpenseDTO;
+using FishPortMS.Shared.DTOs.VendorExpDTO;
+using FishPortMS.Shared.Response;
 
 namespace FishPortMS.Services.ClientVendorExpenseService
 {
 	public interface IClientVendorExpenseService
 	{
-		Task<int> AddVendorExpense(AddVendorExp payload);
-		Task<int> UpdateVendorExpense(UpdateVendorExp payload);
-	}
+		Task<int> AddExpense(AddVendorExp payload);
+		Task<int> UpdateExpense(UpdateVendorExp payload);
+		Task<int> AddCategory(CreateExpenseCategory payload);
+        Task<PaginatedTableResponse<GetExpenseCategory>> GetAllExpenseCategoryPaginated(GetPaginatedDTO payload);
+        Task<PaginatedTableResponse<GetExpenseCategory>> SearchExpenseCategory(GetPaginatedDTO payload);
+        Task<List<GetExpenseCategory>> GetCategoryList();
+        Task<GetExpenseCategory?> GetSingleCategory(int Id);
+    }
 }

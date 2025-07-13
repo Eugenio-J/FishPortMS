@@ -1,0 +1,106 @@
+﻿@using System.Net.Http.Headers
+@inject IClientVendorExpenseService ClientVendorExpenseService
+@inject ISnackbar Snackbar
+
+@if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+
+            <MudPaper Class="px-sm-2 mt-n4 px-1 pb-4" Elevation="0">
+
+                @if (Id == null)
+                {
+                    <HeaderInfos title="ADD CATEGORY" icon="@Icons.Material.Filled.Add" />
+                }
+                else
+                {
+                    <HeaderInfos title="EDIT CATEGORY" icon="@Icons.Material.Filled.Edit" />
+                }
+
+                <div class="mt-3">
+                    <EditForm Model="CreateExpenseCategory" OnValidSubmit="() => HandleSubmit()">
+                        <DataAnnotationsValidator />
+
+                        <MudTextField
+                            Class="mb-5"
+                            Label="Product Name" @bind-Value="CreateExpenseCategory.Title"
+                            For="@(() => CreateExpenseCategory.Title)"
+                            InputType="InputType.Text"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense"
+                            Required="true" />
+
+
+                         <div class="d-flex justify-content-end">
+                             @if (Id == null)
+                            {
+                                <SubmitButton isLoading="isLoading" button_name="SUBMIT" className="submit-btn" />
+                            }
+                            else
+                            {
+                                <SubmitButton isLoading="isLoading" button_name="EDIT" className="edit-btn" />
+                            }
+                        </div>
+                    </EditForm>
+                </div>
+            </MudPaper>
+        </DialogContent>
+    </MudDialog>
+}
+
+
+@code {
+
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public int? Id { get; set; }
+
+    [Parameter] public GetExpenseCategory? singleCategory { get; set; } = new GetExpenseCategory();
+
+    [Parameter] public CreateExpenseCategory? CreateExpenseCategory { get; set; } = new CreateExpenseCategory();
+
+    private MultipartFormDataContent content = new MultipartFormDataContent();
+    private List<IBrowserFile> files = new List<IBrowserFile>();
+    private long maxFileSize = 1024 * 1024 * 5;
+    private List<string> imgs = new List<string>();
+
+    private bool loadingProgress = true;
+
+    public bool isLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loadingProgress = true;
+        if (Id == null)
+        {
+            singleCategory = new GetExpenseCategory();
+        }
+        else
+        {
+            singleCategory = await ClientVendorExpenseService.GetSingleCategory((int)Id);
+
+            if (singleCategory != null)
+            {
+                CreateExpenseCategory = new CreateExpenseCategory
+                {
+                    Title = singleCategory.Title
+                };
+            }
+
+        }
+        loadingProgress = false;
+    }
+
+    void HandleSubmit()
+    {
+        isLoading = true;
+        MudDialog.Close(DialogResult.Ok(CreateExpenseCategory));
+        isLoading = false;
+    }
+
+}

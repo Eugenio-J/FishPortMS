@@ -180,7 +180,7 @@ namespace FishPortMS.Server.Services.ReceiptService
             {
                 Id = x.Id,
                 Amount = x.Amount,
-                ExpenseCategoryId = x.ExpenseCategoryId,
+                VendorExpenseCategoryId = x.VendorExpenseCategoryId,
                 ReceiptId = x.ReceiptId 
             }).ToList();
 

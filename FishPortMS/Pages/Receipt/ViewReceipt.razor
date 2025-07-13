@@ -2,8 +2,9 @@
 @page "/view-receipt/{Id:int}"
 @inject IClientReceiptService ClientReceiptService
 @inject ILocalStorageService LocalStorageService
-@inject IClientMasterProductService ClientProductService
+@inject IClientVendorExpenseService ClientVendorExpenseService
 @inject NavigationManager NavigationManager
+@inject ModifiedSnackBar ModifiedSnackBar
 @inject IJSRuntime JavaScript
 
 <style>
@@ -97,8 +98,71 @@ else
 
                 </div>
 
+              <AuthorizeView Roles="BUY_AND_SELL">
+                  <Authorized>
+                    <MudCheckBox Class="d-flex justify-content-end" @bind-Value="isAddExpense">Add Expense</MudCheckBox>
+                  </Authorized>
+              </AuthorizeView>
 
-             @if (_tabs.Any())
+             @if (isAddExpense)
+            {
+                <div class="d-flex align-items-center">
+                    <MudTextField   
+                        Class="mr-1"
+                        @bind-Value="NewVendorExp.Amount"
+                        InputType="InputType.Number"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
+
+                    <MudSelect Class="mr-1" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="NewVendorExp.VendorExpenseCategoryId">
+                        @foreach (var exp in ExpenseCategories)
+                        {
+                            <MudSelectItem Value="@exp.Id">@exp.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <IconButton 
+                        icon="@Icons.Material.Outlined.Add"
+                        button_name="Add Expense"
+                        className="submit-btn"
+                        OnClick="() => AddExpense(Id)" />
+
+                </div>
+            }
+
+             @if (CreateReceipt.VendorExpenses.Any())
+            {
+                <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Expense</MudText>
+
+                <MudTable Items="@CreateReceipt.VendorExpenses"
+                          Dense="true"
+                          Hover="true"
+                          Breakpoint="Breakpoint.None"
+                          Style="padding-bottom: 0px;"
+                          CellClass="text-center"
+                          LoadingProgressColor="Color.Info">
+
+                    <HeaderContent>
+                        <MudTh Class="text-center">Amount</MudTh>
+                        <MudTh Class="text-center">Category</MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate Context="expense">
+                        <MudTd DataLabel="Amount" Class="text-center">P @string.Format("{0:N0}", expense.Amount)</MudTd>
+                            <MudTd DataLabel="Category" Class="text-center">@categoryName[expense.VendorExpenseCategoryId] </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+            }
+
+            @if (isExpenseAdded)
+            {
+                <SubmitButton 
+                    button_name="Add Expense"
+                    className="submit-btn w-100 mb-5 mt-n5"
+                    OnClick="() => AddVendorExpense()" />
+            }
+
+            @if (_tabs.Any())
             {
                 <MudPaper Class="pa-2">
                     <MudTabs @bind-ActivePanelIndex="_activeTabIndex">
@@ -165,7 +229,6 @@ else
 
     [Parameter] public int? Id { get; set; }
     public bool isLoading { get; set; } = false;
-    private string selectedBranch = string.Empty;
     public CreateReceiptDTO CreateReceipt { get; set; }
     public GetReceiptDTO? GetReceipt { get; set; }
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>();
@@ -173,18 +236,24 @@ else
     private int _tabCounter = 1;
     private int _activeTabIndex = 0;
     public ReceiptSummaryDTO ReceiptSummaryDTO { get; set; } = new ReceiptSummaryDTO();
-    protected decimal DeductedPercentage = 0;
-    protected decimal DeductedAmount = 0;
-    protected decimal GrossSales = 0;
-    protected decimal NetSales = 0;
     private bool isAddExpense = false;
+    private bool isExpenseAdded = false;
     private List<Tabs> _tabs = new List<Tabs>();
-
     public AddVendorExp AddVendorExp { get; set; } = new AddVendorExp();
+    public CreateVendorExp NewVendorExp { get; set; } = new CreateVendorExp();
+    private List<GetExpenseCategory> ExpenseCategories = new List<GetExpenseCategory>();
+    private Dictionary<int, string> categoryName = new Dictionary<int, string>();
 
     protected override async Task OnParametersSetAsync()
     {
         await JavaScript.InvokeVoidAsync("print_pdf");
+
+        ExpenseCategories = await ClientVendorExpenseService.GetCategoryList();
+
+        foreach (var category in ExpenseCategories)
+        {
+            categoryName[category.Id] = category.Title;
+        }
 
         _items = new List<BreadcrumbItem>
         {
@@ -211,7 +280,8 @@ else
                     CashierName = GetReceipt.CashierName,
                     DeductedPercentage = GetReceipt.DeductedPercentage,
                     Notes = GetReceipt.Notes,
-                    GetReceiptItemDTO = GetReceipt.ReceiptItems
+                    GetReceiptItemDTO = GetReceipt.ReceiptItems,
+                    VendorExpenses = GetReceipt.VendorExpenses
                 };
             }
 
@@ -237,22 +307,55 @@ else
                 }
             }
 
+            var expenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount);
+
             ReceiptSummaryDTO = new ReceiptSummaryDTO
             {
                 GrossSales = GetReceipt.GrossSales,
-                NetSales = GetReceipt.NetSales,
+                NetSales = GetReceipt.NetSales - expenseAmount,
                 DeductedPercentage = GetReceipt.DeductedPercentage,
                 DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales,
-                ExpenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount)
+                ExpenseAmount = expenseAmount
             };
         }
 
         loadingProgress = false;
     }
 
-    private async Task AddExpense(int? Id)
+    private void AddExpense(int? Id)
     {
-        
-    
+        AddVendorExp.ReceiptId = (int)Id;
+
+        if (NewVendorExp.Amount <= 0) 
+        {
+            ModifiedSnackBar.ShowMessage("Invalid amount.", Severity.Warning);
+            return;
+        }
+
+        if (NewVendorExp.VendorExpenseCategoryId == 0)
+        {
+            ModifiedSnackBar.ShowMessage("Select expense category.", Severity.Warning);
+            return;
+        }
+
+        AddVendorExp.VendorExpenses.Add(NewVendorExp);
+        CreateReceipt.VendorExpenses.Add(new GetVendorExp
+        {
+            Amount = NewVendorExp.Amount,
+            VendorExpenseCategoryId = NewVendorExp.VendorExpenseCategoryId
+        });
+        NewVendorExp = new CreateVendorExp();
+        isExpenseAdded = true;
+    }
+
+    private async Task AddVendorExpense()
+    {
+        if (!AddVendorExp.VendorExpenses.Any()) 
+        {
+            ModifiedSnackBar.ShowMessage("Please add expense", Severity.Warning); 
+            return;
+        }
+
+        int result = await ClientVendorExpenseService.AddExpense(AddVendorExp);
     }
 }

@@ -9,7 +9,7 @@ namespace FishPortMS.Shared.DTOs.VendorExpDTO
 {
 	public class CreateVendorExp
 	{
-		public int ExpenseCategoryId { get; set; }
+		public int VendorExpenseCategoryId { get; set; }
 		[Column(TypeName = "decimal(18,2)")]
 		public decimal Amount { get; set; }
 	}
