@@ -23,7 +23,7 @@ namespace FishPortMS.Shared.Models.Expenses
 
         [Required]
         [Column(TypeName = "decimal(18,4)")]
-        public decimal Amount { get; set; } = 0;
+        public decimal Amount { get; set; } = 0; 
 
         [Required]
         public string ReceiptNo { get; set; } = string.Empty;

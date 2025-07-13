@@ -13,8 +13,8 @@ namespace FishPortMS.Shared.Models.Expenses
 	{
 		[Key] 
 		public int Id { get; set; }
-		public ExpenseCategory ExpenseCategory { get; set; }
-		public int ExpenseCategoryId { get; set; }
+		public VendorExpenseCategory VendorExpenseCategory { get; set; }
+		public int VendorExpenseCategoryId { get; set; }
 		[Column(TypeName = "decimal(18,2)")]
 		public decimal Amount { get; set; }
 		public Receipt Receipt { get; set; }

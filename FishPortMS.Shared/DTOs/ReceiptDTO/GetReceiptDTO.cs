@@ -24,6 +24,8 @@ namespace FishPortMS.Shared.DTOs.ReceiptDTO
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal DeductedPercentage { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DeductedAmount { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public List<GetReceiptItemDTO> ReceiptItems { get; set; } = new List<GetReceiptItemDTO>();
         public List<GetVendorExp>? VendorExpenses { get; set; } 
