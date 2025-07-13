@@ -3,9 +3,11 @@ using FishPortMS.Shared.DTOs.ReceiptDTO;
 using FishPortMS.Shared.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FishPortMS.Server.Controllers
 {
+    [EnableRateLimiting("fixed")]
     [Route("api/[controller]")]
     [ApiController]
     public class ReceiptController : ControllerBase
@@ -33,9 +35,9 @@ namespace FishPortMS.Server.Controllers
         }
 
         [HttpGet("get-receipt-paginated")]
-        public async Task<ActionResult<PaginatedTableResponse<GetReceiptDTO>>> GetReceiptPaginated([FromQuery] GetPaginatedDTO request) 
+        public async Task<ActionResult<PaginatedTableResponse<GetReceiptDTO>>> GetAllReceiptPaginated([FromQuery] GetPaginatedDTO request) 
         {
-            var result = await _receiptService.GetReceiptPaginated(request);
+            var result = await _receiptService.GetAllReceiptPaginated(request);
             if (result == null) return Unauthorized();
             return Ok(result);  
         }
@@ -47,6 +49,7 @@ namespace FishPortMS.Server.Controllers
             if (result == null) return Unauthorized();
             return Ok(result);
         }
+
         [HttpGet("single-receipt")]
         public async Task<ActionResult<GetReceiptDTO>> GetSingleReceipt(int receiptId) 
         { 

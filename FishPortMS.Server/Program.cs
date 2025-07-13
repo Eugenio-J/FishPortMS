@@ -1,4 +1,5 @@
 using FishPortMS.Server.Data;
+using FishPortMS.Server.Helper;
 using FishPortMS.Server.Services.AccountService;
 using FishPortMS.Server.Services.DashboardService;
 using FishPortMS.Server.Services.MasterProductService;
@@ -7,9 +8,11 @@ using FishPortMS.Server.Services.ReceiptService;
 using FishPortMS.Server.Services.UserManagementService;
 using FishPortMS.Server.Services.VendorExpenseService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +45,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
 });
 
+builder.Services.AddRateLimiter(rateLimiterOptions =>
+{
+    rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    rateLimiterOptions.AddFixedWindowLimiter("fixed", options =>
+    {
+        options.Window = TimeSpan.FromSeconds(10);
+        options.PermitLimit = 3;
+        options.QueueLimit = 3;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+           
+});
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
@@ -58,6 +75,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
 }
+
+
+app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 
