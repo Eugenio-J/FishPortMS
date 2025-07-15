@@ -10,6 +10,7 @@ namespace FishPortMS.Server.Services.VendorExpenseService
 		Task<int> AddCategory(CreateExpenseCategory request);
 		Task<int> AddExpense(AddVendorExp request);
 		Task<int> UpdateExpense(UpdateVendorExp request);
+		Task<int> DeleteExpense(int expenseId);
         Task<PaginatedTableResponse<GetExpenseCategory>> GetAllExpenseCategoryPaginated(GetPaginatedDTO request);
         Task<PaginatedTableResponse<GetExpenseCategory>> SearchExpenseCategory(GetPaginatedDTO request);
 		Task<List<GetExpenseCategory>> GetCategoryList();

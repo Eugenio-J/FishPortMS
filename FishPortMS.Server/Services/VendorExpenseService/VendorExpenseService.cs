@@ -67,28 +67,32 @@ namespace FishPortMS.Server.Services.VendorExpenseService
 
 			if (acc_role != Roles.BUY_AND_SELL) return 0;
 
-			Receipt? receipt = await _dbContext.Receipts
-				.Include(x => x.ReceiptItems)
-				.Include(x => x.VendorExpenses)
-				.Where(x => x.Id == request.ReceiptId)
-				.FirstOrDefaultAsync();
+			VendorExpense? vendotExpense = await _dbContext.VendorExpenses
+				.FirstOrDefaultAsync(x => x.Id == request.ExpenseId);
 
-			if (receipt == null) return 0;
+			if (vendotExpense == null) return 0;
 
-			foreach (var expense in request.VendorExpenses)
-			{
-				var exp = receipt.VendorExpenses
-					.FirstOrDefault(x => x.Id == expense.Id 
-						&& x.ReceiptId == request.ReceiptId);
-
-				if (exp == null) return 0;
-
-				exp.VendorExpenseCategoryId = expense.VendorExpenseCategoryId;
-				exp.Amount = expense.Amount;
-			}
+            vendotExpense.VendorExpenseCategoryId = request.VendorExpenseCategoryId;
+            vendotExpense.Amount = request.Amount;
 
             return await _dbContext.SaveChangesAsync() == 0 ? 0 : 1;
 		}
+
+        public async Task<int> DeleteExpense(int expenseId)
+        {
+            if (!Enum.TryParse(GetUserRole(), out Roles acc_role)) return 0;
+
+            if (acc_role != Roles.BUY_AND_SELL) return 0;
+
+            VendorExpense? vendotExpense = await _dbContext.VendorExpenses
+                .FirstOrDefaultAsync(x => x.Id == expenseId);
+
+            if (vendotExpense == null) return 0;
+
+			_dbContext.VendorExpenses.Remove(vendotExpense);
+
+            return await _dbContext.SaveChangesAsync() == 0 ? 0 : 1;
+        }
 
         public async Task<int> AddCategory(CreateExpenseCategory request)
         {

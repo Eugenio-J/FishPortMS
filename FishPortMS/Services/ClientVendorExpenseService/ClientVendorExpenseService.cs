@@ -116,5 +116,23 @@ namespace FishPortMS.Services.ClientVendorExpenseService
 				return 0;
 			}
 		}
-	}
+
+        public async Task<int> DeleteExpense(int expenseId)
+        {
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"api/vendorexpense/delete-vendor-expense/{expenseId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                int response_data = await response.Content.ReadFromJsonAsync<int>();
+                if (response_data == 0) return 0;
+                _modifiedSnackBar.ShowMessage("Expense deleted successfully", Severity.Success);
+                return response_data;
+            }
+            else
+            {
+                _modifiedSnackBar.ShowMessage("Failed to delete expense", Severity.Error);
+                return 0;
+            }
+        }
+    }
 }

@@ -1,10 +1,10 @@
 ﻿@page "/view-receipt"
 @page "/view-receipt/{Id:int}"
+@using FishPortMS.Pages.Expense.Vendor
 @inject IClientReceiptService ClientReceiptService
-@inject ILocalStorageService LocalStorageService
 @inject IClientVendorExpenseService ClientVendorExpenseService
-@inject NavigationManager NavigationManager
 @inject ModifiedSnackBar ModifiedSnackBar
+@inject IDialogService DialogService
 @inject IJSRuntime JavaScript
 
 <style>
@@ -134,24 +134,44 @@ else
             {
                 <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Expense</MudText>
 
-                <MudTable Items="@CreateReceipt.VendorExpenses"
-                          Dense="true"
-                          Hover="true"
-                          Breakpoint="Breakpoint.None"
-                          Style="padding-bottom: 0px;"
-                          CellClass="text-center"
-                          LoadingProgressColor="Color.Info">
+                <MudTable
+                    Items="@CreateReceipt.VendorExpenses"
+                    Dense="true"
+                    Hover="true"
+                    Breakpoint="Breakpoint.None"
+                    Style="padding-bottom: 0px;"
+                    CellClass="text-center"
+                    LoadingProgressColor="Color.Info">
 
                     <HeaderContent>
                         <MudTh Class="text-center">Amount</MudTh>
                         <MudTh Class="text-center">Category</MudTh>
+                        <MudTh Class="text-center"></MudTh>
                     </HeaderContent>
 
                     <RowTemplate Context="expense">
                         <MudTd DataLabel="Amount" Class="text-center">P @string.Format("{0:N0}", expense.Amount)</MudTd>
-                            <MudTd DataLabel="Category" Class="text-center">@categoryName[expense.VendorExpenseCategoryId] </MudTd>
-                        </RowTemplate>
-                    </MudTable>
+                        <MudTd DataLabel="Category" Class="text-center">@categoryName[expense.VendorExpenseCategoryId] </MudTd>
+                        <AuthorizeView Roles="BUY_AND_SELL">
+                            <Authorized>
+                                <MudTd>
+                                    <IconButton 
+                                        icon="@Icons.Material.Outlined.Edit"
+                                        className="edit-btn"
+                                        tooltip="Edit"
+                                        OnClick="() => UpdateExpense(expense)" />
+
+                                    <IconButton 
+                                        icon="@Icons.Material.Outlined.Delete"
+                                        className="remove-btn"
+                                        tooltip="Delete"
+                                        OnClick="() => DeleteExpense(expense.Id)" />
+                                </MudTd>
+                            </Authorized>
+                        </AuthorizeView>
+                  
+                    </RowTemplate>
+                </MudTable>
             }
 
             @if (isExpenseAdded)
@@ -241,6 +261,7 @@ else
     private List<Tabs> _tabs = new List<Tabs>();
     public AddVendorExp AddVendorExp { get; set; } = new AddVendorExp();
     public CreateVendorExp NewVendorExp { get; set; } = new CreateVendorExp();
+    public UpdateVendorExp UpdateVendorExp { get; set; } = new UpdateVendorExp();
     private List<GetExpenseCategory> ExpenseCategories = new List<GetExpenseCategory>();
     private Dictionary<int, string> categoryName = new Dictionary<int, string>();
 
@@ -270,11 +291,19 @@ else
 
         else
         {
-            GetReceipt = await ClientReceiptService.GetSingleReceipt((int)Id);
+            await LoadReceipt();
+        }
 
-            if (GetReceipt != null)
-            {
-                CreateReceipt = new CreateReceiptDTO
+        loadingProgress = false;
+    }
+
+    private async Task LoadReceipt()
+    {
+        GetReceipt = await ClientReceiptService.GetSingleReceipt((int)Id);
+
+        if (GetReceipt != null)
+        {
+            CreateReceipt = new CreateReceiptDTO
                 {
                     BSname = GetReceipt.BSName,
                     CashierName = GetReceipt.CashierName,
@@ -283,43 +312,41 @@ else
                     GetReceiptItemDTO = GetReceipt.ReceiptItems,
                     VendorExpenses = GetReceipt.VendorExpenses
                 };
-            }
-
-            foreach (var item in CreateReceipt.GetReceiptItemDTO)
-            {
-                if (!_tabs.Any(x => x.Title == item.ProductName)) 
-                {
-                    var newTab = new Tabs
-                        {
-                            Title = item.ProductName,
-                            POItemsList = new List<GetReceiptItemDTO>()
-                        };
-
-                    newTab.POItemsList.Add(item);
-                    _tabs.Add(newTab);
-                }
-
-                else
-                {
-                    var selectedTab = _tabs.FirstOrDefault(x => x.Title == item.ProductName);
-
-                    selectedTab.POItemsList.Add(item);
-                }
-            }
-
-            var expenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount);
-
-            ReceiptSummaryDTO = new ReceiptSummaryDTO
-            {
-                GrossSales = GetReceipt.GrossSales,
-                NetSales = GetReceipt.NetSales - expenseAmount,
-                DeductedPercentage = GetReceipt.DeductedPercentage,
-                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales,
-                ExpenseAmount = expenseAmount
-            };
         }
 
-        loadingProgress = false;
+        foreach (var item in CreateReceipt.GetReceiptItemDTO)
+        {
+            if (!_tabs.Any(x => x.Title == item.ProductName))
+            {
+                var newTab = new Tabs
+                {
+                    Title = item.ProductName,
+                    POItemsList = new List<GetReceiptItemDTO>()
+                };
+
+                newTab.POItemsList.Add(item);
+                _tabs.Add(newTab);
+            }
+            else
+            {
+                var selectedTab = _tabs.FirstOrDefault(x => x.Title == item.ProductName);
+
+                selectedTab.POItemsList.Add(item);
+            }
+        }
+
+        var expenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount);
+
+        ReceiptSummaryDTO = new ReceiptSummaryDTO
+        {
+            GrossSales = GetReceipt.GrossSales,
+            NetSales = GetReceipt.NetSales - expenseAmount,
+            DeductedPercentage = GetReceipt.DeductedPercentage,
+            DeductedAmount = GetReceipt.DeductedAmount,
+            ExpenseAmount = expenseAmount
+        };
+
+        StateHasChanged();
     }
 
     private void AddExpense(int? Id)
@@ -335,6 +362,12 @@ else
         if (NewVendorExp.VendorExpenseCategoryId == 0)
         {
             ModifiedSnackBar.ShowMessage("Select expense category.", Severity.Warning);
+            return;
+        }
+
+        if (CreateReceipt.VendorExpenses.Any(x => x.VendorExpenseCategoryId == NewVendorExp.VendorExpenseCategoryId)) 
+        {
+            ModifiedSnackBar.ShowMessage($"{categoryName[NewVendorExp.VendorExpenseCategoryId]} expense is existing already.", Severity.Warning);
             return;
         }
 
@@ -357,5 +390,38 @@ else
         }
 
         int result = await ClientVendorExpenseService.AddExpense(AddVendorExp);
+    }
+
+    private async Task DeleteExpense(int expenseId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want to delete this expense");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+        var dialog = await DialogService.Show<ApprovalDialog>("Delete expense", parameters).Result;
+        if (dialog.Data != null && dialog.Data is bool confirmed && confirmed)
+        {
+            await ClientVendorExpenseService.DeleteExpense(expenseId);
+            await LoadReceipt();
+        }
+    }
+
+    private async Task UpdateExpense(GetVendorExp expense)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Id", expense.Id);
+        parameters.Add("singleExpense", expense);
+        parameters.Add("ExpenseCategories", ExpenseCategories);
+        parameters.Add("CreateReceipt", CreateReceipt);
+        parameters.Add("categoryName", categoryName);
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, CloseButton = true };
+        var dialog = await DialogService.Show<SingleVendorExpense>("", parameters, options).Result;
+        if (dialog.Data != null && dialog.Data is UpdateVendorExp updateExpense) 
+        {
+            await ClientVendorExpenseService.UpdateExpense(updateExpense);
+            await LoadReceipt();
+        }
+
     }
 }

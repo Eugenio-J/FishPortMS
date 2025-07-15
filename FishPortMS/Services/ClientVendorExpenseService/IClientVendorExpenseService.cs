@@ -8,6 +8,7 @@ namespace FishPortMS.Services.ClientVendorExpenseService
 	{
 		Task<int> AddExpense(AddVendorExp payload);
 		Task<int> UpdateExpense(UpdateVendorExp payload);
+		Task<int> DeleteExpense(int expenseId);
 		Task<int> AddCategory(CreateExpenseCategory payload);
         Task<PaginatedTableResponse<GetExpenseCategory>> GetAllExpenseCategoryPaginated(GetPaginatedDTO payload);
         Task<PaginatedTableResponse<GetExpenseCategory>> SearchExpenseCategory(GetPaginatedDTO payload);

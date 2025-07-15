@@ -22,28 +22,29 @@ else
                         TotalItems="@TotalItems"
                         tableLoading="tableLoading"
                         THCount="10"
-                        Title="PRODUCT"
+                        Title="RECEIPT"
                         Items="GetMasterProducts"
                         Context="receipt"
                         ID="table">
 
             <TableHeader>
                 <th class="text-center">ID</th>
+                <th class="text-center">Date</th>
                 <th class="text-center">BS</th>
                 <th class="text-center">Casher</th>
-                <th class="text-center">Gross</th>
                 <th class="text-center">Porsyento</th>
+                <th class="text-center">Gross</th>
                 <th class="text-center">Net</th> 
-                <th></th>
                 <th></th>
             </TableHeader>
             <RowTemplate>
-                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@receipt.Id</td>
-                <td data-title="Category" class="py-sm-5 py-3 text-end text-sm-center">@receipt.BSName</td>
-                <td data-title="Brand" class="py-sm-5 py-3 text-end text-sm-center">@receipt.CashierName</td>
-                <td data-title="SKU" class="py-sm-5 py-3 text-end text-sm-center">@receipt.GrossSales</td>
-                <td data-title="SKU" class="py-sm-5 py-3 text-end text-sm-center">@receipt.DeductedPercentage</td>
-                <td data-title="UOM" class="py-sm-5 py-3 text-end text-sm-center">@receipt.NetSales</td>
+                <td data-title="Id" class="py-sm-5 py-3 text-end text-sm-center">@receipt.Id</td>
+                <td data-title="Date" class="py-sm-5 py-3 text-end text-sm-center">@receipt.DateCreated.ToString("MMMM d, yyyy")</td>
+                <td data-title="BS name" class="py-sm-5 py-3 text-end text-sm-center">@receipt.BSName</td>
+                <td data-title="Cashier" class="py-sm-5 py-3 text-end text-sm-center">@receipt.CashierName</td>
+                <td data-title="Porsyento" class="py-sm-5 py-3 text-end text-sm-center">@receipt.DeductedPercentage</td>
+                <td data-title="Gross" class="py-sm-5 py-3 text-end text-sm-center">@receipt.GrossSales</td>
+                <td data-title="Net" class="py-sm-5 py-3 text-end text-sm-center">@receipt.NetSales</td>
                 <td>
                     <IconButton 
                         className="view-btn mr-2"

@@ -30,28 +30,14 @@
              ID="table">
 
              <TableHeader>
-                 <th class="text-center"></th>
                  <th class="text-center">Product Name</th>
                  <th class="text-center">SKU</th>
                  <th class="text-center">UOM</th>
                  <th class="text-center">Packaging Qty</th>
                  <th class="text-center">Packaging Cost</th>
                  <th></th>
-                 <th></th>
              </TableHeader>
              <RowTemplate>
-                <td class="text-end text-sm-center">
-                    <MudAvatar>
-                        @if (product.ProductImageURLs.Count > 0)
-                        {
-                            <MudImage Src="@product.ProductImageURLs.FirstOrDefault(prod => prod.MasterProductId == product.Id)!.ProductImageURL"></MudImage>
-                        }
-                        else
-                        {
-                            <MudImage Src="images/form_imgs/noimg.jpg"></MudImage>
-                        }
-                    </MudAvatar>
-                </td>
                 <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@product.Name</td>
                 <td data-title="SKU" class="py-sm-5 py-3 text-end text-sm-center">@product.SKU</td>
                 <td data-title="UOM" class="py-sm-5 py-3 text-end text-sm-center">@product.UOM</td>

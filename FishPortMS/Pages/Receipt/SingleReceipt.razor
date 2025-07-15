@@ -61,15 +61,16 @@ else
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Notes 
                     </MudText>
-                    <MudTextField Class="mb-5"
-                                  Lines="5"
-                                  HelperText="Utang, Kulang, Hulog..."
-                                  HelperTextOnFocus="true"
-                                  @bind-Value="CreateReceipt.Notes"
-                                  For="@(() => CreateReceipt.Notes)"
-                                  InputType="InputType.Text"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudTextField 
+                        Class="mb-5"
+                        Lines="5"
+                        HelperText="Utang, Kulang, Hulog..."
+                        HelperTextOnFocus="true"
+                        @bind-Value="CreateReceipt.Notes"
+                        For="@(() => CreateReceipt.Notes)"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
 
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Buy and Sell Name
@@ -256,7 +257,7 @@ else
                 GrossSales = GetReceipt.GrossSales,
                 NetSales = GetReceipt.NetSales,
                 DeductedPercentage = GetReceipt.DeductedPercentage,
-                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales,
+                DeductedAmount = GetReceipt.DeductedAmount,
                 ExpenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount)
             };
         }

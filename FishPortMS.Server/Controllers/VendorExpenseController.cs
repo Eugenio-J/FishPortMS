@@ -34,6 +34,14 @@ namespace FishPortMS.Server.Controllers
 			return Ok(result);
 		}
 
+        [HttpDelete("delete-vendor-expense/{expenseId}")]
+        public async Task<ActionResult<int>> DeleteExpense(int expenseId)
+        {
+            var result = await _vendorExpenseService.DeleteExpense(expenseId);
+            if (result == 0) return Unauthorized();
+            return Ok(result);
+        }
+
         [HttpPost("add-expense-category")]
         public async Task<ActionResult<int>> AddCategory(CreateExpenseCategory request) 
         {

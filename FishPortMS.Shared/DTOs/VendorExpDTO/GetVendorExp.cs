@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace FishPortMS.Shared.DTOs.VendorExpDTO
 {
 	public class GetVendorExp
-	{
+	{		
 		public int Id { get; set; }
 		public int VendorExpenseCategoryId { get; set; }
 		[Column(TypeName = "decimal(18,2)")]

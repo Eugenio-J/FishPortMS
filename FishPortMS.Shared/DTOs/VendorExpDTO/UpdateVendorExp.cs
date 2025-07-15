@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,9 @@ namespace FishPortMS.Shared.DTOs.VendorExpDTO
 {
 	public class UpdateVendorExp
 	{
-		public int ReceiptId { get; set; }
-		public List<GetVendorExp> VendorExpenses { get; set; } = new List<GetVendorExp>();
-	}
+        public int ExpenseId { get; set; }
+        public int VendorExpenseCategoryId { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; }
+    }
 }

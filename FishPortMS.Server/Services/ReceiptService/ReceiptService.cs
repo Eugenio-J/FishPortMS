@@ -90,7 +90,7 @@ namespace FishPortMS.Server.Services.ReceiptService
             newReceipt.GrossSales = newReceipt.ReceiptItems.Sum(x => x.Subtotal);
 
             decimal amountDeducted = (newReceipt.GrossSales * (request.DeductedPercentage / 100));
-
+            newReceipt.DeductedAmount = amountDeducted;
             newReceipt.NetSales = newReceipt.GrossSales - amountDeducted;
 
             int count = await _context.SaveChangesAsync();
@@ -129,6 +129,9 @@ namespace FishPortMS.Server.Services.ReceiptService
 
         public async Task<GetReceiptDTO?> GetSingleReceipt(int receiptId)
         {
+            string userId = GetUserId() ?? string.Empty;
+            string userRole = GetUserRole() ?? string.Empty;
+
             var singleReceipt = await _context.Receipts
                 .Include(x => x.ReceiptItems)
                   .ThenInclude(x => x.MasterProduct)
@@ -136,6 +139,13 @@ namespace FishPortMS.Server.Services.ReceiptService
                 .SingleOrDefaultAsync(x => x.Id == receiptId);
 
             if (singleReceipt == null) return null;
+
+            // return Unauthorized if other buy and sell tries to access receipt that is not belong to them
+
+            if (userRole == Roles.BUY_AND_SELL.ToString() && singleReceipt.BSId.ToString() != userId) 
+            {
+                return null;
+            }
 
             return ConvertReceipt(singleReceipt);
         }
@@ -194,6 +204,7 @@ namespace FishPortMS.Server.Services.ReceiptService
                 Notes = receipt.Notes,
                 DateCreated = receipt.DateCreated,
                 DeductedPercentage = receipt.DeductedPercentage,
+                DeductedAmount = receipt.DeductedAmount,
                 GrossSales = receipt.GrossSales,
                 NetSales = receipt.NetSales,
                 ReceiptItems = receiptItem,
@@ -233,16 +244,14 @@ namespace FishPortMS.Server.Services.ReceiptService
                 receiptItem.Weight = item.Weight;
                 receiptItem.IsOut = item.IsOut;
                 receiptItem.Subtotal = item.Weight * item.CurrentPrice;
-
-
                 grossSales += item.CurrentPrice * item.Weight;
-
             }
 
             receipt.GrossSales = grossSales;
 
             decimal amountDeducted = (grossSales * (request.DeductedPercentage / 100));
 
+            receipt.DeductedAmount = amountDeducted;
             receipt.NetSales = grossSales - amountDeducted;
 
             await _context.SaveChangesAsync();
