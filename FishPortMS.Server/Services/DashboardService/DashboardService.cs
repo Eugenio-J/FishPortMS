@@ -19,25 +19,42 @@ namespace FishPortMS.Server.Services.DashboardService
 
 		public async Task<SalesSummary> GetSalesByDate(DateTime From, DateTime To)
 		{
-            IQueryable<Receipt> query = _dbContext.Receipts.Where(x => x.DateCreated >= From && x.DateCreated <= To);
+            IQueryable<Receipt> query = _dbContext.Receipts
+                .Where(x => x.DateCreated >= From && x.DateCreated <= To);
 
 			var grossSale = await query.SumAsync(x => x.GrossSales);
 
 			var NetSales = await query.SumAsync(x => x.NetSales);
 
-			var TotalPercentage = await _dbContext.Receipts
-			  .Where(x => x.DateCreated >= From && x.DateCreated <= To)
-			  .SumAsync(x => x.GrossSales);
+			var TotalPorsyento = await query.SumAsync(x => x.DeductedAmount);
 
-			var TotalExpense = await _dbContext.VendorExpenses
-                .Include(x => x.Receipt)
-                .Where(x => x.Receipt.DateCreated >= From && x.Receipt.DateCreated <= To)
-			    .SumAsync(x => x.Amount);
+            var groupedData = await _dbContext.VendorExpenses
+              .Include(x => x.Receipt)
+              .Include(x => x.VendorExpenseCategory)
+              .Where(x => x.Receipt.DateCreated >= From && x.Receipt.DateCreated <= To)
+              .GroupBy(x => new
+              {
+                  Date = x.Receipt.DateCreated.Date,
+                  x.VendorExpenseCategoryId,
+                  x.VendorExpenseCategory.Title
+              })
+              .Select(g => new
+              {
+                  g.Key.Date,
+                  g.Key.VendorExpenseCategoryId,
+                  g.Key.Title,
+                  TotalAmount = g.Sum(x => x.Amount)
+              })
+              .OrderBy(x => x.Date)
+              .ToListAsync();
+
+
 
             return new SalesSummary
             {
                 GrossSales = grossSale,
                 NetSales = NetSales,
+                TotalPorsyento = TotalPorsyento
             };
 		}
 	}

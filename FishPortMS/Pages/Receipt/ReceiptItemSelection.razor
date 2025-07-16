@@ -201,7 +201,7 @@
 
                                         <IconButton OnClick="() => UpdateProduct(orders)" icon="@Icons.Material.Filled.Edit" className="view-icon mr-2" tooltip="Update Qty" />
 
-                                        <IconButton OnClick="() => RemoveProduct(orders)" icon="@Icons.Material.Filled.Remove" className="reject-icon mr-2" tooltip="Remove Item" />
+                                        <IconButton OnClick="() => RemoveProduct(tab.Title ,orders)" icon="@Icons.Material.Filled.Remove" className="reject-icon mr-2" tooltip="Remove Item" />
 
                                     </MudTd>
                                 </RowTemplate>
@@ -236,12 +236,10 @@
 @code {
 
     [Parameter] public int? Id { get; set; }
-
     [Parameter] public List<GetMasterProduct> MasterProductList { get; set; }
-
     [Parameter] public CreateReceiptDTO CreateReceipt { get; set; } = new CreateReceiptDTO();
-
     [Parameter] public List<GetReceiptItemDTO> POItemsList { get; set; } = new List<GetReceiptItemDTO>();
+    [Parameter] public List<Tabs> _tabs { get; set; } = new List<Tabs>();
 
     private MudTextField<decimal> weightField;
 
@@ -266,11 +264,10 @@
     private int _tabCounter = 1;
     private int _activeTabIndex = 0;
 
-    [Parameter] public List<Tabs> _tabs { get; set; } = new List<Tabs>();
 
     private async Task<IEnumerable<string>> SearchProduct(string value, CancellationToken token)
     {
-     
+
         List<string> matchingNames = new List<string>();
 
         foreach (var product in MasterProductList)
@@ -399,18 +396,22 @@
         }
     }
 
-    private void RemoveProduct(GetReceiptItemDTO stock)
+    private void RemoveProduct(string title, GetReceiptItemDTO stock)
     {
-        var prodDelete = CreateReceipt.GetReceiptItemDTO.Find(c => c.MasterProductId == stock.MasterProductId);
-
-        if (prodDelete != null)
+        if (stock != null)
         {
             var selectedProduct = MasterProductList.FirstOrDefault(mp => mp.Id == stock.MasterProductId)?.Name;
 
             if (selectedProduct != null)
             {
                 ModifiedSnackBar.ShowMessage($"{selectedProduct} has been removed.", Severity.Error);
-                CreateReceipt.GetReceiptItemDTO.Remove(prodDelete);
+                CreateReceipt.GetReceiptItemDTO.Remove(stock);
+                var tab = _tabs.FirstOrDefault(x => x.Title == title);
+                tab.POItemsList.Remove(stock);
+                if (tab.POItemsList.Count <= 0) 
+                {
+                    _tabs.Remove(tab);
+                }
                 productSelect = true;
                 POItems = new GetReceiptItemDTO();
             }

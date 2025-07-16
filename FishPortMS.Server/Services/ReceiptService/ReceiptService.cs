@@ -247,6 +247,15 @@ namespace FishPortMS.Server.Services.ReceiptService
                 grossSales += item.CurrentPrice * item.Weight;
             }
 
+            var itemsToRemove = receipt.ReceiptItems
+            .Where(item => !request.GetReceiptItemDTO.Any(x => x.Id == item.Id))
+            .ToList(); // create a safe copy
+
+            foreach (var itemToRemove in itemsToRemove)
+            {
+                receipt.ReceiptItems.Remove(itemToRemove);
+            }
+
             receipt.GrossSales = grossSales;
 
             decimal amountDeducted = (grossSales * (request.DeductedPercentage / 100));

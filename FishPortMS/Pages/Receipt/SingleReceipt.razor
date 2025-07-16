@@ -86,23 +86,25 @@ else
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Cashier
                     </MudText>
-                    <MudTextField Class="mb-5"
-                                  @bind-Value="CreateReceipt.CashierName"
-                                  For="@(() => CreateReceipt.CashierName)"
-                                  InputType="InputType.Text"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudTextField
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.CashierName"
+                        For="@(() => CreateReceipt.CashierName)"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
 
 
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Percentage
                     </MudText>
-                    <MudTextField Class="mb-5"
-                                  @bind-Value="CreateReceipt.DeductedPercentage"
-                                  For="@(() => CreateReceipt.DeductedPercentage)"
-                                  InputType="InputType.Number"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudTextField
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.DeductedPercentage"
+                        For="@(() => CreateReceipt.DeductedPercentage)"
+                        InputType="InputType.Number"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
 
                 </div>
 
@@ -252,13 +254,15 @@ else
                 }
             }
 
+            decimal expenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount);
+
             ReceiptSummaryDTO = new ReceiptSummaryDTO
             {
                 GrossSales = GetReceipt.GrossSales,
-                NetSales = GetReceipt.NetSales,
+                NetSales = GetReceipt.NetSales - expenseAmount,
                 DeductedPercentage = GetReceipt.DeductedPercentage,
                 DeductedAmount = GetReceipt.DeductedAmount,
-                ExpenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount)
+                ExpenseAmount = expenseAmount
             };
         }
     }
