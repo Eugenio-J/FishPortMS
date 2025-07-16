@@ -1,15 +1,15 @@
-﻿using FishPortMS.Shared.DTOs.NotificationDTO;
+﻿using FishPortMS.Components.Dashboard;
+using FishPortMS.Shared.DTOs.DashboardDTO;
+using FishPortMS.Shared.DTOs.NotificationDTO;
 using FishPortMS.Shared.Response;
 
 namespace FishPortMS.Server.Services.DashboardService
 {
     public interface IDashboardService
     {
+        // Sales
 
-        //SALES
-        //Task<string> GetTodaySales();
-        //Task<string> GetWeeklySales();
-        //Task<string> GetMonthlySales();
-        //Task<string> GetYearlySales();
+        Task<SalesSummary> GetSalesByDate(DateTime From, DateTime To);
+
     }
 }

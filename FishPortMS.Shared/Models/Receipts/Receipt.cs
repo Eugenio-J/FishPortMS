@@ -25,7 +25,10 @@ namespace FishPortMS.Shared.Models.Receipts
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal DeductedPercentage { get; set; }
-        public Guid CreatedBy { get; set; } 
+
+		[Column(TypeName = "decimal(18,2)")]
+		public decimal DeductedAmount { get; set; }
+		public Guid CreatedBy { get; set; } 
         public Guid? BSId { get; set; } 
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 

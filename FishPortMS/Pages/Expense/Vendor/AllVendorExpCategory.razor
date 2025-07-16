@@ -1,0 +1,158 @@
+﻿@page "/vendor-expense-categories"
+@inject NavigationManager NavigationManager
+@inject IClientVendorExpenseService ClientVendorExpenseService
+@inject IDialogService DialogService
+@inject IJSRuntime JavaScript
+
+
+@if (loadingProgress)
+{
+    <TableSkeletonLoading />
+}
+else
+{
+    <div Class="pt-8 px-5">
+
+        <MudText Typo="Typo.h4">VENDOR EXPENSE CATEGORIES</MudText><MudBreadcrumbs Items="_items" Class="ml-n2"></MudBreadcrumbs>
+
+        <CreateButton OnClick="CreateCategory" className="create-btn" button_name="Add Category" />
+
+        <PaginatedTable 
+            RowsPerPageChanged="HandleRowsPerPageChangedInRazor"
+            SearchBar="HandleSearchTextValue"
+            Paginated="HandlePaginatedBtn"
+            TotalItems="@TotalItems"
+            tableLoading="tableLoading"
+            THCount="10"
+            Title="CATEGORIES"
+            Items="GetExpenseCategory"
+            Context="category"
+            ID="table">
+
+            <TableHeader>
+                <th class="text-center">Title</th>
+            </TableHeader>
+            <RowTemplate>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@category.Title</td>
+            </RowTemplate>
+
+        </PaginatedTable>
+
+    </div>
+}
+
+@code {
+
+    private int RowsPerPage { get; set; } = 10;
+    public string TextValue { get; set; } = string.Empty;
+    private int TotalItems { get; set; } = 0;
+    private GetPaginatedDTO Paginated = new GetPaginatedDTO();
+    private List<GetExpenseCategory> GetExpenseCategory = new List<GetExpenseCategory>();
+    private CreateExpenseCategory CreateExpenseCategory = new CreateExpenseCategory();
+
+    private bool loadingProgress = true;
+    private bool tableLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadingProgress = true;
+        tableLoading = true;
+        PaginatedTableResponse<GetExpenseCategory> response = await ClientVendorExpenseService.GetAllExpenseCategoryPaginated(Paginated);
+        TotalItems = response.Count;
+        GetExpenseCategory = response.ResponseData;
+        await JavaScript.InvokeVoidAsync("TablePaginate");
+        loadingProgress = false;
+        tableLoading = false;
+    }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Products", href: "#", disabled: true),
+        new BreadcrumbItem("Manage", href: "/vendor-expense-categories"),
+    };
+
+    private async Task CreateCategory()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("CreateExpenseCategory", CreateExpenseCategory);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        var dialogResult = await DialogService.Show<SingleExpenseCategory>("", parameters, options).Result;
+
+        if (dialogResult.Data != null && dialogResult.Data is CreateExpenseCategory createCategory)
+        {
+            await ClientVendorExpenseService.AddCategory(createCategory);
+            PaginatedTableResponse<GetExpenseCategory> page_response = await ClientVendorExpenseService.GetAllExpenseCategoryPaginated(Paginated);
+            TotalItems = page_response.Count;
+            GetExpenseCategory = page_response.ResponseData;
+        };
+    }
+
+    private async Task EditCategory(GetExpenseCategory payload)
+    {
+        // var parameters = new DialogParameters();
+        // parameters.Add("Id", payload.Id);
+        // parameters.Add("singleProduct", payload);
+        // parameters.Add("createMasterProduct", createMasterProduct);
+        // var options = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+        // var dialogResult = await DialogService.Show<SingleExpenseCategory>("", parameters, options).Result;
+
+        // if (dialogResult.Data != null && dialogResult.Data is CreateExpenseCategory createExpense)
+        // {
+        //     await ClientVendorExpenseService.UpdateMasterProduct(payload.Id, createExpense);
+        //     PaginatedTableResponse<GetExpenseCategory> page_response = await ClientVendorExpenseService.GetAllExpenseCategoryPaginated(Paginated);
+        //     TotalItems = page_response.Count;
+        //     GetExpenseCategory = page_response.ResponseData;
+        // };
+    }
+
+    private async void HandleRowsPerPageChangedInRazor(TableStates state)
+    {
+        tableLoading = true;
+        RowsPerPage = state.PageSize;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetExpenseCategory> response = await ClientVendorExpenseService.GetAllExpenseCategoryPaginated(Paginated);
+        TotalItems = response.Count;
+        GetExpenseCategory = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+    private async void HandleSearchTextValue(string textValue)
+    {
+        if (!string.IsNullOrWhiteSpace(textValue))
+        {
+            tableLoading = true;
+            Paginated.SearchValue = textValue;
+            PaginatedTableResponse<GetExpenseCategory> response = await ClientVendorExpenseService.SearchExpenseCategory(Paginated);
+            TotalItems = response.Count;
+            GetExpenseCategory = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            tableLoading = true;
+            Paginated.Skip = 0;
+            Paginated.Take = RowsPerPage;
+            PaginatedTableResponse<GetExpenseCategory> response = await ClientVendorExpenseService.GetAllExpenseCategoryPaginated(Paginated);
+            TotalItems = response.Count;
+            GetExpenseCategory = response.ResponseData;
+            tableLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void HandlePaginatedBtn(TableStates state)
+    {
+        tableLoading = true;
+        Paginated.Skip = state.Page * state.PageSize;
+        Paginated.Take = state.PageSize;
+        PaginatedTableResponse<GetExpenseCategory> response = await ClientVendorExpenseService.GetAllExpenseCategoryPaginated(Paginated);
+        TotalItems = response.Count;
+        GetExpenseCategory = response.ResponseData;
+        tableLoading = false;
+        StateHasChanged();
+    }
+
+}

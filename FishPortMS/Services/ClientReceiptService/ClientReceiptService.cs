@@ -37,7 +37,7 @@ namespace FishPortMS.Services.ClientReceiptService
             }
         }
 
-        public async Task<PaginatedTableResponse<GetReceiptDTO>> GetReceiptPaginated(GetPaginatedDTO payload)
+        public async Task<PaginatedTableResponse<GetReceiptDTO>> GetAllReceiptPaginated(GetPaginatedDTO payload)
         {
             var result = await _http.GetFromJsonAsync<PaginatedTableResponse<GetReceiptDTO>>($"api/receipt/get-receipt-paginated?Take={payload.Take}&Skip={payload.Skip}");
 

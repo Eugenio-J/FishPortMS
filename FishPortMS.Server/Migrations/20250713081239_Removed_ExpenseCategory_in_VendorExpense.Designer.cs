@@ -4,6 +4,7 @@ using FishPortMS.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FishPortMS.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250713081239_Removed_ExpenseCategory_in_VendorExpense")]
+    partial class Removed_ExpenseCategory_in_VendorExpense
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,14 +260,9 @@ namespace FishPortMS.Server.Migrations
                     b.Property<int>("ReceiptId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VendorExpenseCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ReceiptId");
-
-                    b.HasIndex("VendorExpenseCategoryId");
 
                     b.ToTable("VendorExpenses");
                 });
@@ -444,9 +442,6 @@ namespace FishPortMS.Server.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("DeductedAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("DeductedPercentage")
                         .HasColumnType("decimal(18,2)");
 
@@ -545,15 +540,7 @@ namespace FishPortMS.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FishPortMS.Shared.Models.Expenses.VendorExpenseCategory", "VendorExpenseCategory")
-                        .WithMany()
-                        .HasForeignKey("VendorExpenseCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Receipt");
-
-                    b.Navigation("VendorExpenseCategory");
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Products.MasterInventory", b =>

@@ -61,15 +61,16 @@ else
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Notes 
                     </MudText>
-                    <MudTextField Class="mb-5"
-                                  Lines="5"
-                                  HelperText="Utang, Kulang, Hulog..."
-                                  HelperTextOnFocus="true"
-                                  @bind-Value="CreateReceipt.Notes"
-                                  For="@(() => CreateReceipt.Notes)"
-                                  InputType="InputType.Text"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudTextField 
+                        Class="mb-5"
+                        Lines="5"
+                        HelperText="Utang, Kulang, Hulog..."
+                        HelperTextOnFocus="true"
+                        @bind-Value="CreateReceipt.Notes"
+                        For="@(() => CreateReceipt.Notes)"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
 
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Buy and Sell Name
@@ -85,23 +86,25 @@ else
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Cashier
                     </MudText>
-                    <MudTextField Class="mb-5"
-                                  @bind-Value="CreateReceipt.CashierName"
-                                  For="@(() => CreateReceipt.CashierName)"
-                                  InputType="InputType.Text"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudTextField
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.CashierName"
+                        For="@(() => CreateReceipt.CashierName)"
+                        InputType="InputType.Text"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
 
 
                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">
                         Percentage
                     </MudText>
-                    <MudTextField Class="mb-5"
-                                  @bind-Value="CreateReceipt.DeductedPercentage"
-                                  For="@(() => CreateReceipt.DeductedPercentage)"
-                                  InputType="InputType.Number"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudTextField
+                        Class="mb-5"
+                        @bind-Value="CreateReceipt.DeductedPercentage"
+                        For="@(() => CreateReceipt.DeductedPercentage)"
+                        InputType="InputType.Number"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense" />
 
                 </div>
 
@@ -145,15 +148,17 @@ else
                 {
                     <div class="d-flex justify-content-end mt-8">
 
-                        <SubmitButton button_name="Update"
-                                      isLoading="isLoading"
-                                      className="submit-btn mr-2"
-                                      icon="@Icons.Material.Filled.Check"
-                                      OnClick="() => UpdateReceipt((int)Id)" />
+                        <SubmitButton
+                            button_name="Update"
+                            isLoading="isLoading"
+                            className="submit-btn mr-2"
+                            icon="@Icons.Material.Filled.Check"
+                            OnClick="() => UpdateReceipt((int)Id)" />
 
-                        <SubmitButton button_name="Cancel"
-                                      className="cancel-btn"
-                                      OnClick="Cancel" />
+                        <SubmitButton
+                            button_name="Cancel"
+                            className="cancel-btn"
+                            OnClick="Cancel" />
 
                     </div>
                 }
@@ -249,13 +254,15 @@ else
                 }
             }
 
+            decimal expenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount);
+
             ReceiptSummaryDTO = new ReceiptSummaryDTO
             {
                 GrossSales = GetReceipt.GrossSales,
-                NetSales = GetReceipt.NetSales,
+                NetSales = GetReceipt.NetSales - expenseAmount,
                 DeductedPercentage = GetReceipt.DeductedPercentage,
-                DeductedAmount = GetReceipt.GrossSales - GetReceipt.NetSales,
-                ExpenseAmount = GetReceipt.VendorExpenses == null ? 0 : GetReceipt.VendorExpenses.Sum(x => x.Amount)
+                DeductedAmount = GetReceipt.DeductedAmount,
+                ExpenseAmount = expenseAmount
             };
         }
     }
