@@ -11,5 +11,6 @@ namespace FishPortMS.Shared.DTOs.DashboardDTO
         public decimal Amount { get; set; }
         public int ExpenseCategoryId { get; set; }
         public string? ExpenseCategoryName { get; set; }
+        public DateTime DateCreated { get; set; } // ensure this exists
     }
 }
