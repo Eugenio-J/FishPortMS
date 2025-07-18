@@ -37,25 +37,22 @@ else
 
     <PrintButton />
 
-    <div class="position-relative mx-2 mx-sm-7 my-2 my-sm-10" style="border: solid 1px #df4140 ">
+    <div class="position-relative mx-2 mx-sm-7 my-2 my-sm-10" style="border: solid 1px #3362a7 ">
 
-        <div class="d-flex align-items-center justify-content-start" style="width: 100% !important; background: #df4140; height: 40px; ">
-            <MudText Style="font-size: 20px !important; color: white !important; letter-spacing: 1px;">
-                <MudImage Class="ml-1" Src="images/sys_imgs/more.png" Width="17" ObjectFit="ObjectFit.Fill" /> Receipt
+        <div class="d-flex align-items-center justify-content-between" style="width: 100% !important; background: #3362a7; height: 40px; ">
+            <MudText Class="ml-2" Style="font-size: 20px !important; color: white !important; letter-spacing: 1px;">
+                PAGADO
             </MudText>
+
+            <MudText Typo="Typo.subtitle2" Style="font-size: 20px !important; color: white !important; letter-spacing: 1px;" Class="mr-2">
+                Date: @CreateReceipt.DateCreated?.ToString("MMMM d, yyyy")
+            </MudText>
+
         </div>
 
         <div class="mx-2 mx-sm-0 px-2 px-sm-4 pb-4">
-
                 <div class="d-flex flex-column mx-1 mx-sm-2">
-
-                    <MudText Typo="Typo.h4" Class="form-header-title mt-10 mb-2">Basic Information</MudText>
-
-                    <div class="mb-5" style="background-color: #DADADA; height: 1px; width: 100%;"></div>
-
-                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Date: @CreateReceipt.DateCreated?.ToString("MMMM d, yyyy")</MudText>
-
-                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Notes</MudText>
+                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2 mt-5">Notes</MudText>
                     <MudTextField 
                         Class="mb-5"
                         Lines="5"

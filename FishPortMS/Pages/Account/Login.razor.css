@@ -6,8 +6,8 @@
     bottom: 0;
     right: 0;
     z-index: -1;
-    background: linear-gradient(rgba(17, 24, 70, .7), rgba(17, 24, 70, 0.6)), /* Overlay color and opacity */
-    url('images/bg_imgs/pexels-burst-374023.jpg');
+    background: linear-gradient(rgba(49, 90, 150, .5), rgba(49, 90, 150, 0.7)), /* Overlay color and opacity */
+    url('images/bg_imgs/abstract_bg.jpg');
     background-size: cover;
     background-position: center;
 }
@@ -31,8 +31,8 @@
 }
 
 .right-panel .logo {
-    width: 48px;
-    height: 43px;
+    width: 75px;
+    height: 70px;
     position: absolute;
     top: 18px;
     right: 28px;
@@ -100,10 +100,10 @@ input[type="email"]:focus {
 
 button[type="submit"] {
     width: 100%;
-    padding: 10px;
+    padding: 10px;  
     border: none;
     border-radius: 7px;
-    background-color: #000000;
+    background-color: #3362a7;
     color: white;
     font-size: 13px;
     cursor: pointer;
@@ -113,9 +113,10 @@ button[type="submit"] {
     font-weight: 400;
 }
 
-button[type="submit"]:hover {
-    transform: scale(1.01);
-}
+    button[type="submit"]:hover {
+        transform: scale(1.01);
+        background-color: #12305c;
+    }
 
 .right-panel p {
     font-size: 12px;

@@ -30,9 +30,11 @@ else
             ID="table">
 
             <TableHeader>
+                <th class="text-center">Id</th>
                 <th class="text-center">Title</th>
             </TableHeader>
             <RowTemplate>
+                <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@category.Id</td>
                 <td data-title="Name" class="py-sm-5 py-3 text-end text-sm-center">@category.Title</td>
             </RowTemplate>
 

@@ -1,13 +1,41 @@
 ﻿@page "/dashboard"
+@using ApexCharts
 @using FishPortMS.Components.Dashboard.Chart
 @inject IJSRuntime JavaScript
 
-<div class="pa-7 pb-10">
+<div class="pl-3 pr-3 pb-10">
 
     <div class="pb-7 mb-8 mt-n2" style="border-bottom: 1px solid #DAE4F3" data-aos="fade-up">
         <MudText Typo="Typo.h4" Class="mt-3" data-aos="fade-up">DASHBOARD</MudText>
     </div>
 
-    <SalesChart />
+    <MudSelect Style="width: 20px !important;" Class="my-sm-2 my-5" T="ChartInterval" Margin="Margin.Dense" ValueChanged="OnIntervalChanged" AnchorOrigin="Origin.CenterCenter" Placeholder="-Select Interval-" Variant="Variant.Outlined" Value="@chartInterval">
+        @foreach (ChartInterval interval in Enum.GetValues(typeof(ChartInterval)).Cast<ChartInterval>().Where(i => i != ChartInterval.DAILY))
+        {
+            <MudSelectItem T="ChartInterval" Value="interval">@interval.ToString()</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudGrid>
+        <MudItem xs="12" lg="8" md="6" Class="my-sm-2 my-0">
+            <SalesChart chartInterval="@chartInterval" />
+        </MudItem>
+
+        <MudItem xs="12" lg="4" md="6" Class="my-sm-2 my-0">
+            <VendorExpenseChart />
+        </MudItem>
+    </MudGrid>
+
 
 </div>
+
+
+@code {
+
+    public ChartInterval chartInterval { get; set; } = ChartInterval.WEEKLY;
+
+    private void OnIntervalChanged(ChartInterval newInterval)
+    {
+        chartInterval = newInterval;
+    }
+}

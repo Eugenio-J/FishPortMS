@@ -1,4 +1,6 @@
-﻿<style>
+﻿@inject IClientDashboardService ClientDashboardService
+@using ApexCharts
+<style>
 	.chart-container{
 		background: white;
 		border-radius: 8px;
@@ -6,36 +8,95 @@
 	}
 </style>
 
-<MudGrid>
-	<MudItem xs="12" lg="7" xl="8">
-		<div class="chart-container px-7 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
-			<div class="d-flex">
-				<MudText Typo="Typo.h4" Style="font-size: 15px!important;">NET SALES CHART</MudText>
-			</div>
-			<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
-			<MudChart ChartType="ChartType.Line" ChartOptions="options" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="400px" />
-
+@if (isLoading)
+{
+	<DasbboardLoading/>
+}
+else
+{
+	<div class="chart-container px-3 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
+		<div class="d-flex">
+			<MudText Typo="Typo.h4" Style="font-size: 15px!important;">SALES CHART</MudText>
 		</div>
-	</MudItem>
-</MudGrid>
+		<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
+		<ApexChart @ref="chart" TItem="ChartDataDTO" Title="Sales Chart" Options="Options">
+			<ApexPointSeries
+				TItem="ChartDataDTO"
+				Items="ChartData"
+				Name="Gross"
+				SeriesType="SeriesType.Area"
+				XValue="e => e.Label"
+				YValue="e=> e.GrossSales" />
 
+			<ApexPointSeries 
+				TItem="ChartDataDTO"
+				Items="ChartData"
+				Name="Net"
+				SeriesType="SeriesType.Area"
+				XValue="e => e.Label"
+				YValue="e=> e.NetSales" />
+			<AuthorizeView Roles="SUPERUSER,ADMIN,CONSIGNACION_OWNER">
+				<Authorized>
+					<ApexPointSeries
+						TItem="ChartDataDTO"
+						Items="ChartData"
+						Name="Porsyento"
+						SeriesType="SeriesType.Line"
+						XValue="e => e.Label"
+						YValue="e=> e.Porsyento" />
+				</Authorized>
+			</AuthorizeView>
+
+		</ApexChart>
+	</div>
+}
 
 @code {
-	private int Index = -1;
-	int dataSize = 4;
-	public double[] data = { 50, 25, 20, 5 };
-	private ChartOptions options = new ChartOptions
+
+	private ApexChart<ChartDataDTO> chart;
+
+	private bool isLoading { get; set; } = false;
+
+	private ApexChartOptions<ChartDataDTO> Options { get; set; } = new ApexChartOptions<ChartDataDTO>
+		{
+			Chart = new Chart
+			{
+				Type = ApexCharts.ChartType.Area
+			},
+			Stroke = new Stroke
+			{
+				Curve = Curve.Smooth
+			},
+		};
+
+	private List<ChartDataDTO> ChartData { get; set; } = new List<ChartDataDTO>();
+
+	[Parameter] public ChartInterval chartInterval { get; set; } = ChartInterval.WEEKLY;
+
+	protected override async Task OnInitializedAsync()
 	{
-		InterpolationOption = InterpolationOption.NaturalSpline
-	};
+		await LoadChartDataAsync(chartInterval);
+	}
 
-	public List<ChartSeries> Series = new List<ChartSeries>()
+	protected override async Task OnParametersSetAsync()
 	{
-		new ChartSeries() { Name = "Yesterday", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 }, LineDisplayType = LineDisplayType.Area },
-		new ChartSeries() { Name = "Today", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 }, LineDisplayType = LineDisplayType.Area },
-	};
-	public string[] XAxisLabels = { "01:00", "03:00", "05:00", "07:00", "09:00", "11:00", "13:00", "15:00", "17:00", "019:00", "21:00", "23:00" };
+		await LoadChartDataAsync(chartInterval);
+	}
 
-	public string[] labels = { "Petty Cash", "Allowance", "Transportation", "Gas" };
 
+	private async Task LoadChartDataAsync(ChartInterval interval)
+	{
+		isLoading = true;
+		chartInterval = interval;
+		var newData = await ClientDashboardService.GetSalesChartAsync(interval.ToString());
+		ChartData = newData;
+		StateHasChanged();
+
+		if (chart != null)
+		{
+			await chart.UpdateSeriesAsync(true);
+			StateHasChanged();
+		}
+		isLoading = false;
+	}
 }
