@@ -4,21 +4,21 @@
     <Authorized>
         <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
         @* <MudNavLink Href="reports" Icon="@Icons.Material.Outlined.BarChart">Reports</MudNavLink> *@
-        <MudNavLink OnClick="() => ToggleAnnouncementDrawer.InvokeAsync()" Icon="@Icons.Material.Outlined.LocalLibrary">Bulletin Board</MudNavLink>
-
+@*         <MudNavLink OnClick="() => ToggleAnnouncementDrawer.InvokeAsync()" Icon="@Icons.Material.Outlined.LocalLibrary">Bulletin Board</MudNavLink>
+ *@
         <SidebarLabel Title="SUPPLIES" />
 
         <MudNavGroup Title="Products" Icon="@Icons.Material.Outlined.ShoppingCart">
             <MudNavLink Href="/all-products">Manage</MudNavLink>
-            <MudNavGroup Title="Category">
+  @*           <MudNavGroup Title="Category">
                 <MudNavLink Href="/all-categories">Manage</MudNavLink>
-            </MudNavGroup>
+            </MudNavGroup> *@
         </MudNavGroup>
 
-        <MudNavGroup Title="Inventory" Icon="@Icons.Material.Outlined.Inventory">
+@*         <MudNavGroup Title="Inventory" Icon="@Icons.Material.Outlined.Inventory">
             <MudNavLink Href="/all-inventories">Manage</MudNavLink>
         </MudNavGroup>
-
+ *@
         <SidebarLabel Title="RECEIPT" />
 
         <MudNavGroup Title="Receipts" Icon="@Icons.Material.Outlined.Receipt">
@@ -33,9 +33,9 @@
         </MudNavGroup>
 
 
-        <MudNavGroup Title="Petty Cash" Icon="@Icons.Material.Outlined.Wallet">
+@*         <MudNavGroup Title="Petty Cash" Icon="@Icons.Material.Outlined.Wallet">
             <MudNavLink Href="/all-petty-cash">Manage</MudNavLink>
-        </MudNavGroup>
+        </MudNavGroup> *@
 
         <SidebarLabel Title="OTHERS" />
 
@@ -43,11 +43,11 @@
             <MudNavLink Href="/all-xendit-invoice">Manage</MudNavLink>
             <MudNavLink OnClick="OpenXPricing">Pricing</MudNavLink>
         </MudNavGroup> *@
-
+@* 
         <MudNavGroup Title="Announcement" Icon="@Icons.Material.Outlined.Announcement">
             <MudNavLink Href="/all-announcement">Manage</MudNavLink>
         </MudNavGroup>
-
+ *@
         <MudNavGroup Title="Users" Icon="@Icons.Material.Outlined.Groups2">
             <MudNavGroup Title="Manage">
                 <MudNavLink Href="/all-users">All</MudNavLink>
