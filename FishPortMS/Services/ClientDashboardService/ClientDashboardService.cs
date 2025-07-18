@@ -1,4 +1,5 @@
 ﻿using FishPortMS.Shared.DTOs.DashboardDTO;
+using FishPortMS.Shared.Enums;
 using System.Net.Http.Json;
 
 namespace FishPortMS.Services.ClientDashboardService
@@ -17,7 +18,16 @@ namespace FishPortMS.Services.ClientDashboardService
             if (response != null) return response;
 
             return new List<ChartDataDTO>();
-        }   
+        }
+
+        public async Task<List<VendorExpenseData>> GetVendorExpense()
+        {
+            var response = await _httpClient.GetFromJsonAsync<List<VendorExpenseData>>($"api/dashboard/get-expense-data");
+
+            if (response != null) return response;
+
+            return new List<VendorExpenseData>();
+        }
     }
 }
     

@@ -9,5 +9,6 @@ namespace FishPortMS.Server.Services.DashboardService
     public interface IDashboardService
     {
         Task<List<ChartDataDTO>> GetSalesChartAsync(string chartInterval);
+        Task<List<VendorExpenseData>> GetVendorExpense();
     }
 }

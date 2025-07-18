@@ -8,37 +8,33 @@
 	}
 </style>
 
+@if (isLoading)
+{
+	<DasbboardLoading/>
+}
+else
+{
+	<div class="chart-container px-3 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
+		<div class="d-flex">
+			<MudText Typo="Typo.h4" Style="font-size: 15px!important;">SALES CHART</MudText>
+		</div>
+		<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
+		<ApexChart @ref="chart" TItem="ChartDataDTO" Title="Sales Chart" Options="Options">
+			<ApexPointSeries
+				TItem="ChartDataDTO"
+				Items="ChartData"
+				Name="Gross"
+				SeriesType="SeriesType.Area"
+				XValue="e => e.Label"
+				YValue="e=> e.GrossSales" />
 
-<MudSelect T="ChartInterval" Margin="Margin.Dense" ValueChanged="LoadChartDataAsync" AnchorOrigin="Origin.BottomCenter" Placeholder="-Select Interval-" Variant="Variant.Outlined" Value="@chartInterval">
-    @foreach (ChartInterval interval in Enum.GetValues(typeof(ChartInterval)))
-    {
-        <MudSelectItem T="ChartInterval" Value="interval">@interval.ToString()</MudSelectItem> 
-    }
-</MudSelect>
-
-<MudGrid>
-	<MudItem xs="12" lg="8" md="6">
-		<div class="chart-container px-3 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
-			<div class="d-flex">
-				<MudText Typo="Typo.h4" Style="font-size: 15px!important;">SALES CHART</MudText>
-			</div>
-			<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
-			<ApexChart @ref="chart" TItem="ChartDataDTO" Title="Sales" Options="Options">
-				<ApexPointSeries
-					TItem="ChartDataDTO"
-					Items="ChartData"
-					Name="Gross"
-					SeriesType="SeriesType.Area"
-					XValue="e => e.Label"
-					YValue="e=> e.GrossSales" />
-
-				<ApexPointSeries 
-					TItem="ChartDataDTO"
-					Items="ChartData"
-					Name="Net"
-					SeriesType="SeriesType.Area"
-					XValue="e => e.Label"
-					YValue="e=> e.NetSales" />
+			<ApexPointSeries 
+				TItem="ChartDataDTO"
+				Items="ChartData"
+				Name="Net"
+				SeriesType="SeriesType.Area"
+				XValue="e => e.Label"
+				YValue="e=> e.NetSales" />
 			<AuthorizeView Roles="SUPERUSER,ADMIN,CONSIGNACION_OWNER">
 				<Authorized>
 					<ApexPointSeries
@@ -51,15 +47,15 @@
 				</Authorized>
 			</AuthorizeView>
 
-			</ApexChart>
-		</div>
-	</MudItem>
-</MudGrid>
-
+		</ApexChart>
+	</div>
+}
 
 @code {
 
 	private ApexChart<ChartDataDTO> chart;
+
+	private bool isLoading { get; set; } = false;
 
 	private ApexChartOptions<ChartDataDTO> Options { get; set; } = new ApexChartOptions<ChartDataDTO>
 		{
@@ -73,17 +69,24 @@
 			},
 		};
 
-	public List<ChartDataDTO> ChartData { get; set; } = new List<ChartDataDTO>();
+	private List<ChartDataDTO> ChartData { get; set; } = new List<ChartDataDTO>();
 
-	public ChartInterval chartInterval { get; set; } = ChartInterval.WEEKLY;
+	[Parameter] public ChartInterval chartInterval { get; set; } = ChartInterval.WEEKLY;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadChartDataAsync(chartInterval);
 	}
 
+	protected override async Task OnParametersSetAsync()
+	{
+		await LoadChartDataAsync(chartInterval);
+	}
+
+
 	private async Task LoadChartDataAsync(ChartInterval interval)
 	{
+		isLoading = true;
 		chartInterval = interval;
 		var newData = await ClientDashboardService.GetSalesChartAsync(interval.ToString());
 		ChartData = newData;
@@ -94,5 +97,6 @@
 			await chart.UpdateSeriesAsync(true);
 			StateHasChanged();
 		}
+		isLoading = false;
 	}
 }

@@ -3,6 +3,7 @@ using FishPortMS.Server.Data;
 using FishPortMS.Shared.DTOs.DashboardDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Enums.Status;
+using FishPortMS.Shared.Models.Expenses;
 using FishPortMS.Shared.Models.Receipts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -111,7 +112,7 @@ namespace FishPortMS.Server.Services.DashboardService
 
         private async Task<List<ChartDataDTO>> GetWeeklySales(string Role, string userId, DateTime currentDate) 
         {
-			IQueryable<Receipt> query = _dbContext.Receipts;
+			IQueryable<Receipt> query = _dbContext.Receipts.Include(x => x.VendorExpenses);
 
 			if (Role == Roles.BUY_AND_SELL.ToString())
 			{
@@ -276,5 +277,46 @@ namespace FishPortMS.Server.Services.DashboardService
 
 			return result;
 		}
+
+
+		public async Task<List<VendorExpenseData>> GetVendorExpense() 
+		{
+            string userRole = GetUserRole() ?? string.Empty;
+
+            string userId = GetUserId() ?? string.Empty;
+
+            IQueryable<VendorExpense> query = _dbContext.VendorExpenses
+				.Include(x => x.VendorExpenseCategory)
+				.Include(x => x.Receipt);
+
+            if (userRole == Roles.BUY_AND_SELL.ToString())
+            {
+                query = query.Where(x => x.Receipt.BSId.ToString() == userId);
+            }
+
+            List<VendorExpenseData> result = new List<VendorExpenseData>();
+
+            var expense = await query
+					.GroupBy(x => new { x.VendorExpenseCategory.Id, x.VendorExpenseCategory.Title })
+                   .Select(g => new
+                   {
+                       Id = g.Key.Id,
+                       Category = g.Key.Title,
+                       TotalAmount = g.Sum(r => r.Amount)
+                   })
+                   .ToListAsync();
+
+            result = expense
+           .Select(x => new VendorExpenseData
+           {
+               ExpenseCategoryName = x.Category, 
+               ExpenseCategoryId = x.Id,
+               Amount = x.TotalAmount
+           })
+           .ToList();
+
+            return result;
+        }
+
     }
 }

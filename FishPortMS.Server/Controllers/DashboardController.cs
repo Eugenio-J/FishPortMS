@@ -23,5 +23,13 @@ namespace FishPortMS.Server.Controllers
             if (result == null) return Unauthorized(result);
             return Ok(result);
         }
+
+        [HttpGet("get-expense-data")]
+        public async Task<ActionResult<List<VendorExpenseData>>> GetVendorExpense()
+        {
+            var result = await _dashboardService.GetVendorExpense();
+            if (result == null) return Unauthorized(result);
+            return Ok(result);
+        }
     }
 }

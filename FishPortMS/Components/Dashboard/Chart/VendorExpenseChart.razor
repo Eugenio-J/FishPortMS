@@ -1,0 +1,71 @@
+﻿@inject IClientDashboardService ClientDashboardService
+@using ApexCharts
+<style>
+	.chart-container {
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 12px 25px rgba(0,0,0,.04);
+	}
+</style>
+
+@if (isLoading)
+{
+<DasbboardLoading />
+}
+else
+{
+	<div class="chart-container px-3 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
+		<div class="d-flex">
+			<MudText Typo="Typo.h4" Style="font-size: 15px!important;">EXPENSE CHART</MudText>
+		</div>
+		<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
+		<ApexChart @ref="chart" TItem="VendorExpenseData" Title="Expense" Options="Options">
+			<ApexPointSeries
+				TItem="VendorExpenseData"
+				Items="ChartData"
+				Name="Expense"
+				ShowDataLabels="true"
+				SeriesType="SeriesType.Pie"
+				XValue="e => e.ExpenseCategoryName"
+				YValue="e=> e.Amount"/>
+		</ApexChart>
+	</div>
+}
+
+@code {
+
+	private ApexChart<VendorExpenseData> chart;
+
+	private bool isLoading { get; set; } = false;
+
+	private ApexChartOptions<VendorExpenseData> Options { get; set; } = new ApexChartOptions<VendorExpenseData>
+		{
+			Chart = new Chart
+			{
+				Type = ApexCharts.ChartType.Donut
+			}
+		};
+
+	public List<VendorExpenseData> ChartData { get; set; } = new List<VendorExpenseData>();
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadChartDataAsync();
+	}
+
+	private async Task LoadChartDataAsync()
+	{
+		isLoading = true;
+		var newData = await ClientDashboardService.GetVendorExpense();
+		ChartData = newData;
+		StateHasChanged();
+
+		if (chart != null)
+		{
+			await chart.UpdateSeriesAsync(true);
+			StateHasChanged();
+		}
+		isLoading = false;
+	}
+}
