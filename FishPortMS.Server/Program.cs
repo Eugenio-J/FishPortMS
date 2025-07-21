@@ -1,5 +1,6 @@
 using FishPortMS.Server.Data;
 using FishPortMS.Server.Helper;
+using FishPortMS.Server.Repositories.MasterProductRepository;
 using FishPortMS.Server.Services.AccountService;
 using FishPortMS.Server.Services.DashboardService;
 using FishPortMS.Server.Services.MasterProductService;
@@ -66,6 +67,11 @@ builder.Services.AddScoped<IMasterProductService, MasterProductService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IVendorExpenseService, VendorExpenseService>();
+
+
+// Repositories
+
+builder.Services.AddScoped<IMasterProductRepository, MasterProductRepository>();
 
 
 var app = builder.Build();

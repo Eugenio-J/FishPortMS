@@ -4,6 +4,7 @@
 @inject IClientReceiptService ClientReceiptService
 @inject IClientVendorExpenseService ClientVendorExpenseService
 @inject ModifiedSnackBar ModifiedSnackBar
+@inject NavigationManager NavigationManager
 @inject IDialogService DialogService
 @inject IJSRuntime JavaScript
 
@@ -35,7 +36,7 @@ else
         <HeaderBreadcrumps header_items="_items" header_title="View Receipt" />
     </div>
 
-    <PrintButton />
+    <PrintButton OnClick="OnCloseButton" />
 
     <div class="position-relative mx-2 mx-sm-7 my-2 my-sm-10" style="border: solid 1px #3362a7 ">
 
@@ -45,7 +46,7 @@ else
             </MudText>
 
             <MudText Typo="Typo.subtitle2" Style="font-size: 20px !important; color: white !important; letter-spacing: 1px;" Class="mr-2">
-                Date: @CreateReceipt.DateCreated?.ToString("MMMM d, yyyy")
+                Date Created: @CreateReceipt.DateCreated?.ToString("MMMM d, yyyy")
             </MudText>
 
         </div>
@@ -239,7 +240,6 @@ else
     </div>
         
     <PrintableReceipt ReceiptSummaryDTO="@ReceiptSummaryDTO" Receipt="@CreateReceipt" />
- 
 }
 
 @code {
@@ -294,6 +294,11 @@ else
         loadingProgress = false;
     }
 
+    private void OnCloseButton()
+    {
+        NavigationManager.NavigateTo("all-receipt");
+    }
+
     private async Task LoadReceipt()
     {
         GetReceipt = await ClientReceiptService.GetSingleReceipt((int)Id);
@@ -307,7 +312,8 @@ else
                     DeductedPercentage = GetReceipt.DeductedPercentage,
                     Notes = GetReceipt.Notes,
                     GetReceiptItemDTO = GetReceipt.ReceiptItems,
-                    VendorExpenses = GetReceipt.VendorExpenses
+                    VendorExpenses = GetReceipt.VendorExpenses,
+                    DateCreated = GetReceipt.DateCreated
                 };
         }
 

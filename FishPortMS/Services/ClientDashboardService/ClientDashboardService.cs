@@ -28,6 +28,14 @@ namespace FishPortMS.Services.ClientDashboardService
 
             return new List<VendorExpenseData>();
         }
+        public async Task<List<ProductChart>> GetProductSales(int masterProductId, string chartInterval)
+        {
+            var response = await _httpClient.GetFromJsonAsync<List<ProductChart>>($"api/dashboard/get-product-data?masterProductId={masterProductId}&chartInterval={chartInterval}");
+
+            if (response != null) return response;
+
+            return new List<ProductChart>();
+        }
     }
 }
     

@@ -1,4 +1,4 @@
-﻿function print_pdf(data, filename) {
+﻿function print_pdf(filename) {
     $(document).ready(function () {
         $("#print_pdf").on("click", function () {
             $("#mainContent").hide();
@@ -6,7 +6,6 @@
             var invoice = $("#printableContent");
 
             var opt = {
-                margin: 0.5,
                 filename: filename || 'default_invoice.pdf', // fallback if no filename is passed
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },

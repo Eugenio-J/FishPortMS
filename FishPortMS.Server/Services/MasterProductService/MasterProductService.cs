@@ -1,4 +1,5 @@
 ﻿using FishPortMS.Server.Data;
+using FishPortMS.Server.Repositories.MasterProductRepository;
 using FishPortMS.Shared.DTOs.MasterProductDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Models.Products;
@@ -11,18 +12,22 @@ namespace FishPortMS.Server.Services.MasterProductService
     public class MasterProductService : IMasterProductService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMasterProductRepository _masterProductRepository;
         private readonly DataContext _context;
 
-        public MasterProductService(IHttpContextAccessor httpContextAccessor, DataContext context)
+        public MasterProductService(IHttpContextAccessor httpContextAccessor, DataContext context, IMasterProductRepository masterProductRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+            _masterProductRepository = masterProductRepository;
         }
 
         private string? GetUserRole() => _httpContextAccessor.HttpContext?.User
            .FindFirstValue(ClaimTypes.Role);
+		private string? GetUserId() => _httpContextAccessor.HttpContext?.User
+		.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        private GetMasterProduct ConvertDTO(MasterProduct masterProduct)
+		private GetMasterProduct ConvertDTO(MasterProduct masterProduct)
         {
             List<ProductCarouselDTO> paymentCarouselDTO = masterProduct.ProductCarousels?
            .Select(carousel => new ProductCarouselDTO
@@ -58,20 +63,37 @@ namespace FishPortMS.Server.Services.MasterProductService
 
             List<GetMasterProduct> getMasterProducts = new List<GetMasterProduct>();
 
-            List<MasterProduct>? mproducts = await _context.MasterProducts
-                .Include(p => p.MasterInventory)
-                .OrderBy(p => p.Name)
-                .ToListAsync();
+            List<MasterProduct>? mproducts = await _masterProductRepository.GetAllMasterProduct();
 
-            foreach (MasterProduct? mproduct in mproducts)
-            {
-                getMasterProducts.Add(ConvertDTO(mproduct));
-            }
+			getMasterProducts = mproducts.Select(ConvertDTO).ToList();
 
             return getMasterProducts;
         }
 
-        public async Task<List<ProductCategory>> GetAllCategories()
+
+		public async Task<List<GetMasterProduct>?> GetAllMasterProductsByRole()
+		{
+			if (!Enum.TryParse(GetUserRole(), out Roles acc_role)) return null;
+
+            string UserId = GetUserId() ?? string.Empty;    
+
+			IQueryable<MasterProduct> mproducts = _context.MasterProducts;
+
+			//if (acc_role == Roles.BUY_AND_SELL) 
+   //         {
+   //             mproducts = mproducts.Where(p => (_context.ReceiptItems.Any(x => x.MasterProductId == p.Id && x.Receipt.BSId)));
+
+			//}
+
+			List<GetMasterProduct> getMasterProducts = new List<GetMasterProduct>();
+
+
+			getMasterProducts = mproducts.Select(ConvertDTO).ToList();
+
+			return getMasterProducts;
+		}
+
+		public async Task<List<ProductCategory>> GetAllCategories()
         {
             if (!Enum.TryParse(GetUserRole(), out Roles acc_role)) return null;
 

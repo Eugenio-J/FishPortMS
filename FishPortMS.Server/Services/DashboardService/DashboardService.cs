@@ -4,6 +4,7 @@ using FishPortMS.Shared.DTOs.DashboardDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Enums.Status;
 using FishPortMS.Shared.Models.Expenses;
+using FishPortMS.Shared.Models.Products;
 using FishPortMS.Shared.Models.Receipts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -314,6 +315,250 @@ namespace FishPortMS.Server.Services.DashboardService
                Amount = x.TotalAmount
            })
            .ToList();
+
+            return result;
+        }
+
+		public async Task<List<ProductChart>> GetProductSales(int masterProductId, string chartInterval) 
+		{
+			string userRole = GetUserRole() ?? string.Empty;
+
+			string userId = GetUserId() ?? string.Empty;
+
+			DateTime currentDate = PHTime();
+
+			List<ProductChart> result = new List<ProductChart>();
+
+			switch (chartInterval)
+			{
+				case "WEEKLY":
+					result = await GetProductWeeklySales(masterProductId, userRole, userId, currentDate);
+					break;
+				case "MONTHLY":
+					result = await GetProductMonthlySales(masterProductId, userRole, userId, currentDate);
+					break;
+				case "YEARLY":
+					result = await GetProductYearlySales(masterProductId, userRole, userId, currentDate);
+					break;
+			}
+
+			return result;
+		}
+
+		private async Task<List<ProductChart>> GetProductYearlySales(int masterProductId, string Role, string userId, DateTime currentDate)
+		{
+			List<ProductChart> result = new List<ProductChart>();
+
+			IQueryable<ReceiptItem> query = _dbContext.ReceiptItems
+				.Include(x => x.Receipt)
+				.Include(x => x.MasterProduct);
+
+			if (Role == Roles.BUY_AND_SELL.ToString())
+			{
+				query = query.Where(x => x.Receipt.BSId.ToString() == userId);
+			}
+
+			if (masterProductId != 0)
+			{
+				query = query.Where(x => x.MasterProductId == masterProductId);
+			}
+
+			int currentYear = currentDate.Year;
+			int startYear = currentYear - 4; // last 5 years
+
+			var yearSales = await query
+				.Where(r => r.Receipt.DateCreated.Year >= startYear && r.Receipt.DateCreated.Year <= currentYear)
+				.GroupBy(r => new
+				{
+					r.Receipt.DateCreated.Year,
+					r.MasterProduct.Id,
+					r.MasterProduct.Name
+				})
+				.Select(g => new
+				{
+					Year = g.Key.Year,
+					TotalSales = g.Sum(r => r.Subtotal),
+					ProductName = g.Key.Name,
+					Id = g.Key.Id,
+				})
+				.ToListAsync();
+
+			var allProducts = yearSales.Select(r => r.ProductName).Distinct().ToList();
+
+			var yearlySales = Enumerable.Range(startYear, currentYear - startYear + 1)
+				.SelectMany(year => allProducts, (year, product) =>
+				{
+					var sales = yearSales.FirstOrDefault(g => g.Year == year && g.ProductName == product);
+					return new
+					{
+						Year = year,
+						ProductName = product,
+						TotalSales = sales?.TotalSales ?? 0
+					};
+				})
+				.ToList();
+
+			var chartData = yearlySales.Select(x => new
+			{
+				YearLabel = x.Year.ToString(),
+				x.ProductName,
+				x.TotalSales
+			}).ToList();
+
+			result = chartData
+			   .Select(x => new ProductChart
+			   {
+				   Label = x.YearLabel.ToString(),  // e.g., "Monday"
+				   TotalSales = x.TotalSales,
+				   ProductName = x.ProductName
+			   })
+			   .ToList();
+
+			return result;
+		}
+
+		private async Task<List<ProductChart>> GetProductMonthlySales(int masterProductId, string Role, string userId, DateTime currentDate)
+		{
+
+			try
+			{
+				IQueryable<ReceiptItem> query = _dbContext.ReceiptItems
+				.Include(x => x.Receipt)
+				.Include(x => x.MasterProduct);
+
+				if (Role == Roles.BUY_AND_SELL.ToString())
+				{
+					query = query.Where(x => x.Receipt.BSId.ToString() == userId);
+				}
+
+				if (masterProductId != 0)
+				{
+					query = query.Where(x => x.MasterProductId == masterProductId);
+				}
+
+				int currentYear = currentDate.Year;
+
+				List<ProductChart> result = new List<ProductChart>();
+
+				var monthSales = await query
+					.Where(r => r.Receipt.DateCreated.Year == currentYear)
+					.GroupBy(r => new
+					{
+						r.Receipt.DateCreated.Month,
+						r.MasterProduct.Id,
+						r.MasterProduct.Name
+					})
+					.Select(g => new
+					{
+						Month = g.Key.Month,
+						TotalSales = g.Sum(r => r.Subtotal),
+						ProductId = g.Key.Id,
+						ProductName = g.Key.Name
+					})
+					.ToListAsync();
+
+				var allProducts = monthSales.Select(r => r.ProductName).Distinct().ToList();
+
+				var monthlySales = Enumerable.Range(1, 12)
+					.SelectMany(month => allProducts, (month, product) =>
+					{
+						var sales = monthSales.FirstOrDefault(g => g.Month == month && g.ProductName == product);
+						return new
+						{
+							Month = month,
+							ProductName = product,
+							TotalSales = sales?.TotalSales ?? 0
+						};
+					})
+					.ToList();
+
+				var chartData = monthlySales.Select(x => new
+				{
+					MonthLabel = new DateTime(currentYear, x.Month, 1).ToString("MMMM"),
+					x.ProductName,
+					x.TotalSales
+				}).ToList();
+
+				result = chartData
+				   .Select(x => new ProductChart
+				   {
+					   Label = x.MonthLabel.ToString(),  // e.g., "Monday"
+					   TotalSales = x.TotalSales,
+					   ProductName = x.ProductName
+				   })
+				   .ToList();
+
+				return result;
+			}
+
+			catch (Exception ex)
+			{
+				Console.WriteLine("Query error: " + ex.Message);
+				throw;
+			}
+		}
+
+		private async Task<List<ProductChart>> GetProductWeeklySales(int masterProductId, string Role, string userId, DateTime currentDate)
+		{
+            IQueryable<ReceiptItem> query = _dbContext.ReceiptItems
+				.Include(x => x.Receipt)
+				.Include(x => x.MasterProduct);
+
+			if (masterProductId != 0)	
+			{
+				query = query.Where(x => x.MasterProductId == masterProductId);
+			}
+
+			if (Role == Roles.BUY_AND_SELL.ToString())
+			{
+				query = query.Where(x => x.Receipt.BSId.ToString() == userId);
+			}
+
+			List<ProductChart> result = new List<ProductChart>();
+
+            DateTime today = currentDate.Date;
+            int daysSinceSunday = (int)today.DayOfWeek;
+            DateTime startOfWeek = today.AddDays(-daysSinceSunday);
+            DateTime endOfWeek = startOfWeek.AddDays(6).AddDays(1).AddTicks(-1);  
+
+            var weekSales = await query
+                .Where(r => r.Receipt.DateCreated >= startOfWeek && r.Receipt.DateCreated <= endOfWeek)
+                .ToListAsync();
+
+            var groupWeekly = weekSales.GroupBy(r => new { r.Receipt.DateCreated.DayOfWeek, r.MasterProduct })
+                .Select(g => new
+                {
+                    Day = g.Key.DayOfWeek,
+                    TotalSales = g.Sum(r => r.Subtotal),
+					ProductName = g.Key.MasterProduct.Name
+                })
+                .ToList();
+
+            var allDays = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().ToList();
+
+            var allProducts = weekSales.Select(r => r.MasterProduct).Distinct().ToList();
+
+            var weeklySales = allDays
+                .SelectMany(day => allProducts, (day, product) =>
+                {
+                    var sales = groupWeekly.FirstOrDefault(g => g.Day == day && g.ProductName == product.Name);
+                    return new
+                    {
+                        Day = day,
+                        ProductName = product.Name,
+                        TotalSales = sales?.TotalSales ?? 0
+                    };
+                })
+                .ToList();
+
+            result = weeklySales
+               .Select(x => new ProductChart
+               {
+                   Label = x.Day.ToString(),  // e.g., "Monday"
+                   TotalSales = x.TotalSales,
+				   ProductName = x.ProductName
+               })
+               .ToList();
 
             return result;
         }

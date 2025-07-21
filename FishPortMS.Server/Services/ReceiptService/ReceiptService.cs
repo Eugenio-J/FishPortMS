@@ -57,7 +57,8 @@ namespace FishPortMS.Server.Services.ReceiptService
                 BSId = request.BsId,
                 Notes = request.Notes,
                 DateCreated = PHTime(),
-                CreatedBy = UserId,
+                CreatedBy = UserId, 
+                LastModifiedBy =  UserId,
                 DeductedPercentage = request.DeductedPercentage,
                 ReceiptItems = new List<ReceiptItem>()
             };
@@ -200,6 +201,7 @@ namespace FishPortMS.Server.Services.ReceiptService
                 Id = receipt.Id,
                 BSName = receipt.BSName,
                 BuyAndSellId = receipt.BSId,
+                LastModifiedBy = receipt.LastModifiedBy,
                 CashierName = receipt.CashierName,
                 Notes = receipt.Notes,
                 DateCreated = receipt.DateCreated,
@@ -214,6 +216,10 @@ namespace FishPortMS.Server.Services.ReceiptService
 
         public async Task<int> UpdateReceipt(int Id, CreateReceiptDTO request)
         {
+            string userId = GetUserId() ?? string.Empty;
+
+            Guid.TryParse(userId, out Guid UserId);
+
             Receipt? receipt = await _context.Receipts
                  .Include(x => x.ReceiptItems)
                  .ThenInclude(x => x.MasterProduct)
@@ -230,6 +236,8 @@ namespace FishPortMS.Server.Services.ReceiptService
             receipt.BSId = request.BsId;
             receipt.CashierName = request.CashierName;
             receipt.DeductedPercentage = request.DeductedPercentage;
+            receipt.LastModifiedBy = UserId;
+
 
             foreach (var item in request.GetReceiptItemDTO)
             {

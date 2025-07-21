@@ -6,5 +6,6 @@ namespace FishPortMS.Services.ClientDashboardService
     {
         Task<List<ChartDataDTO>> GetSalesChartAsync(string chartInterval);
         Task<List<VendorExpenseData>> GetVendorExpense();
+        Task<List<ProductChart>> GetProductSales(int masterProductId, string chartInterval);
     }
 }

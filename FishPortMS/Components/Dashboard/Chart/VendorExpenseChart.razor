@@ -10,14 +10,11 @@
 
 @if (isLoading)
 {
-<DasbboardLoading />
+	<DasbboardLoading />
 }
 else
 {
-	<div class="chart-container px-3 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
-		<div class="d-flex">
-			<MudText Typo="Typo.h4" Style="font-size: 15px!important;">EXPENSE CHART</MudText>
-		</div>
+	<div class="chart-container px-3 py-7 mt-2" style="height: 100%!important;">
 		<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
 		<ApexChart @ref="chart" TItem="VendorExpenseData" Title="Expense" Options="Options">
 			<ApexPointSeries

@@ -31,5 +31,13 @@ namespace FishPortMS.Server.Controllers
             if (result == null) return Unauthorized(result);
             return Ok(result);
         }
+
+        [HttpGet("get-product-data")]
+        public async Task<ActionResult<List<VendorExpenseData>>> GetProductSales([FromQuery] int masterProductId, string chartInterval)
+        {
+            var result = await _dashboardService.GetProductSales(masterProductId, chartInterval);
+            if (result == null) return Unauthorized(result);
+            return Ok(result);
+        }
     }
 }
