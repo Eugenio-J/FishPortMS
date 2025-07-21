@@ -1,0 +1,149 @@
+﻿@inject IClientDashboardService ClientDashboardService
+@inject IClientMasterProductService ClientMasterProductService
+@using ApexCharts
+@using FishPortMS.Components.Dashboard.NoDataFound
+<style>
+	.chart-container {
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 12px 25px rgba(0,0,0,.04);
+	}
+</style>
+
+@if (isLoading)
+{
+	<DasbboardLoading />
+}
+else
+{
+
+	if (ProductNames.Count <= 0)
+	{
+		<NoChartData 
+			 Title="Product Sales Analytics"
+             Message="No sales data found"
+             Description="We couldn't find any sales data for the selected period."
+             ShowRefreshButton="true" />
+	}
+
+	else
+	{
+		<div class="chart-container px-3 py-7 mt-10" style="height: 100%!important;">
+
+			<MudSelect
+				ValueChanged="OnIntervalChanged"
+				Style="width: 20px !important;"
+				Class="my-sm-2 my-5" T="int"
+				Margin="Margin.Dense"
+				AnchorOrigin="Origin.CenterCenter"
+				Placeholder="-Select Interval-"
+				Variant="Variant.Outlined"
+				Value="@masterProductId">
+				@foreach (var product in GetMasterProducts)
+				{
+					<MudSelectItem T="int" Value="product.Id">@product.Name</MudSelectItem>
+				}
+			</MudSelect>
+
+			<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
+			<ApexChart @ref="chart" TItem="ProductChart" Title="Product Chart" Options="Options">
+
+				@foreach (var product in ProductNames)
+				{
+					<ApexPointSeries
+						TItem="ProductChart"
+						Items="@GroupedByProduct[product]"
+						Name="@product"
+						SeriesType="SeriesType.Area"
+						XValue="e => e.Label"
+						YValue="e => e.TotalSales" />
+				}
+
+			</ApexChart>
+		</div>
+	}
+}
+
+@code {
+
+	[Parameter] public ChartInterval chartInterval { get; set; } = ChartInterval.WEEKLY;
+
+	public int masterProductId { get; set; } = 0;
+
+	private ApexChart<ProductChart> chart;
+
+	private List<string> ProductNames = new List<string>();
+
+	private Dictionary<string, List<ProductChart>>? GroupedByProduct;
+
+	private bool isLoading { get; set; } = false;
+
+	private ApexChartOptions<ProductChart> Options { get; set; } = new ApexChartOptions<ProductChart>
+		{
+			Chart = new Chart
+			{
+				Type = ApexCharts.ChartType.Area
+			},
+			Stroke = new Stroke
+			{
+				Curve = Curve.Smooth
+			},
+		};
+
+	private List<ProductChart> ChartData { get; set; } = new List<ProductChart>();
+	private List<GetMasterProduct> GetMasterProducts { get; set; } = new List<GetMasterProduct>();
+
+	private GetMasterProduct placeHolder = new GetMasterProduct
+	{
+		Id = 0,
+		Name = "All"
+	};
+
+	protected override async Task OnInitializedAsync()
+	{
+		await ClientMasterProductService.GetAllMasterProducts();
+		GetMasterProducts = ClientMasterProductService.getMasterProducts;
+		GetMasterProducts.Insert(0, placeHolder);
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await LoadChartDataAsync(chartInterval);
+	}
+
+	private async Task OnIntervalChanged(int Id)
+	{
+		masterProductId = Id;
+		await LoadChartDataAsync(chartInterval);
+	}
+
+	private async Task LoadChartDataAsync(ChartInterval interval)
+	{
+		isLoading = true;
+		chartInterval = interval;
+		var newData = await ClientDashboardService.GetProductSales(masterProductId, chartInterval.ToString());
+
+		// Get all product names
+		ProductNames = newData
+			.Select(p => p.ProductName)
+			.Distinct()
+			.ToList();
+
+		// Group by product
+	    GroupedByProduct = ProductNames.ToDictionary(
+			name => name,
+			name => newData
+						.Where(p => p.ProductName == name)
+						.ToList());
+
+		ChartData = newData;
+		StateHasChanged();
+
+		if (chart != null)
+		{
+			await chart.UpdateSeriesAsync(true);
+			StateHasChanged();
+		}
+		isLoading = false;
+	}
+}

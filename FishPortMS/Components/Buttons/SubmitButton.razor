@@ -7,7 +7,7 @@
             OnClick="@(() => OnClick.InvokeAsync())"
             Style="@css"
             Disabled="isLoading"
-            DisableElevation>
+            DropShadow="false">
         @if (isLoading == false)
         {
             <MudText style="font-size: 14px; letter-spacing: .5px;">@button_name</MudText>

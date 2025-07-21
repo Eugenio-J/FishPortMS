@@ -14,10 +14,7 @@
 }
 else
 {
-	<div class="chart-container px-3 py-7 mt-2" data-aos="fade-up" style="height: 100%!important;">
-		<div class="d-flex">
-			<MudText Typo="Typo.h4" Style="font-size: 15px!important;">SALES CHART</MudText>
-		</div>
+	<div class="chart-container px-3 py-7 mt-2" style="height: 100%!important;">
 		<div class="mt-6 mb-4" style="border-bottom: 1px solid #DAE4F3" />
 		<ApexChart @ref="chart" TItem="ChartDataDTO" Title="Sales Chart" Options="Options">
 			<ApexPointSeries
@@ -72,11 +69,6 @@ else
 	private List<ChartDataDTO> ChartData { get; set; } = new List<ChartDataDTO>();
 
 	[Parameter] public ChartInterval chartInterval { get; set; } = ChartInterval.WEEKLY;
-
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadChartDataAsync(chartInterval);
-	}
 
 	protected override async Task OnParametersSetAsync()
 	{

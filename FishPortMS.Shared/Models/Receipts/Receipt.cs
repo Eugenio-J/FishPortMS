@@ -31,7 +31,7 @@ namespace FishPortMS.Shared.Models.Receipts
 		public Guid CreatedBy { get; set; } 
         public Guid? BSId { get; set; } 
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-
+        public Guid? LastModifiedBy { get; set; }
         public List<ReceiptItem> ReceiptItems { get; set; } = new List<ReceiptItem>(); 
         public List<VendorExpense>? VendorExpenses { get; set; } = new List<VendorExpense>(); 
     }

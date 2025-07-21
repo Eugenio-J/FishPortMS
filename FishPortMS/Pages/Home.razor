@@ -1,6 +1,7 @@
 ﻿@page "/dashboard"
 @using ApexCharts
 @using FishPortMS.Components.Dashboard.Chart
+@inject IClientMasterProductService ClientMasterProductService
 @inject IJSRuntime JavaScript
 
 <div class="pl-3 pr-3 pb-10">
@@ -25,6 +26,10 @@
             <VendorExpenseChart />
         </MudItem>
     </MudGrid>
+
+    <MudItem xs="12" lg="12" md="12" Class="my-sm-2 my-0">
+        <ProductSalesChart chartInterval="@chartInterval"/>
+    </MudItem>
 
 
 </div>

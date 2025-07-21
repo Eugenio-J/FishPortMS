@@ -13,7 +13,7 @@
     }
 </style>
 
-<div class="mt-7 mb-0 d-flex justify-content-end">
+<div class="mt-7 mb-0 mr-2 d-flex justify-content-end">
     <MudButton 
         id="print_pdf"
         Class="export-btn mr-2"
@@ -22,7 +22,7 @@
         Variant="Variant.Filled"
         Color="Color.Info"
         Size="Size.Medium"
-        DisableElevation>
+        DropShadow="false">
         PRINT
     </MudButton>
 
@@ -33,7 +33,7 @@
         Variant="Variant.Filled"
         Color="Color.Info"
         Size="Size.Medium"
-        DisableElevation
+        DropShadow="false"
         OnClick="(() => OnClick.InvokeAsync())">
         CLOSE
     </MudButton>

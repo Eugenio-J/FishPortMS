@@ -3,3 +3,26 @@
 .mud-table-sticky-header * .mud-table-root .mud-table-head * .mud-table-cell:first-child {
     font-weight: 600;
 }
+
+.logo {
+    width: 150px;
+    height: 150px;
+}
+
+.receipt-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 20px;
+    margin-left: 20px;
+    margin-top: 0px;
+}
+
+.receipt-title {
+    font-family: 'Poppins' !important;
+    font-weight: 600 !important;
+    letter-spacing: -.5px !important;
+    font-size: 35px !important;
+    color: #42546A !important;
+}

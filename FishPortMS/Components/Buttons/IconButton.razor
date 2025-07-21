@@ -4,6 +4,7 @@
             StartIcon="@icon"
             Class="@className"
             Size="Size.Small"
+            DropShadow="false"
             OnClick="(() => OnClick.InvokeAsync())" />
 </MudTooltip>
 
@@ -15,3 +16,4 @@
     [Parameter] public string icon { get; set; } = string.Empty;
     [Parameter] public string tooltip { get; set; } = string.Empty;
 }
+    
