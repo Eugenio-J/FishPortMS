@@ -1,4 +1,5 @@
-﻿@using FishPortMS.Pages.Account
+﻿@using FishPortMS.Components.Account
+@using FishPortMS.Pages.Account
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 @inject IClientAccountService ClientAccountService
 @inject IDialogService DialogService
@@ -38,7 +39,7 @@
     </DialogContent>
 </MudDialog>
 
-<MudDialog @bind-IsVisible="visibleEditProfile" Class="no-dialog" Options="dialogOptionsEditProfile">
+<MudDialog Visible="visibleEditProfile" Class="no-dialog" Options="dialogOptionsEditProfile">
     <DialogContent>
         <CEditProfile />
     </DialogContent>

@@ -1,7 +1,14 @@
 ﻿@inject ModifiedSnackBar ModifiedSnackBar
 
+@if (!string.IsNullOrEmpty(ObjectImg))
+{
+    <div class="mb-6 pa-4 text-center" style="border: 1px dashed #c4ccd5; border-radius: 8px; background: #F0F0F0;">
+        <MudImage Src="@ObjectImg" Width="300" Fluid Style="border-radius: 10px;" />
+     </div>
+}
+
 <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" AppendMultipleFiles Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0">
-     <ButtonTemplate Context="btnContext">
+     <SelectedTemplate Context="btnContext">
         <MudPaper Outlined="true" Class="pb-8 pt-5 relative rounded-lg border-2 border-dashed pa-4 mud-width-full mud-height-full z-10" Style=" text-align: center; background-color: #F6F7FF;">
             <MudImage Src="images/form_imgs/image.png" Width="70" Class="mt-4 mb-2"></MudImage>
             <MudText Typo="Typo.h6" Style="font-family: 'Poppins'; font-size: 16px;">Click to upload @Title<br>image here.</MudText>
@@ -10,9 +17,9 @@
                 <MudChip T="string" Color="Color.Dark" Class="mt-3 py-7">@imgName <br /> @imgSize mb</MudChip>
             }
         </MudPaper>
-    </ButtonTemplate>
+    </SelectedTemplate>
 </MudFileUpload>
-@* 
+
 <div class="mt-6 text-end">
     <MudButton 
         OnClick="@Clear"
@@ -22,7 +29,7 @@
         Class="clear-btn">
          Clear
      </MudButton>
- </div> *@
+ </div>
 
 @code {
 
@@ -44,6 +51,7 @@
     {
         imgName = "";
         imgSize = 0;
+        ObjectImg = string.Empty;
         StateHasChanged();
     }
 
@@ -85,7 +93,7 @@
             ImgString = await ConvertImgToString(file);
             if (!string.IsNullOrEmpty(ImgString))
             {
-                ImageData = $"data:{file     .ContentType};base64,{ImgString}";
+                ImageData = $"data:{file.ContentType};base64,{ImgString}";
                 ObjectImg = ImageData;
                 imgName = FileData.Name;
 

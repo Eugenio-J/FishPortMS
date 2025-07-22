@@ -412,6 +412,7 @@ namespace FishPortMS.Server.Services.AccountService
             user.PhoneNumber = request.Phone;
             user.City = request.City;
             user.Address = request.Address;
+            user.Region = request.Region;
             user.City = request.City;
             user.Avatar = request.Avatar;
 

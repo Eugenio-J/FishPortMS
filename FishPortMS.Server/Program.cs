@@ -1,7 +1,9 @@
+using FishPortMS.Server.Services.BlobStorageService;
 using FishPortMS.Server.Data;
 using FishPortMS.Server.Helper;
 using FishPortMS.Server.Repositories.MasterProductRepository;
 using FishPortMS.Server.Services.AccountService;
+using FishPortMS.Server.Services.BlobStorageService;
 using FishPortMS.Server.Services.DashboardService;
 using FishPortMS.Server.Services.MasterProductService;
 using FishPortMS.Server.Services.ProductCategoryService;
@@ -14,12 +16,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.RateLimiting;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+var blobStorageConnectionString = builder.Configuration.GetValue<string>("fpstoragekey") ?? throw new InvalidOperationException("Connection string 'fpstoragekey' not found.");
+
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));
 
 
 
@@ -67,6 +73,7 @@ builder.Services.AddScoped<IMasterProductService, MasterProductService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IVendorExpenseService, VendorExpenseService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 
 // Repositories
