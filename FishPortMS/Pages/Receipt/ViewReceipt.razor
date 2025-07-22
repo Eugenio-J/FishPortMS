@@ -1,6 +1,7 @@
 ﻿@page "/view-receipt"
 @page "/view-receipt/{Id:int}"
 @using FishPortMS.Pages.Expense.Vendor
+@using FishPortMS.Pages.Receipt.Component
 @inject IClientReceiptService ClientReceiptService
 @inject IClientVendorExpenseService ClientVendorExpenseService
 @inject ModifiedSnackBar ModifiedSnackBar
@@ -238,8 +239,8 @@ else
 
         </div>
     </div>
-        
-    <PrintableReceipt ReceiptSummaryDTO="@ReceiptSummaryDTO" Receipt="@CreateReceipt" />
+
+    <PrintableReceipt ReceiptSummaryDTO="@ReceiptSummaryDTO" Receipt="@CreateReceipt" categoryName="@categoryName" />
 }
 
 @code {

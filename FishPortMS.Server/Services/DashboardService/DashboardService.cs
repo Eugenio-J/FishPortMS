@@ -1,13 +1,16 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using FishPortMS.Server.Data;
 using FishPortMS.Shared.DTOs.DashboardDTO;
 using FishPortMS.Shared.Enums;
 using FishPortMS.Shared.Enums.Status;
+using FishPortMS.Shared.Enums.Views;
 using FishPortMS.Shared.Models.Expenses;
 using FishPortMS.Shared.Models.Products;
 using FishPortMS.Shared.Models.Receipts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace FishPortMS.Server.Services.DashboardService
@@ -46,11 +49,11 @@ namespace FishPortMS.Server.Services.DashboardService
 
 			List<ChartDataDTO> result = new List<ChartDataDTO>();
 
-			switch (chartInterval) 
-            {
-                case "DAILY":
+			switch (chartInterval)
+			{
+				case "DAILY":
 					result = await GetDailySales(userRole, userId, currentDate);
-                    break;
+					break;
 				case "WEEKLY":
 					result = await GetWeeklySales(userRole, userId, currentDate);
 					break;
@@ -62,12 +65,12 @@ namespace FishPortMS.Server.Services.DashboardService
 					break;
 			}
 
-            return result;
+			return result;
         }
 
         private async Task<List<ChartDataDTO>> GetDailySales(string Role, string userId, DateTime currentDate) 
         {
-            IQueryable<Receipt> query = _dbContext.Receipts;
+            IQueryable<ReceiptSalesSummaryVM> query = _dbContext.ReceiptSalesSummaryVMs;
 
             if (Role == Roles.BUY_AND_SELL.ToString()) 
             {
@@ -113,9 +116,9 @@ namespace FishPortMS.Server.Services.DashboardService
 
         private async Task<List<ChartDataDTO>> GetWeeklySales(string Role, string userId, DateTime currentDate) 
         {
-			IQueryable<Receipt> query = _dbContext.Receipts.Include(x => x.VendorExpenses);
+            IQueryable<ReceiptSalesSummaryVM> query = _dbContext.ReceiptSalesSummaryVMs;
 
-			if (Role == Roles.BUY_AND_SELL.ToString())
+            if (Role == Roles.BUY_AND_SELL.ToString())
 			{
 				query = query.Where(x => x.BSId.ToString() == userId);
 			}
@@ -168,9 +171,9 @@ namespace FishPortMS.Server.Services.DashboardService
 
 		private async Task<List<ChartDataDTO>> GetMonthlySales(string Role, string userId, DateTime currentDate)
 		{
-			IQueryable<Receipt> query = _dbContext.Receipts;
+            IQueryable<ReceiptSalesSummaryVM> query = _dbContext.ReceiptSalesSummaryVMs;
 
-			if (Role == Roles.BUY_AND_SELL.ToString())
+            if (Role == Roles.BUY_AND_SELL.ToString())
 			{
 				query = query.Where(x => x.BSId.ToString() == userId);
 			}
@@ -224,9 +227,9 @@ namespace FishPortMS.Server.Services.DashboardService
 
 		private async Task<List<ChartDataDTO>> GetYearlySales(string Role, string userId, DateTime currentDate)
 		{
-			IQueryable<Receipt> query = _dbContext.Receipts;
+            IQueryable<ReceiptSalesSummaryVM> query = _dbContext.ReceiptSalesSummaryVMs;
 
-			if (Role == Roles.BUY_AND_SELL.ToString())
+            if (Role == Roles.BUY_AND_SELL.ToString())
 			{
 				query = query.Where(x => x.BSId.ToString() == userId);
 			}
