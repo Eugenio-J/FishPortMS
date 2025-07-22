@@ -14,6 +14,7 @@ using FishPortMS.Services.ClientProductCategoryService;
 using FishPortMS.Services.ClientReceiptService;
 using FishPortMS.Services.ClientVendorExpenseService;
 using FishPortMS.Services.ClientDashboardService;
+using FishPortMS.Services.ClientBlobStorageService;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IClientProductCategoryService, ClientProductCategoryS
 builder.Services.AddScoped<IClientReceiptService, ClientReceiptService>();
 builder.Services.AddScoped<IClientVendorExpenseService, ClientVendorExpenseService>();
 builder.Services.AddScoped<IClientDashboardService, ClientDashboardService>();
+builder.Services.AddScoped<IClientBlobStorageService, ClientBlobStorageService>();
 
 
 await builder.Build().RunAsync();

@@ -33,7 +33,7 @@ namespace FishPortMS.Services.ClientAccountService
 
         public async Task<string> GetSingleUserAvatar()
         {
-            var result = await _http.GetStringAsync("api/account/single-user-avatar");
+            var result = await _http.GetStringAsync("api/account/get-user-avatar");
             return result;
         }
 

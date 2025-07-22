@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FishPortMS.Shared.Enums.Views
+namespace FishPortMS.Shared.Models.Views
 {
     [Table("VReceiptSalesSummary")]
     public class ReceiptSalesSummaryVM
@@ -18,8 +18,11 @@ namespace FishPortMS.Shared.Enums.Views
         public string DayOfWeek { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
-        public decimal GrossSales { get; set; } 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal GrossSales { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal NetSales { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal DeductedAmount { get; set; }
     }
 }
