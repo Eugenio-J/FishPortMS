@@ -1,0 +1,48 @@
+﻿
+
+.mud-table-sticky-header * .mud-table-root .mud-table-head * .mud-table-cell:first-child {
+    font-weight: 600;
+}
+
+.logo {
+    width: 130px;
+    height: 130px;
+}
+
+.receipt-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0px;
+}
+
+.receipt-title {
+    font-family: 'Poppins' !important;
+    font-weight: 600 !important;
+    letter-spacing: -.5px !important;
+    font-size: 25px !important;
+    color: #42546A !important;
+}
+
+span {
+    font-family: 'Poppins' !important;
+    font-weight: 400 !important;
+    letter-spacing: -.1px !important;
+    font-size: 13px !important;
+    margin-bottom: 10px;
+    color: #42546A !important;
+}
+
+.info-section .date-text {
+    font-weight: 600 !important;
+    font-size: 15px !important;
+}
+
+.table-title {
+    font-family: 'Poppins' !important;
+    font-weight: 600 !important;
+    letter-spacing: -.1px !important;
+    font-size: 15px !important;
+    color: #42546A !important;
+}

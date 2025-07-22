@@ -33,62 +33,70 @@
             <div class="d-flex flex-column">
 
                 <div class="receipt-header">
-                    <span class="receipt-title">
-                        PAGADO
-                    </span>
                     <div class="d-flex flex-column align-items-center mb-3">
                         <img src="images/sys_imgs/jomar_logo.png" class="logo" />
                     </div>
                 </div>
+                <div class="mx-3">
+                    <div class="info-section">
 
-                <div style="border-bottom: 0.3px solid #4E5E78;"/>
+                        <div class="text-end mr-3">
+                            <span class="date-text">
+                                DATE: @Receipt.DateCreated?.ToString("MMMM d, yyyy")
+                            </span>
+                        </div>
 
-                <div class="m-3">
-                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Date: @Receipt.DateCreated?.ToString("MMMM d, yyyy")</MudText>
-                    <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Notes</MudText>
-                    <MudTextField
-                        Class="mb-5"
-                        Lines="5"
-                        HelperText="Utang, Kulang, Hulog..."
-                        @bind-Value="Receipt.Notes"
-                        InputType="InputType.Text"
-                        Variant="Variant.Outlined"
-                        Margin="Margin.Dense"
-                        ReadOnly />
+                        <div class="d-flex flex-column">
+                            <span>BUY AND SELL: @Receipt.BSname</span>
+                            <span>CASHIER: @Receipt.CashierName</span>
+                            <span>PORSYENTO (%): @Receipt.DeductedPercentage</span>
+                        </div>
 
-                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Buy and Sell Name</MudText>
-                     <MudTextField 
-                        Class="mb-5"
-                        @bind-Value="Receipt.BSname"
-                        InputType="InputType.Text"
-                        Variant="Variant.Outlined"
-                        Margin="Margin.Dense"
-                        ReadOnly />
-
-                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Cashier</MudText>
-
-                     <MudTextField
-                        Class="mb-5"
-                        @bind-Value="Receipt.CashierName"
-                        InputType="InputType.Text"
-                        Variant="Variant.Outlined"
-                        Margin="Margin.Dense"
-                        ReadOnly />
-
-
-                     <MudText Typo="Typo.subtitle2" Class="input-label mb-2">Percentage</MudText>
-
-                     <MudTextField
-                         Class="mb-5"
-                        @bind-Value="Receipt.DeductedPercentage"
-                        InputType="InputType.Number"
-                        Variant="Variant.Outlined"
-                        Margin="Margin.Dense"         
-                        ReadOnly />
+                        <div>
+                            <span class="mb-5">Notes</span>
+                            <MudTextField
+                                Class="mb-5 mt-5"
+                                Lines="3"
+                                @bind-Value="Receipt.Notes"
+                                InputType="InputType.Text"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Normal"
+                                ReadOnly />
+                        </div>
+                
+                    </div>
+                   
                 </div>
 
              
             </div>
+        </div>
+
+        <div class="mx-3">
+             @if (Receipt.VendorExpenses.Any())
+            {
+                <span class="table-title">Expense</span>
+
+                <MudTable Items="@Receipt.VendorExpenses"
+                          Dense="true"
+                          Hover="true"
+                          Breakpoint="Breakpoint.None"
+                          Style="padding-bottom: 0px;"
+                          CellClass="text-center"
+                          LoadingProgressColor="Color.Info">
+
+                    <HeaderContent>
+                        <MudTh Class="text-center">Amount</MudTh>
+                        <MudTh Class="text-center">Category</MudTh>
+                        <MudTh Class="text-center"></MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate Context="expense">
+                        <MudTd DataLabel="Amount" Class="text-center">P @string.Format("{0:N0}", expense.Amount)</MudTd>
+                            <MudTd DataLabel="Category" Class="text-center">@categoryName[expense.VendorExpenseCategoryId] </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+            }
         </div>
 
 
@@ -101,10 +109,10 @@
 
                 var totalSubtotal = group.Sum(x => x.Subtotal);
 
-                <div class="m-3">
+                <div class="mx-3">
                     <MudGrid Class="mb-1">
                         <MudItem xs="12">
-                            <h4>@group.Key</h4> <!-- Group header: ProductName -->
+                            <span class="table-title">@group.Key</span>
                             <MudTable Items="group" FixedHeader="true" Dense="true" Breakpoint="Breakpoint.None" Style="padding-bottom: 0px;" CellClass="text-center py-1">
                                 <HeaderContent>
                                     <MudTh>Weight (KG)</MudTh>
@@ -120,6 +128,7 @@
                                         <MudTFootRow Class="bold-text text-end">
                                             <MudTd>Total Kilo: @string.Format("{0:N2}", group.Sum(x => x.Weight))</MudTd>
                                             <MudTd>Total Benta: @string.Format("{0:N2}", group.Sum(x => x.Subtotal))</MudTd>
+                                            <MudTd>Total %: P @string.Format("{0:N2}", (group.Sum(x => x.Subtotal) * (@Receipt.DeductedPercentage / 100)))</MudTd>
                                         </MudTFootRow>
                                     </FooterContent>
                                 </MudTable>
@@ -129,9 +138,9 @@
             }
         }
 
-        <div class="m-3">
+        <div class="mx-3">
 
-        <SalesBreakdown Summary="ReceiptSummaryDTO" />
+            <ReceiptBreakdown Summary="ReceiptSummaryDTO" />
 
         </div>
         </div>
@@ -142,6 +151,8 @@
 
     [Parameter] public CreateReceiptDTO Receipt { get; set; }
     [Parameter] public ReceiptSummaryDTO ReceiptSummaryDTO { get; set; } = new ReceiptSummaryDTO();
+    [Parameter] public Dictionary<int, string> categoryName { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await JavaScript.InvokeVoidAsync("print_pdf", $"PAGADO_{Receipt.BSname}_{Receipt.DateCreated:MMMMd_yyyy}");
