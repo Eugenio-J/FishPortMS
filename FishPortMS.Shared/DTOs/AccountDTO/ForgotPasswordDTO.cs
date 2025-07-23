@@ -18,8 +18,6 @@ namespace FishPortMS.Shared.DTOs.AccountDTO
             StrongPassword(ErrorMessage = "Password must contain at least 1 capital letter and a number")
         ]
         public string NewPassword { get; set; } = String.Empty;
-
-
         [
             Required(ErrorMessage = "Confirm Password field is required"),
             Compare("NewPassword", ErrorMessage = "Confirm password does not match to input password")

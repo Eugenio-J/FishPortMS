@@ -43,10 +43,16 @@
             button_name="SIGN IN"
             isLoading="isLoading" />
         <div class="text-center d-flex flex-column mt-4">
-            <MudLink Href="/forgot-password" Style="color: #A3B2C2!important;font-weight: 400!important;">Forgot your password?</MudLink>
+             <MudLink @onclick="ForgotPassword"> Style="color: #A3B2C2!important;font-weight: 400!important;">Forgot your password?</MudLink>
         </div>
     </div>
 </EditForm>
+
+ <MudDialog Visible="visibleForgotPass" Class="no-dialog" Options="dialogOptionsForgetPass">
+     <DialogContent>
+         <CForgotPassword />
+     </DialogContent>
+ </MudDialog>
 
  @code{
 
@@ -54,9 +60,14 @@
 
     public bool Label_CheckBox2 { get; set; } = false;
 
+    private bool visibleForgotPass;
+
     private bool isLoading = false;
 
     public string Password { get; set; } = string.Empty;
+
+    private DialogOptions dialogOptionsForgetPass = new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
+
     bool isShow;
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -101,6 +112,11 @@
             ModifiedSnackBar.ShowMessage("Invalid Credentials.", Severity.Warning);
             return;
         }
+    }
+
+    void ForgotPassword()
+    {
+        visibleForgotPass = !visibleForgotPass;
     }
 
     void ShowPassword()
