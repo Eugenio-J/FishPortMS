@@ -51,7 +51,7 @@
                     <input type="checkbox" id="remember" name="remember">
                     <label for="remember" class="ml-2" style="margin-bottom: 0px;">Remember me</label>
                 </div>
-                <a>Forgot password?</a>
+                <a @onclick="ForgotPassword">Forgot password?</a>
             </div>
 
             <button type="submit">Sign In</button>
@@ -59,11 +59,21 @@
     </div>
 </div>
 
+<MudDialog Visible="visibleForgotPass" Class="no-dialog" Options="dialogOptionsForgetPass">
+    <DialogContent>
+        <CForgotPassword />
+    </DialogContent>
+</MudDialog>
+
 <div class="background" />
 
 @code {
 
     private LoginDTO loginDTO = new LoginDTO();
+
+    private bool visibleForgotPass;
+
+    private DialogOptions dialogOptionsForgetPass = new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true };
 
     public bool Label_CheckBox2 { get; set; } = false;
 
@@ -94,18 +104,12 @@
 
             if (role == Roles.SUPERUSER.ToString()
                 || role == Roles.ADMIN.ToString()
-                || role == Roles.ADMIN_ASST.ToString())
+                || role == Roles.ADMIN_ASST.ToString()
+                || role == Roles.CONSIGNACION_OWNER.ToString())
             {
                 isLoading = false;
                 StateHasChanged();
                 NavigationManager.NavigateTo("/dashboard");
-            }
-
-            else if (role == Roles.CONSIGNACION_OWNER.ToString())
-            {
-                isLoading = false;
-                StateHasChanged();
-                NavigationManager.NavigateTo("/branch-selection");
             }
             else if (role == Roles.CASHIER.ToString() || role == Roles.BUY_AND_SELL.ToString())
             {
@@ -119,6 +123,12 @@
             ModifiedSnackBar.ShowMessage("Invalid Credentials.", Severity.Warning);
             return;
         }
+    }
+
+
+    void ForgotPassword()
+    {
+        NavigationManager.NavigateTo("/forgot-password");
     }
 
     void ShowPassword()
