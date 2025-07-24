@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace FishPortMS.Server.Controllers
 {
-    [EnableRateLimiting("fixed")]
+
     [Route("api/[controller]")]
     [ApiController]
     public class ReceiptController : ControllerBase
