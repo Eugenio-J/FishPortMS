@@ -1,5 +1,6 @@
 ﻿
 @inject IClientAccountService ClientAccountService
+@inject IClientBlobStorageService ClientBlobStorageService
 @attribute [Authorize]
 
 <style>
@@ -16,12 +17,12 @@
 
     <EditForm Model="editProfileDTO" OnValidSubmit="UpdateUser">
         <div class="mb-8">
-         @*    <SingleUploadButton 
+            <SingleUploadButton 
                     ObjectImg="@editProfileDTO.Avatar"
                     Title="avatar"
                     OnFileDataChanged="HandleFileDataChanged"
                     FileData="FileData"
-                    SetImageUrl="SetImageUrl" /> *@
+                    SetImageUrl="SetImageUrl" />
         </div>
 
         <div class="d-sm-flex gap-3 mt-4">
@@ -82,7 +83,7 @@
             <div class="py-4  mt-n5 w-100">
                 <MudTextField 
                     @bind-Value="editProfileDTO.Region"
-                               For="@(() => editProfileDTO.Region)"
+                    For="@(() => editProfileDTO.Region)"
                     Label="Region"
                     Adornment="Adornment.Start"
                     Clearable
@@ -134,17 +135,15 @@
     {
         isLoading = true;
 
-        // TODO: TODO
+        if (FileData != null)
+        {
+            string imageURL = await ClientBlobStorageService.UploadAvatar(FileData);
 
-        // if (FileData != null)
-        // {
-        //     string imageURL = await ClientBlobStorageService.UploadAvatar(FileData);
-
-        //     if (!string.IsNullOrEmpty(imageURL))
-        //     {
-        //         editProfileDTO.Avatar = imageURL;
-        //     }
-        // }
+            if (!string.IsNullOrEmpty(imageURL))
+            {
+                editProfileDTO.Avatar = imageURL;
+            }
+        }
         await ClientAccountService.UpdateUser(editProfileDTO);
         Cancel();
         isLoading = false;

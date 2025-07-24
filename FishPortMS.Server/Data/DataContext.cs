@@ -1,11 +1,11 @@
-﻿using FishPortMS.Shared.Enums.Views;
-using FishPortMS.Shared.Models.Account;
+﻿using FishPortMS.Shared.Models.Account;
 using FishPortMS.Shared.Models.Announcements;
 using FishPortMS.Shared.Models.ConPettyCash;
 using FishPortMS.Shared.Models.Expenses;
 using FishPortMS.Shared.Models.NotifSubscription;
 using FishPortMS.Shared.Models.Products;
 using FishPortMS.Shared.Models.Receipts;
+using FishPortMS.Shared.Models.Views;
 using Microsoft.EntityFrameworkCore;
 
 namespace FishPortMS.Server.Data

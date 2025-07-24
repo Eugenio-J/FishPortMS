@@ -12,7 +12,10 @@ using MimeKit;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.WebUtilities;
+
 using static MudBlazor.Icons.Custom;
+using System.Text;
 
 namespace FishPortMS.Server.Services.AccountService
 {
@@ -373,11 +376,11 @@ namespace FishPortMS.Server.Services.AccountService
 
         public async Task<int> SendVerification(EmailVerificationDTO request, string userEmail)
         {
-            User? db_user = await _context.Users.FirstOrDefaultAsync(user => user.Email == userEmail);
+            User? db_user = await _context.Users.Include(x => x.UserProfile).FirstOrDefaultAsync(user => user.Email == userEmail);
             if (db_user == null) return 0;
 
             string emailBody = "<div style='text-align: center; font-weight: bold; font-size: 18px;'>";
-            emailBody += "<span style='color: black!important;'> Hello!<br><br>Here is your verification code :</span><br><br>";
+            emailBody += $"<span style='color: black!important;'> Hello {db_user.UserProfile.FirstName}<br><br>Here is your verification code :</span><br><br>";
             emailBody += $"<span style='font-size:27px!important; letter-spacing: 1px; background: linear-gradient(112deg, rgba(244,222,81,1) 0%, rgba(242,180,30,1) 91%); color: white; padding: 7px; padding-left: 10px; padding-right: 10px; border-radius: 4px;'>{db_user.VerificationToken}</span></div><br>";
 
             var email = new MimeMessage();
@@ -412,6 +415,7 @@ namespace FishPortMS.Server.Services.AccountService
             user.PhoneNumber = request.Phone;
             user.City = request.City;
             user.Address = request.Address;
+            user.Region = request.Region;
             user.City = request.City;
             user.Avatar = request.Avatar;
 
