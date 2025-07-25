@@ -63,7 +63,31 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
         options.QueueLimit = 3;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
-           
+
+
+    rateLimiterOptions.AddPolicy("fixed-by-ip", context =>
+    RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: RateLimitingHelper.GetClientIp(context),
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+        }));
+
+
+    rateLimiterOptions.AddPolicy("verify-email", context =>
+           RateLimitPartition.GetTokenBucketLimiter(
+        partitionKey: RateLimitingHelper.GetClientIp(context), 
+         factory: _ => new TokenBucketRateLimiterOptions
+         {
+             TokenLimit = 3,               // Max tokens available
+             TokensPerPeriod = 1,          // Regen 1 token per interval
+             ReplenishmentPeriod = TimeSpan.FromSeconds(30), // Every 12s
+             QueueLimit = 0,
+             AutoReplenishment = true
+         }));
 });
 
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -89,9 +113,6 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
 }
 
-
-app.UseRateLimiter();
-
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
@@ -100,6 +121,7 @@ app.UseStaticFiles();
 app.UseAuthorization();
 app.UseAuthentication();
 
+app.UseRateLimiter();
 
 app.MapRazorPages();
 app.MapControllers();
