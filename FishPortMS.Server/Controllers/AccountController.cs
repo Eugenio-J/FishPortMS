@@ -3,6 +3,7 @@ using FishPortMS.Server.Services.AccountService;
 using FishPortMS.Shared.DTOs.AccountDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FishPortMS.Server.Controllers
 {
@@ -117,6 +118,7 @@ namespace FishPortMS.Server.Controllers
             return Ok(response);
         }
 
+        [EnableRateLimiting("verify-email")]
         [HttpPost("send-verification/{userEmail}")]
         public async Task<IActionResult> SendVerification(EmailVerificationDTO request, string userEmail)
         {
