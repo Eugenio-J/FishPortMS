@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FishPortMS.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250715160510_Added_Deducted_Amount")]
-    partial class Added_Deducted_Amount
+    [Migration("20250726163253_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -456,6 +456,9 @@ namespace FishPortMS.Server.Migrations
                     b.Property<decimal>("GrossSales")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("NetSales")
                         .HasColumnType("decimal(18,2)");
 
@@ -505,6 +508,47 @@ namespace FishPortMS.Server.Migrations
                     b.HasIndex("ReceiptId");
 
                     b.ToTable("ReceiptItems");
+                });
+
+            modelBuilder.Entity("FishPortMS.Shared.Models.Views.ReceiptSalesSummaryVM", b =>
+                {
+                    b.Property<Guid?>("BSId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateOnly")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DayOfWeek")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DeductedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GrossSales")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Hour")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NetSales")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.ToTable("VReceiptSalesSummary");
+
+                    b.ToView("VReceiptSalesSummary", (string)null);
                 });
 
             modelBuilder.Entity("FishPortMS.Shared.Models.Account.UserProfile", b =>

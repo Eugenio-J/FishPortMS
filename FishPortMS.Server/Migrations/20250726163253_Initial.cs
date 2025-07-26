@@ -84,9 +84,11 @@ namespace FishPortMS.Server.Migrations
                     GrossSales = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     NetSales = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DeductedPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DeductedAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BSId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -111,6 +113,39 @@ namespace FishPortMS.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VendorExpenseCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VendorExpenseCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VReceiptSalesSummary",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BSId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DateOnly = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Hour = table.Column<int>(type: "int", nullable: false),
+                    DayOfWeek = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Month = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    GrossSales = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NetSales = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DeductedAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
                 });
 
             migrationBuilder.CreateTable(
@@ -167,31 +202,6 @@ namespace FishPortMS.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReceiptItems",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReceiptId = table.Column<int>(type: "int", nullable: false),
-                    IsOut = table.Column<bool>(type: "bit", nullable: false),
-                    MasterProductId = table.Column<int>(type: "int", nullable: false),
-                    UOM = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CurrentPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Subtotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReceiptItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ReceiptItems_Receipts_ReceiptId",
-                        column: x => x.ReceiptId,
-                        principalTable: "Receipts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserProfiles",
                 columns: table => new
                 {
@@ -214,6 +224,33 @@ namespace FishPortMS.Server.Migrations
                         name: "FK_UserProfiles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VendorExpenses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VendorExpenseCategoryId = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ReceiptId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VendorExpenses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VendorExpenses_Receipts_ReceiptId",
+                        column: x => x.ReceiptId,
+                        principalTable: "Receipts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VendorExpenses_VendorExpenseCategories_VendorExpenseCategoryId",
+                        column: x => x.VendorExpenseCategoryId,
+                        principalTable: "VendorExpenseCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -257,6 +294,37 @@ namespace FishPortMS.Server.Migrations
                         name: "FK_ProductCarousels_MasterProducts_MasterProductId",
                         column: x => x.MasterProductId,
                         principalTable: "MasterProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReceiptItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReceiptId = table.Column<int>(type: "int", nullable: false),
+                    IsOut = table.Column<bool>(type: "bit", nullable: false),
+                    MasterProductId = table.Column<int>(type: "int", nullable: false),
+                    UOM = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CurrentPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Subtotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReceiptItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReceiptItems_MasterProducts_MasterProductId",
+                        column: x => x.MasterProductId,
+                        principalTable: "MasterProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReceiptItems_Receipts_ReceiptId",
+                        column: x => x.ReceiptId,
+                        principalTable: "Receipts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -309,6 +377,11 @@ namespace FishPortMS.Server.Migrations
                 column: "MasterProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ReceiptItems_MasterProductId",
+                table: "ReceiptItems",
+                column: "MasterProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ReceiptItems_ReceiptId",
                 table: "ReceiptItems",
                 column: "ReceiptId");
@@ -318,6 +391,16 @@ namespace FishPortMS.Server.Migrations
                 table: "UserProfiles",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorExpenses_ReceiptId",
+                table: "VendorExpenses",
+                column: "ReceiptId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorExpenses_VendorExpenseCategoryId",
+                table: "VendorExpenses",
+                column: "VendorExpenseCategoryId");
         }
 
         /// <inheritdoc />
@@ -345,6 +428,12 @@ namespace FishPortMS.Server.Migrations
                 name: "ReceiptItems");
 
             migrationBuilder.DropTable(
+                name: "VendorExpenses");
+
+            migrationBuilder.DropTable(
+                name: "VReceiptSalesSummary");
+
+            migrationBuilder.DropTable(
                 name: "ExpenseCategories");
 
             migrationBuilder.DropTable(
@@ -355,6 +444,9 @@ namespace FishPortMS.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Receipts");
+
+            migrationBuilder.DropTable(
+                name: "VendorExpenseCategories");
 
             migrationBuilder.DropTable(
                 name: "Users");
