@@ -20,7 +20,7 @@ using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("FishPortSMSConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 var blobStorageConnectionString = builder.Configuration.GetValue<string>("fpstoragekey") ?? throw new InvalidOperationException("Connection string 'fpstoragekey' not found.");
 
